@@ -8,6 +8,7 @@ import curatedchallenges.challenge.Ironclad.Endoparasitic;
 import curatedchallenges.challenge.Watcher.EmotionalSupportFlower;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
+import curatedchallenges.interfaces.WinCondition;
 import curatedchallenges.util.ChallengeRegistry;
 import curatedchallenges.util.GeneralUtils;
 import curatedchallenges.util.KeywordInfo;
@@ -30,6 +31,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.localization.*;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import curatedchallenges.winconditions.CompleteActWinCondition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.scannotation.AnnotationDB;
@@ -329,39 +331,64 @@ public class CuratedChallenges implements
     }
 
     private void initializeChallengeDeck() {
-        BaseMod.logger.info("initializeChallenge called");
         Challenge challenge = getChallengeById(currentChallengeId);
         if (challenge != null) {
             AbstractPlayer player = AbstractDungeon.player;
 
             // Initialize deck
-            BaseMod.logger.info("Current deck size before clearing: " + player.masterDeck.size());
             player.masterDeck.clear();
-            BaseMod.logger.info("Deck cleared. Current size: " + player.masterDeck.size());
             for (AbstractCard card : challenge.startingDeck) {
                 player.masterDeck.addToTop(card.makeCopy());
             }
-            BaseMod.logger.info("Challenge deck initialized. New deck size: " + player.masterDeck.size());
 
             // Initialize relics
-            BaseMod.logger.info("Current relic count before clearing: " + player.relics.size());
-            BaseMod.logger.info("Current relic count before clearing: " + player.relics.size());
             player.relics.clear();
-            player.relics.removeAll(player.relics); // Ensure all relics are removed
-            BaseMod.logger.info("Relics cleared. Current count: " + player.relics.size());
             for (AbstractRelic relic : challenge.startingRelics) {
                 AbstractRelic relicCopy = relic.makeCopy();
                 relicCopy.instantObtain(player, player.relics.size(), false);
-                BaseMod.logger.info("Added relic: " + relicCopy.name);
             }
+
+            // Check if the challenge has a "Complete Act 4" win condition
+            boolean hasAct4WinCondition = false;
+            if (challenge.winConditionLogic != null) {
+                for (WinCondition condition : challenge.winConditionLogic) {
+                    if (condition instanceof CompleteActWinCondition &&
+                            ((CompleteActWinCondition) condition).getTargetAct() == 4) {
+                        hasAct4WinCondition = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hasAct4WinCondition) {
+                // Add keys
+                Settings.hasRubyKey = true;
+                Settings.hasEmeraldKey = true;
+                Settings.hasSapphireKey = true;
+            }
+
+            // Update DuVuDoll if present
             for (AbstractRelic relic : player.relics) {
                 if (relic instanceof DuVuDoll) {
                     ((DuVuDoll) relic).onMasterDeckChange();
                 }
             }
-            BaseMod.logger.info("Challenge initialized for challenge: " + currentChallengeId);
-        } else {
-            BaseMod.logger.error("Failed to find challenge with ID: " + currentChallengeId);
+        }
+    }
+
+
+    public static void checkAndSetFinalActAvailability() {
+        ChallengeDefinition definition = ChallengeRegistry.getChallenge(currentChallengeId);
+        if (definition != null) {
+            List<WinCondition> winConditions = definition.getWinConditionLogic();
+            if (winConditions != null) {
+                for (WinCondition condition : winConditions) {
+                    if (condition instanceof CompleteActWinCondition && ((CompleteActWinCondition) condition).getTargetAct() == 4) {
+                        Settings.isFinalActAvailable = true;
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -374,7 +401,7 @@ public class CuratedChallenges implements
         // No need to call updateChallengeMap() here, as ChallengesScreen will use the registry directly
     }
 
-    private Challenge getChallengeById(String challengeId) {
+    public Challenge getChallengeById(String challengeId) {
         ChallengeDefinition definition = ChallengeRegistry.getChallenge(challengeId);
         if (definition != null) {
             Challenge challenge = new Challenge(
@@ -386,7 +413,8 @@ public class CuratedChallenges implements
             challenge.initializeTinyCards();
             challenge.startingRelics = definition.getStartingRelics();
             challenge.specialRules = definition.getSpecialRules();
-            challenge.winConditions = definition.getWinConditions();
+            challenge.winConditions = definition.getWinConditions(); // String for display
+            challenge.winConditionLogic = definition.getWinConditionLogic(); // Actual logic
             return challenge;
         }
         return null;

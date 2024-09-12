@@ -1,13 +1,16 @@
 package curatedchallenges.challenge.Watcher;
 
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import curatedchallenges.winconditions.CompleteActWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.purple.*;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.relics.*;
+import curatedchallenges.interfaces.WinCondition;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EmotionalSupportFlower implements ChallengeDefinition {
 
@@ -63,6 +66,13 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
 
     @Override
     public String getWinConditions() {
-        return "Defeat the Act 3 boss.";
+        return "Complete Act 3.";
+    }
+
+    @Override
+    public List<WinCondition> getWinConditionLogic() {
+        List<WinCondition> conditions = new ArrayList<>();
+        conditions.add(new CompleteActWinCondition(3));
+        return conditions;
     }
 }

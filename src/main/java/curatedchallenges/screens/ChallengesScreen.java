@@ -107,7 +107,8 @@ public class ChallengesScreen {
         challenge.initializeTinyCards();
         challenge.startingRelics = initializeRelics(definition.getStartingRelics());
         challenge.specialRules = definition.getSpecialRules();
-        challenge.winConditions = definition.getWinConditions();
+        challenge.winConditions = definition.getWinConditions(); // String for display
+        challenge.winConditionLogic = definition.getWinConditionLogic(); // Actual logic
         this.challenges.add(challenge);
     }
 
@@ -255,10 +256,6 @@ public class ChallengesScreen {
         AbstractDungeon.generateSeeds();
 
         CustomTrial trial = new CustomTrial();
-
-      //  trial.setStarterCards(getCardIds(selectedChallenge.startingDeck));
-
-       // trial.setStarterRelics(getRelicIds(selectedChallenge.startingRelics));
 
         CardCrawlGame.trial = trial;
         AbstractPlayer.customMods = CardCrawlGame.trial.dailyModIDs();

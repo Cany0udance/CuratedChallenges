@@ -5,6 +5,7 @@ import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface ChallengeDefinition {
     String getId();
@@ -13,5 +14,6 @@ public interface ChallengeDefinition {
     ArrayList<AbstractCard> getStartingDeck();
     ArrayList<AbstractRelic> getStartingRelics();
     String getSpecialRules();
-    String getWinConditions();
+    String getWinConditions(); // This returns a String for display purposes
+    List<WinCondition> getWinConditionLogic(); // New method for actual win condition logic
 }

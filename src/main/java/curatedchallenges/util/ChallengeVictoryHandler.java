@@ -7,8 +7,50 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
+import curatedchallenges.winconditions.MaxHPWinCondition;
+import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
+import curatedchallenges.interfaces.ChallengeDefinition;
+import curatedchallenges.interfaces.WinCondition;
 
 public class ChallengeVictoryHandler {
+    public static void checkVictoryConditions(String challengeId, boolean isInBossTreasureRoom) {
+        ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
+        if (challenge != null) {
+            for (WinCondition condition : challenge.getWinConditionLogic()) {
+                if ((isInBossTreasureRoom && condition.shouldCheckInBossTreasureRoom()) ||
+                        (!isInBossTreasureRoom && condition.shouldCheckInVictoryRoom())) {
+                    if (condition.isMet()) {
+                        handleVictory(challengeId);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void checkRemoveCardWinConditions(String challengeId) {
+        ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
+        if (challenge != null) {
+            for (WinCondition condition : challenge.getWinConditionLogic()) {
+                if (condition instanceof RemoveAllCardsWinCondition && condition.isMet()) {
+                    handleVictory(challengeId);
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void checkMaxHPWinCondition(String challengeId) {
+        ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
+        if (challenge != null) {
+            for (WinCondition condition : challenge.getWinConditionLogic()) {
+                if (condition instanceof MaxHPWinCondition && condition.isMet()) {
+                    handleVictory(challengeId);
+                    return;
+                }
+            }
+        }
+    }
 
     public static void handleVictory(String challengeId) {
         // Unlock achievements

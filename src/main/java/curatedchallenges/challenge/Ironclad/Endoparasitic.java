@@ -2,6 +2,8 @@ package curatedchallenges.challenge.Ironclad;
 
 import com.megacrit.cardcrawl.cards.curses.Parasite;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import curatedchallenges.winconditions.CompleteActWinCondition;
+import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.red.Bash;
@@ -10,8 +12,10 @@ import com.megacrit.cardcrawl.cards.red.Strike_Red;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.DuVuDoll;
+import curatedchallenges.interfaces.WinCondition;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Endoparasitic implements ChallengeDefinition {
     public static final String ID = "ENDOPARASITIC";
@@ -67,7 +71,14 @@ public class Endoparasitic implements ChallengeDefinition {
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3 OR NL " +
-                "remove ALL Parasites from your deck.";
+        return "Complete Act 3 OR NL remove ALL Parasites from your deck.";
+    }
+
+    @Override
+    public List<WinCondition> getWinConditionLogic() {
+        List<WinCondition> conditions = new ArrayList<>();
+        conditions.add(new CompleteActWinCondition(3));
+        conditions.add(new RemoveAllCardsWinCondition(Parasite.ID));
+        return conditions;
     }
 }

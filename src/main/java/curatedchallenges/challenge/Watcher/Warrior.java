@@ -1,6 +1,7 @@
 package curatedchallenges.challenge.Watcher;
 
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import curatedchallenges.winconditions.CompleteActWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.purple.Eruption;
@@ -11,8 +12,10 @@ import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.BlackStar;
 import com.megacrit.cardcrawl.relics.PureWater;
+import curatedchallenges.interfaces.WinCondition;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Warrior implements ChallengeDefinition {
 
@@ -65,6 +68,13 @@ public class Warrior implements ChallengeDefinition {
 
     @Override
     public String getWinConditions() {
-        return "Defeat the Act 3 boss.";
+        return "Complete Act 3.";
+    }
+
+    @Override
+    public List<WinCondition> getWinConditionLogic() {
+        List<WinCondition> conditions = new ArrayList<>();
+        conditions.add(new CompleteActWinCondition(3));
+        return conditions;
     }
 }

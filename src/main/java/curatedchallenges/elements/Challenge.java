@@ -12,11 +12,9 @@ import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
+import curatedchallenges.interfaces.WinCondition;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class Challenge {
@@ -29,7 +27,8 @@ public class Challenge {
     public ArrayList<TinyCard> tinyCards;
     public ArrayList<AbstractRelic> startingRelics;
     public String specialRules;
-    public String winConditions;
+    public String winConditions; // This is the display string
+    public List<WinCondition> winConditionLogic; // This is the actual logic
 
     private static final float NAME_OFFSET_X = 20f * Settings.scale;
     private static final float ICON_SIZE = 32f * Settings.scale;

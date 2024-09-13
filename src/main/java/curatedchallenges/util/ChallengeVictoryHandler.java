@@ -7,6 +7,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
+import curatedchallenges.winconditions.GoldThresholdWinCondition;
 import curatedchallenges.winconditions.MaxHPWinCondition;
 import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -45,6 +46,18 @@ public class ChallengeVictoryHandler {
         if (challenge != null) {
             for (WinCondition condition : challenge.getWinConditionLogic()) {
                 if (condition instanceof MaxHPWinCondition && condition.isMet()) {
+                    handleVictory(challengeId);
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void checkGoldThresholdWinCondition(String challengeId) {
+        ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
+        if (challenge != null) {
+            for (WinCondition condition : challenge.getWinConditionLogic()) {
+                if (condition instanceof GoldThresholdWinCondition && condition.isMet()) {
                     handleVictory(challengeId);
                     return;
                 }

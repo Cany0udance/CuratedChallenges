@@ -2,9 +2,15 @@ package curatedchallenges;
 
 import basemod.BaseMod;
 import basemod.interfaces.*;
+import com.megacrit.cardcrawl.cards.curses.AscendersBane;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.DuVuDoll;
+import com.megacrit.cardcrawl.relics.PandorasBox;
+import curatedchallenges.challenge.Defect.AuxiliaryPower;
+import curatedchallenges.challenge.Defect.Gamblecore;
+import curatedchallenges.challenge.Ironclad.CheatDay;
 import curatedchallenges.challenge.Ironclad.Endoparasitic;
+import curatedchallenges.challenge.Silent.Avarice;
 import curatedchallenges.challenge.Watcher.EmotionalSupportFlower;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -45,7 +51,9 @@ public class CuratedChallenges implements
         EditStringsSubscriber,
         EditKeywordsSubscriber,
         PostInitializeSubscriber,
+        OnPlayerTurnStartSubscriber,
         OnStartBattleSubscriber,
+        PostBattleSubscriber,
         StartGameSubscriber,
         PostDungeonInitializeSubscriber {
     public static ModInfo info;
@@ -233,10 +241,39 @@ public class CuratedChallenges implements
         }
     }
 
+
+    @Override
+    public void receiveOnPlayerTurnStart() {
+        if (currentChallengeId != null) {
+            ChallengeDefinition challenge = ChallengeRegistry.getChallenge(currentChallengeId);
+            if (challenge != null) {
+                challenge.applyStartOfTurnEffect(AbstractDungeon.player);
+            }
+        }
+    }
+
+
     @Override
     public void receiveOnBattleStart(AbstractRoom abstractRoom) {
         String challengeId = readChallengeIdFromSaveFile();
         BaseMod.logger.info("Current Challenge ID from save file: " + challengeId);
+
+        if (challengeId != null && !challengeId.isEmpty()) {
+            ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
+            if (challenge != null) {
+                challenge.applyStartOfBattleEffect(AbstractDungeon.player);
+            }
+        }
+    }
+
+    @Override
+    public void receivePostBattle(AbstractRoom abstractRoom) {
+        if (currentChallengeId != null) {
+            ChallengeDefinition challenge = ChallengeRegistry.getChallenge(currentChallengeId);
+            if (challenge != null) {
+                challenge.applyPostBattleEffect(AbstractDungeon.player);
+            }
+        }
     }
 
     public String readChallengeIdFromSaveFile() {
@@ -323,10 +360,27 @@ public class CuratedChallenges implements
         BaseMod.logger.info("currentChallengeId: " + currentChallengeId);
 
         if (Settings.isTrial && currentChallengeId != null) {
-            BaseMod.logger.info("Conditions met for challenge deck initialization");
+            BaseMod.logger.info("Conditions met for challenge initialization");
             initializeChallengeDeck();
+            applyStartOfRunEffect();
         } else {
-            BaseMod.logger.info("Conditions not met for challenge deck initialization");
+            BaseMod.logger.info("Conditions not met for challenge initialization");
+        }
+    }
+
+    private void applyStartOfRunEffect() {
+        ChallengeDefinition challenge = ChallengeRegistry.getChallenge(currentChallengeId);
+        if (challenge != null) {
+            challenge.applyStartOfRunEffect(AbstractDungeon.player);
+            BaseMod.logger.info("Applied start of run effect for challenge: " + currentChallengeId);
+        }
+    }
+
+    public static void applyStartOfActEffect(AbstractPlayer player, int actNumber) {
+        ChallengeDefinition challenge = ChallengeRegistry.getChallenge(currentChallengeId);
+        if (challenge != null) {
+            challenge.applyStartOfActEffect(player, actNumber);
+            BaseMod.logger.info("Applied start of act effect for challenge: " + currentChallengeId + ", Act: " + actNumber);
         }
     }
 
@@ -337,6 +391,12 @@ public class CuratedChallenges implements
 
             // Initialize deck
             player.masterDeck.clear();
+
+            // Add Ascender's Bane if Ascension level is 10 or higher
+            if (AbstractDungeon.ascensionLevel >= 10) {
+                player.masterDeck.addToTop(new AscendersBane());
+            }
+
             for (AbstractCard card : challenge.startingDeck) {
                 player.masterDeck.addToTop(card.makeCopy());
             }
@@ -372,6 +432,9 @@ public class CuratedChallenges implements
                 if (relic instanceof DuVuDoll) {
                     ((DuVuDoll) relic).onMasterDeckChange();
                 }
+                if (relic instanceof PandorasBox) {
+                    ((PandorasBox) relic).onEquip();
+                }
             }
         }
     }
@@ -392,10 +455,21 @@ public class CuratedChallenges implements
         }
     }
 
+    public static void applyPreCombatLogic(AbstractPlayer player) {
+        ChallengeDefinition challenge = ChallengeRegistry.getChallenge(currentChallengeId);
+        if (challenge != null) {
+            challenge.applyPreCombatLogic(player);
+        }
+    }
+
     private void initializeChallenges() {
         // Register built-in challenges
         ChallengeRegistry.registerChallenge(new Endoparasitic());
+        ChallengeRegistry.registerChallenge(new Avarice());
+        ChallengeRegistry.registerChallenge(new AuxiliaryPower());
+        ChallengeRegistry.registerChallenge(new Gamblecore());
         ChallengeRegistry.registerChallenge(new EmotionalSupportFlower());
+        ChallengeRegistry.registerChallenge(new CheatDay());
 
         // At this point, other mods should have had the chance to register their challenges
         // No need to call updateChallengeMap() here, as ChallengesScreen will use the registry directly

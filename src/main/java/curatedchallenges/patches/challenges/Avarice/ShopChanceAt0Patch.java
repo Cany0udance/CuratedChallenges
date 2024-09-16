@@ -1,4 +1,4 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.challenges.Avarice;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SpirePatch(clz = EventHelper.class, method = SpirePatch.CONSTRUCTOR)
-public class EventHelperPatch {
+public class ShopChanceAt0Patch {
     @SpirePostfixPatch
     public static void Postfix(EventHelper __instance) {
         if (Avarice.ID.equals(CuratedChallenges.currentChallengeId)) {
@@ -20,7 +20,7 @@ public class EventHelperPatch {
                 shopChanceField.setAccessible(true);
                 shopChanceField.setFloat(null, 0f);
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                Logger.getLogger(EventHelperPatch.class.getName()).log(Level.SEVERE, "Failed to set SHOP_CHANCE", e);
+                Logger.getLogger(ShopChanceAt0Patch.class.getName()).log(Level.SEVERE, "Failed to set SHOP_CHANCE", e);
             }
         }
     }

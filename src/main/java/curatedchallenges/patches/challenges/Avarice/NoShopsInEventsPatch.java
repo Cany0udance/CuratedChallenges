@@ -1,4 +1,4 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.challenges.Avarice;
 
 import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.megacrit.cardcrawl.helpers.EventHelper;
@@ -7,12 +7,6 @@ import curatedchallenges.CuratedChallenges;
 import curatedchallenges.challenge.Silent.Avarice;
 import javassist.CtBehavior;
 
-import java.lang.reflect.Field;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static basemod.BaseMod.logger;
-
 @SpirePatch(
         clz = EventHelper.class,
         method = "roll",
@@ -20,7 +14,7 @@ import static basemod.BaseMod.logger;
                 Random.class
         }
 )
-public class EventHelperRollPatch {
+public class NoShopsInEventsPatch {
 
     @SpireInsertPatch(
             locator = Locator.class
@@ -28,14 +22,12 @@ public class EventHelperRollPatch {
     public static void Insert(Random eventRng, @ByRef float[] ___SHOP_CHANCE) {
         if (Avarice.ID.equals(CuratedChallenges.currentChallengeId)) {
             ___SHOP_CHANCE[0] = 0f;
-            logger.info("Avarice Challenge: Set SHOP_CHANCE to 0");
         }
     }
 
     @SpirePostfixPatch
     public static EventHelper.RoomResult Postfix(EventHelper.RoomResult __result, Random eventRng) {
         if (Avarice.ID.equals(CuratedChallenges.currentChallengeId) && __result == EventHelper.RoomResult.SHOP) {
-            logger.info("Avarice Challenge: Changing SHOP result to EVENT");
             return EventHelper.RoomResult.EVENT;
         }
         return __result;

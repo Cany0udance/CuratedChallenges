@@ -1,4 +1,4 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.challenges.Avarice;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SpirePatch(clz = RoomTypeAssigner.class, method = "assignRowAsRoomType")
-public class RoomTypeAssignerPatch {
+public class GuaranteedShopPatch {
     @SpirePrefixPatch
     public static SpireReturn<Void> Prefix(ArrayList<MapRoomNode> row, Class<? extends AbstractRoom> c) {
         if (Avarice.ID.equals(CuratedChallenges.currentChallengeId) && c == TreasureRoom.class) {
@@ -25,7 +25,7 @@ public class RoomTypeAssignerPatch {
                     try {
                         n.setRoom(new ShopRoom());
                     } catch (Exception e) {
-                        Logger.getLogger(RoomTypeAssignerPatch.class.getName()).log(Level.SEVERE, "Failed to set ShopRoom", e);
+                        Logger.getLogger(GuaranteedShopPatch.class.getName()).log(Level.SEVERE, "Failed to set ShopRoom", e);
                     }
                 }
             }

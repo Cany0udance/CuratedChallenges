@@ -7,10 +7,13 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.DuVuDoll;
 import com.megacrit.cardcrawl.relics.PandorasBox;
 import curatedchallenges.challenge.Defect.AuxiliaryPower;
+import curatedchallenges.challenge.Defect.FlyingRobot;
 import curatedchallenges.challenge.Defect.Gamblecore;
 import curatedchallenges.challenge.Ironclad.CheatDay;
 import curatedchallenges.challenge.Ironclad.Endoparasitic;
 import curatedchallenges.challenge.Silent.Avarice;
+import curatedchallenges.challenge.Silent.GlassCannon;
+import curatedchallenges.challenge.Watcher.Duet;
 import curatedchallenges.challenge.Watcher.EmotionalSupportFlower;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -388,26 +391,26 @@ public class CuratedChallenges implements
         Challenge challenge = getChallengeById(currentChallengeId);
         if (challenge != null) {
             AbstractPlayer player = AbstractDungeon.player;
-
             // Initialize deck
             player.masterDeck.clear();
-
             // Add Ascender's Bane if Ascension level is 10 or higher
             if (AbstractDungeon.ascensionLevel >= 10) {
                 player.masterDeck.addToTop(new AscendersBane());
             }
-
             for (AbstractCard card : challenge.startingDeck) {
-                player.masterDeck.addToTop(card.makeCopy());
+                AbstractCard cardCopy = card.makeCopy();
+                // Preserve upgrades
+                for (int i = 0; i < card.timesUpgraded; i++) {
+                    cardCopy.upgrade();
+                }
+                player.masterDeck.addToTop(cardCopy);
             }
-
             // Initialize relics
             player.relics.clear();
             for (AbstractRelic relic : challenge.startingRelics) {
                 AbstractRelic relicCopy = relic.makeCopy();
                 relicCopy.instantObtain(player, player.relics.size(), false);
             }
-
             // Check if the challenge has a "Complete Act 4" win condition
             boolean hasAct4WinCondition = false;
             if (challenge.winConditionLogic != null) {
@@ -419,14 +422,12 @@ public class CuratedChallenges implements
                     }
                 }
             }
-
             if (hasAct4WinCondition) {
                 // Add keys
                 Settings.hasRubyKey = true;
                 Settings.hasEmeraldKey = true;
                 Settings.hasSapphireKey = true;
             }
-
             // Update DuVuDoll if present
             for (AbstractRelic relic : player.relics) {
                 if (relic instanceof DuVuDoll) {
@@ -466,8 +467,11 @@ public class CuratedChallenges implements
         // Register built-in challenges
         ChallengeRegistry.registerChallenge(new Endoparasitic());
         ChallengeRegistry.registerChallenge(new Avarice());
+        ChallengeRegistry.registerChallenge(new GlassCannon());
         ChallengeRegistry.registerChallenge(new AuxiliaryPower());
+        ChallengeRegistry.registerChallenge(new FlyingRobot());
         ChallengeRegistry.registerChallenge(new Gamblecore());
+        ChallengeRegistry.registerChallenge(new Duet());
         ChallengeRegistry.registerChallenge(new EmotionalSupportFlower());
         ChallengeRegistry.registerChallenge(new CheatDay());
 

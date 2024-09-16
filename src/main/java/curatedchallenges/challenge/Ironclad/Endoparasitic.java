@@ -2,6 +2,11 @@ package curatedchallenges.challenge.Ironclad;
 
 import com.megacrit.cardcrawl.cards.curses.Parasite;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.events.exordium.GoopPuddle;
+import com.megacrit.cardcrawl.events.exordium.ScrapOoze;
+import com.megacrit.cardcrawl.events.exordium.ShiningLight;
+import com.megacrit.cardcrawl.events.shrines.FountainOfCurseRemoval;
 import curatedchallenges.winconditions.CompleteActWinCondition;
 import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -15,6 +20,7 @@ import com.megacrit.cardcrawl.relics.DuVuDoll;
 import curatedchallenges.interfaces.WinCondition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Endoparasitic implements ChallengeDefinition {
@@ -81,4 +87,12 @@ public class Endoparasitic implements ChallengeDefinition {
         conditions.add(new RemoveAllCardsWinCondition(Parasite.ID));
         return conditions;
     }
+
+    @Override
+    public List<Class<? extends AbstractEvent>> getEventsToRemove() {
+        return Arrays.asList(
+                FountainOfCurseRemoval.class
+        );
+    }
+
 }

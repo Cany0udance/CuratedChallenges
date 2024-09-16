@@ -1,6 +1,13 @@
 package curatedchallenges.challenge.Watcher;
 
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.events.exordium.GoopPuddle;
+import com.megacrit.cardcrawl.events.exordium.ScrapOoze;
+import com.megacrit.cardcrawl.events.exordium.ShiningLight;
+import com.megacrit.cardcrawl.events.shrines.Nloth;
+import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.potions.StancePotion;
 import curatedchallenges.winconditions.CompleteActWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import com.megacrit.cardcrawl.cards.AbstractCard;
@@ -10,6 +17,7 @@ import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.interfaces.WinCondition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EmotionalSupportFlower implements ChallengeDefinition {
@@ -75,4 +83,37 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
         conditions.add(new CompleteActWinCondition(3));
         return conditions;
     }
+
+
+    @Override
+    public List<Class<? extends AbstractCard>> getCardsToRemove() {
+        return Arrays.asList(
+                Tantrum.class,
+                Indignation.class,
+                Devotion.class,
+                Crescendo.class,
+                Worship.class,
+                Eruption.class,
+                Tranquility.class,
+                Meditate.class,
+                Vigilance.class,
+                Prostrate.class,
+                Blasphemy.class,
+                Pray.class,
+                FearNoEvil.class,
+                InnerPeace.class,
+                SimmeringFury.class
+        );
+    }
+
+    @Override
+    public List<String> getRelicIdsToRemove() {
+        return Arrays.asList(TeardropLocket.ID, Damaru.ID);
+    }
+
+    @Override
+    public List<Class<? extends AbstractPotion>> getPotionsToRemove() {
+        return Arrays.asList(StancePotion.class);
+    }
+
 }

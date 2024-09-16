@@ -47,18 +47,21 @@ public class Challenge {
 
     public void initializeTinyCards() {
         this.tinyCards = new ArrayList<>();
+        Map<String, AbstractCard> cardMap = new LinkedHashMap<>();
         Map<String, Integer> cardCounts = new LinkedHashMap<>();
 
-        // Count the cards while preserving order
+        // Group cards by ID and upgrade level, preserving order
         for (AbstractCard card : this.startingDeck) {
-            cardCounts.merge(card.cardID, 1, Integer::sum);
+            String key = card.cardID + (card.upgraded ? "+" : "");
+            cardMap.putIfAbsent(key, card);
+            cardCounts.merge(key, 1, Integer::sum);
         }
 
         // Create TinyCards in the order they appear in the starting deck
         for (Map.Entry<String, Integer> entry : cardCounts.entrySet()) {
-            String cardID = entry.getKey();
+            String key = entry.getKey();
             int count = entry.getValue();
-            AbstractCard card = CardLibrary.getCard(cardID).makeCopy();
+            AbstractCard card = cardMap.get(key);
             TinyCard tinyCard = new TinyCard(card, count);
             this.tinyCards.add(tinyCard);
         }

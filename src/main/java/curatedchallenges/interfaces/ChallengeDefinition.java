@@ -20,6 +20,10 @@ public interface ChallengeDefinition {
     String getWinConditions();
     List<WinCondition> getWinConditionLogic();
 
+    default ArrayList<AbstractPotion> getStartingPotions() {
+        return new ArrayList<>();
+    }
+
     // New method for start of run effects
     default void applyStartOfRunEffect(AbstractPlayer p) {
         // Default implementation does nothing

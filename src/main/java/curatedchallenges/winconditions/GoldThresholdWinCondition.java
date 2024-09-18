@@ -24,4 +24,10 @@ public class GoldThresholdWinCondition implements WinCondition {
     public boolean shouldCheckInVictoryRoom() {
         return true;
     }
+
+    @Override
+    public boolean shouldCheckInTrueVictoryRoom() {
+        return true;
+    }
+
 }

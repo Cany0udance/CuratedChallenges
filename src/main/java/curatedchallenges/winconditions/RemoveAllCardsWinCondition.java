@@ -24,4 +24,10 @@ public class RemoveAllCardsWinCondition implements WinCondition {
     public boolean shouldCheckInVictoryRoom() {
         return false;
     }
+
+    @Override
+    public boolean shouldCheckInTrueVictoryRoom() {
+        return false;
+    }
+
 }

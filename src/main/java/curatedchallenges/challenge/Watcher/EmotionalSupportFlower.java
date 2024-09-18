@@ -51,7 +51,6 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
         deck.add(new Defend_Watcher());
         deck.add(new Defend_Watcher());
 
-        // Add other cards
         deck.add(new Wallop());
         deck.add(new EmptyFist());
 

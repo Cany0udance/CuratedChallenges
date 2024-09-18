@@ -3,16 +3,23 @@ package curatedchallenges;
 import basemod.BaseMod;
 import basemod.interfaces.*;
 import com.megacrit.cardcrawl.cards.curses.AscendersBane;
+import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.potions.PotionSlot;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.DuVuDoll;
 import com.megacrit.cardcrawl.relics.PandorasBox;
 import curatedchallenges.challenge.Defect.AuxiliaryPower;
 import curatedchallenges.challenge.Defect.FlyingRobot;
 import curatedchallenges.challenge.Defect.Gamblecore;
+import curatedchallenges.challenge.Defect.Overclocked;
 import curatedchallenges.challenge.Ironclad.CheatDay;
+import curatedchallenges.challenge.Ironclad.CursedCombo;
 import curatedchallenges.challenge.Ironclad.Endoparasitic;
 import curatedchallenges.challenge.Silent.Avarice;
+import curatedchallenges.challenge.Defect.CuriousCreatures;
 import curatedchallenges.challenge.Silent.GlassCannon;
+import curatedchallenges.challenge.Silent.TheSadist;
+import curatedchallenges.challenge.Watcher.AmpedEnemies;
 import curatedchallenges.challenge.Watcher.Duet;
 import curatedchallenges.challenge.Watcher.EmotionalSupportFlower;
 import curatedchallenges.elements.Challenge;
@@ -391,44 +398,51 @@ public class CuratedChallenges implements
         Challenge challenge = getChallengeById(currentChallengeId);
         if (challenge != null) {
             AbstractPlayer player = AbstractDungeon.player;
+
             // Initialize deck
             player.masterDeck.clear();
-            // Add Ascender's Bane if Ascension level is 10 or higher
             if (AbstractDungeon.ascensionLevel >= 10) {
                 player.masterDeck.addToTop(new AscendersBane());
             }
             for (AbstractCard card : challenge.startingDeck) {
                 AbstractCard cardCopy = card.makeCopy();
-                // Preserve upgrades
                 for (int i = 0; i < card.timesUpgraded; i++) {
                     cardCopy.upgrade();
                 }
                 player.masterDeck.addToTop(cardCopy);
             }
+
             // Initialize relics
             player.relics.clear();
             for (AbstractRelic relic : challenge.startingRelics) {
                 AbstractRelic relicCopy = relic.makeCopy();
                 relicCopy.instantObtain(player, player.relics.size(), false);
             }
-            // Check if the challenge has a "Complete Act 4" win condition
-            boolean hasAct4WinCondition = false;
-            if (challenge.winConditionLogic != null) {
-                for (WinCondition condition : challenge.winConditionLogic) {
-                    if (condition instanceof CompleteActWinCondition &&
-                            ((CompleteActWinCondition) condition).getTargetAct() == 4) {
-                        hasAct4WinCondition = true;
-                        break;
-                    }
-                }
+
+            // Initialize potions
+            player.potions.clear();
+            // Ensure the player has the correct number of potion slots
+            while (player.potions.size() < player.potionSlots) {
+                player.potions.add(new PotionSlot(player.potions.size()));
             }
+            // Now add the starting potions
+            for (int i = 0; i < challenge.startingPotions.size() && i < player.potionSlots; i++) {
+                AbstractPotion potionCopy = challenge.startingPotions.get(i).makeCopy();
+                player.obtainPotion(i, potionCopy);
+            }
+
+            // Check for Act 4 win condition
+            boolean hasAct4WinCondition = challenge.winConditionLogic.stream()
+                    .anyMatch(condition -> condition instanceof CompleteActWinCondition &&
+                            ((CompleteActWinCondition) condition).getTargetAct() == 4);
+
             if (hasAct4WinCondition) {
-                // Add keys
                 Settings.hasRubyKey = true;
                 Settings.hasEmeraldKey = true;
                 Settings.hasSapphireKey = true;
             }
-            // Update DuVuDoll if present
+
+            // Update DuVuDoll and PandorasBox if present
             for (AbstractRelic relic : player.relics) {
                 if (relic instanceof DuVuDoll) {
                     ((DuVuDoll) relic).onMasterDeckChange();
@@ -465,15 +479,20 @@ public class CuratedChallenges implements
 
     private void initializeChallenges() {
         // Register built-in challenges
+        ChallengeRegistry.registerChallenge(new CheatDay());
+        ChallengeRegistry.registerChallenge(new CursedCombo());
         ChallengeRegistry.registerChallenge(new Endoparasitic());
         ChallengeRegistry.registerChallenge(new Avarice());
+        ChallengeRegistry.registerChallenge(new CuriousCreatures());
         ChallengeRegistry.registerChallenge(new GlassCannon());
+        ChallengeRegistry.registerChallenge(new TheSadist());
         ChallengeRegistry.registerChallenge(new AuxiliaryPower());
         ChallengeRegistry.registerChallenge(new FlyingRobot());
         ChallengeRegistry.registerChallenge(new Gamblecore());
+        ChallengeRegistry.registerChallenge(new Overclocked());
+        ChallengeRegistry.registerChallenge(new AmpedEnemies());
         ChallengeRegistry.registerChallenge(new Duet());
         ChallengeRegistry.registerChallenge(new EmotionalSupportFlower());
-        ChallengeRegistry.registerChallenge(new CheatDay());
 
         // At this point, other mods should have had the chance to register their challenges
         // No need to call updateChallengeMap() here, as ChallengesScreen will use the registry directly
@@ -490,9 +509,10 @@ public class CuratedChallenges implements
             challenge.startingDeck = definition.getStartingDeck();
             challenge.initializeTinyCards();
             challenge.startingRelics = definition.getStartingRelics();
+            challenge.startingPotions = definition.getStartingPotions(); // Add this line
             challenge.specialRules = definition.getSpecialRules();
-            challenge.winConditions = definition.getWinConditions(); // String for display
-            challenge.winConditionLogic = definition.getWinConditionLogic(); // Actual logic
+            challenge.winConditions = definition.getWinConditions();
+            challenge.winConditionLogic = definition.getWinConditionLogic();
             return challenge;
         }
         return null;

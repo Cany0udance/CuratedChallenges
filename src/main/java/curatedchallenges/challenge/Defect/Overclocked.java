@@ -1,14 +1,16 @@
 package curatedchallenges.challenge.Defect;
 
+import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.blue.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.PowerTip;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
-import com.megacrit.cardcrawl.orbs.*;
+import com.megacrit.cardcrawl.powers.CombustPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
-import com.megacrit.cardcrawl.relics.GoldPlatedCables;
+import com.megacrit.cardcrawl.relics.CrackedCore;
+import com.megacrit.cardcrawl.relics.RegalPillow;
 import com.megacrit.cardcrawl.relics.WingBoots;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
@@ -17,14 +19,12 @@ import curatedchallenges.winconditions.CompleteActWinCondition;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static basemod.BaseMod.logger;
 
-public class FlyingRobot implements ChallengeDefinition {
-    public static final String ID = "FLYING_ROBOT";
+public class Overclocked implements ChallengeDefinition {
+    public static final String ID = "OVERCLOCKED";
 
     @Override
     public String getId() {
@@ -33,7 +33,7 @@ public class FlyingRobot implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Flying Robot";
+        return "Overclocked";
     }
 
     @Override
@@ -56,19 +56,24 @@ public class FlyingRobot implements ChallengeDefinition {
         deck.add(new Zap());
         deck.add(new Dualcast());
 
+        for (int i = 0; i < 2; i++) {
+            deck.add(new Overclock());
+        }
+
         return deck;
     }
 
     @Override
     public ArrayList<AbstractRelic> getStartingRelics() {
         ArrayList<AbstractRelic> relics = new ArrayList<>();
-        relics.add(RelicLibrary.getRelic(WingBoots.ID).makeCopy());
+        relics.add(RelicLibrary.getRelic(CrackedCore.ID).makeCopy());
+        relics.add(RelicLibrary.getRelic(RegalPillow.ID).makeCopy());
         return relics;
     }
 
     @Override
     public String getSpecialRules() {
-        return "Map generation will only have two paths. NL At the start of each Act, refresh your Wing Boots.";
+        return "At the start of your turn, gain the effects of the Combust power.";
 
     }
 
@@ -85,27 +90,8 @@ public class FlyingRobot implements ChallengeDefinition {
     }
 
     @Override
-    public void applyStartOfActEffect(AbstractPlayer p, int actNumber) {
-        if (actNumber > 1) {
-            AbstractRelic wingBoots = p.getRelic(WingBoots.ID);
-            if (wingBoots != null) {
-                wingBoots.setCounter(3);
-                wingBoots.usedUp = false;
-                wingBoots.grayscale = false;
-
-                wingBoots.description = wingBoots.getUpdatedDescription();
-                wingBoots.tips.clear();
-                wingBoots.tips.add(new PowerTip(wingBoots.name, wingBoots.description));
-
-                try {
-                    Method initializeTipsMethod = AbstractRelic.class.getDeclaredMethod("initializeTips");
-                    initializeTipsMethod.setAccessible(true);
-                    initializeTipsMethod.invoke(wingBoots);
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    logger.error("Failed to call initializeTips on WingBoots: " + e.getMessage());
-                }
-            }
-        }
+    public void applyStartOfTurnEffect(AbstractPlayer p) {
+        AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(p, p, new CombustPower(p, 1, 5), 5));
     }
 
 }

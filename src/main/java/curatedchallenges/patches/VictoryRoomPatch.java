@@ -11,7 +11,7 @@ public class VictoryRoomPatch {
     @SpirePostfixPatch
     public static void Postfix(VictoryRoom __instance) {
         if (CuratedChallenges.currentChallengeId != null) {
-            ChallengeVictoryHandler.checkVictoryConditions(CuratedChallenges.currentChallengeId, false);
+            ChallengeVictoryHandler.checkVictoryConditions(CuratedChallenges.currentChallengeId, false, true, false);
         }
     }
 }

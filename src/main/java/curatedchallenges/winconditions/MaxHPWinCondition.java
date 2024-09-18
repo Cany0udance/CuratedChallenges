@@ -24,4 +24,10 @@ public class MaxHPWinCondition implements WinCondition {
     public boolean shouldCheckInVictoryRoom() {
         return false;
     }
+
+    @Override
+    public boolean shouldCheckInTrueVictoryRoom() {
+        return false;
+    }
+
 }

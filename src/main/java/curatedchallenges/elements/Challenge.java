@@ -1,5 +1,6 @@
 package curatedchallenges.elements;
 
+import com.megacrit.cardcrawl.potions.AbstractPotion;
 import curatedchallenges.CuratedChallenges;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -26,6 +27,7 @@ public class Challenge {
     public ArrayList<AbstractCard> startingDeck;
     public ArrayList<TinyCard> tinyCards;
     public ArrayList<AbstractRelic> startingRelics;
+    public ArrayList<AbstractPotion> startingPotions;
     public String specialRules;
     public String winConditions; // This is the display string
     public List<WinCondition> winConditionLogic; // This is the actual logic
@@ -43,6 +45,7 @@ public class Challenge {
         this.startingDeck = new ArrayList<>();
         this.tinyCards = new ArrayList<>();
         this.startingRelics = new ArrayList<>();
+        this.startingPotions = new ArrayList<>();
     }
 
     public void initializeTinyCards() {

@@ -265,18 +265,6 @@ public class ChallengesScreen {
         CardCrawlGame.mode = CardCrawlGame.GameMode.CHAR_SELECT;
     }
 
-    private List<String> getRelicIds(ArrayList<AbstractRelic> relics) {
-        return relics.stream()
-                .map(relic -> relic.relicId)
-                .collect(Collectors.toList());
-    }
-
-    private List<String> getCardIds(ArrayList<AbstractCard> cards) {
-        return cards.stream()
-                .map(card -> card.cardID)
-                .collect(Collectors.toList());
-    }
-
     private AbstractPlayer.PlayerClass getPlayerClassFromString(String className) {
         switch (className.toUpperCase()) {
             case "IRONCLAD":

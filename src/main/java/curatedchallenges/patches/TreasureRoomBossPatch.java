@@ -11,7 +11,7 @@ public class TreasureRoomBossPatch {
     @SpirePostfixPatch
     public static void Postfix(TreasureRoomBoss __instance) {
         if (CuratedChallenges.currentChallengeId != null) {
-            ChallengeVictoryHandler.checkVictoryConditions(CuratedChallenges.currentChallengeId, true);
+            ChallengeVictoryHandler.checkVictoryConditions(CuratedChallenges.currentChallengeId, true, false, false);
         }
     }
 }

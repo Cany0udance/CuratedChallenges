@@ -12,17 +12,22 @@ public class CompleteActWinCondition implements WinCondition {
 
     @Override
     public boolean isMet() {
-        return AbstractDungeon.actNum > targetAct;
+        return AbstractDungeon.actNum == targetAct;
     }
 
     @Override
     public boolean shouldCheckInBossTreasureRoom() {
-        return true;
+        return targetAct == 1 || targetAct == 2;
     }
 
     @Override
     public boolean shouldCheckInVictoryRoom() {
-        return true;
+        return targetAct == 3;
+    }
+
+    @Override
+    public boolean shouldCheckInTrueVictoryRoom() {
+        return targetAct == 4;
     }
 
     public int getTargetAct() {

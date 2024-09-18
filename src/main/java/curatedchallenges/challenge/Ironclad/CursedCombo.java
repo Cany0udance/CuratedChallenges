@@ -1,14 +1,15 @@
-package curatedchallenges.challenge.Defect;
+package curatedchallenges.challenge.Ironclad;
 
 import com.megacrit.cardcrawl.cards.AbstractCard;
-import com.megacrit.cardcrawl.cards.blue.*;
+import com.megacrit.cardcrawl.cards.red.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.PowerTip;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
-import com.megacrit.cardcrawl.orbs.*;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
-import com.megacrit.cardcrawl.relics.GoldPlatedCables;
+import com.megacrit.cardcrawl.relics.RunicPyramid;
+import com.megacrit.cardcrawl.relics.SneckoEye;
 import com.megacrit.cardcrawl.relics.WingBoots;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
@@ -17,14 +18,12 @@ import curatedchallenges.winconditions.CompleteActWinCondition;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static basemod.BaseMod.logger;
 
-public class FlyingRobot implements ChallengeDefinition {
-    public static final String ID = "FLYING_ROBOT";
+public class CursedCombo implements ChallengeDefinition {
+    public static final String ID = "CURSED_COMBO";
 
     @Override
     public String getId() {
@@ -33,28 +32,29 @@ public class FlyingRobot implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Flying Robot";
+        return "Cursed Combo";
     }
 
     @Override
     public AbstractPlayer.PlayerClass getCharacterClass() {
-        return AbstractPlayer.PlayerClass.DEFECT;
+        return AbstractPlayer.PlayerClass.IRONCLAD;
     }
 
     @Override
     public ArrayList<AbstractCard> getStartingDeck() {
         ArrayList<AbstractCard> deck = new ArrayList<>();
 
-        for (int i = 0; i < 4; i++) {
-            deck.add(new Strike_Blue());
+        for (int i = 0; i < 5; i++) {
+            deck.add(new Strike_Red());
         }
 
         for (int i = 0; i < 4; i++) {
-            deck.add(new Defend_Blue());
+            deck.add(new Defend_Red());
         }
 
-        deck.add(new Zap());
-        deck.add(new Dualcast());
+        deck.add(new SeverSoul());
+
+        deck.add(new Bash());
 
         return deck;
     }
@@ -62,13 +62,13 @@ public class FlyingRobot implements ChallengeDefinition {
     @Override
     public ArrayList<AbstractRelic> getStartingRelics() {
         ArrayList<AbstractRelic> relics = new ArrayList<>();
-        relics.add(RelicLibrary.getRelic(WingBoots.ID).makeCopy());
+        relics.add(RelicLibrary.getRelic(SneckoEye.ID).makeCopy());
         return relics;
     }
 
     @Override
     public String getSpecialRules() {
-        return "Map generation will only have two paths. NL At the start of each Act, refresh your Wing Boots.";
+        return "At the start of Act 2, obtain a Runic Pyramid.";
 
     }
 
@@ -86,26 +86,14 @@ public class FlyingRobot implements ChallengeDefinition {
 
     @Override
     public void applyStartOfActEffect(AbstractPlayer p, int actNumber) {
-        if (actNumber > 1) {
-            AbstractRelic wingBoots = p.getRelic(WingBoots.ID);
-            if (wingBoots != null) {
-                wingBoots.setCounter(3);
-                wingBoots.usedUp = false;
-                wingBoots.grayscale = false;
+        if (actNumber == 2) {
+            AbstractRelic runicPyramid = new RunicPyramid();
 
-                wingBoots.description = wingBoots.getUpdatedDescription();
-                wingBoots.tips.clear();
-                wingBoots.tips.add(new PowerTip(wingBoots.name, wingBoots.description));
-
-                try {
-                    Method initializeTipsMethod = AbstractRelic.class.getDeclaredMethod("initializeTips");
-                    initializeTipsMethod.setAccessible(true);
-                    initializeTipsMethod.invoke(wingBoots);
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    logger.error("Failed to call initializeTips on WingBoots: " + e.getMessage());
-                }
-            }
+            AbstractDungeon.getCurrRoom().spawnRelicAndObtain(
+                    (float) (Settings.WIDTH / 2),
+                    (float) (Settings.HEIGHT / 2),
+                    runicPyramid
+            );
         }
     }
-
 }

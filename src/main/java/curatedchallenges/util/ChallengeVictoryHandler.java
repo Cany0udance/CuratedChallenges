@@ -14,12 +14,13 @@ import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
 
 public class ChallengeVictoryHandler {
-    public static void checkVictoryConditions(String challengeId, boolean isInBossTreasureRoom) {
+    public static void checkVictoryConditions(String challengeId, boolean isInBossTreasureRoom, boolean isInVictoryRoom, boolean isInTrueVictoryRoom) {
         ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
         if (challenge != null) {
             for (WinCondition condition : challenge.getWinConditionLogic()) {
                 if ((isInBossTreasureRoom && condition.shouldCheckInBossTreasureRoom()) ||
-                        (!isInBossTreasureRoom && condition.shouldCheckInVictoryRoom())) {
+                        (isInVictoryRoom && condition.shouldCheckInVictoryRoom()) ||
+                        (isInTrueVictoryRoom && condition.shouldCheckInTrueVictoryRoom())) {
                     if (condition.isMet()) {
                         handleVictory(challengeId);
                         return;

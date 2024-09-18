@@ -3,11 +3,13 @@ package curatedchallenges;
 import basemod.BaseMod;
 import basemod.interfaces.*;
 import com.megacrit.cardcrawl.cards.curses.AscendersBane;
+import com.megacrit.cardcrawl.monsters.city.Snecko;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.potions.PotionSlot;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.DuVuDoll;
 import com.megacrit.cardcrawl.relics.PandorasBox;
+import com.megacrit.cardcrawl.relics.SneckoEye;
 import curatedchallenges.challenge.Defect.AuxiliaryPower;
 import curatedchallenges.challenge.Defect.FlyingRobot;
 import curatedchallenges.challenge.Defect.Gamblecore;
@@ -18,6 +20,7 @@ import curatedchallenges.challenge.Ironclad.Endoparasitic;
 import curatedchallenges.challenge.Silent.Avarice;
 import curatedchallenges.challenge.Defect.CuriousCreatures;
 import curatedchallenges.challenge.Silent.GlassCannon;
+import curatedchallenges.challenge.Silent.TheBestDefense;
 import curatedchallenges.challenge.Silent.TheSadist;
 import curatedchallenges.challenge.Watcher.AmpedEnemies;
 import curatedchallenges.challenge.Watcher.Duet;
@@ -450,6 +453,9 @@ public class CuratedChallenges implements
                 if (relic instanceof PandorasBox) {
                     ((PandorasBox) relic).onEquip();
                 }
+                if (relic instanceof SneckoEye) {
+                    ((SneckoEye) relic).onEquip();
+                }
             }
         }
     }
@@ -485,6 +491,7 @@ public class CuratedChallenges implements
         ChallengeRegistry.registerChallenge(new Avarice());
         ChallengeRegistry.registerChallenge(new CuriousCreatures());
         ChallengeRegistry.registerChallenge(new GlassCannon());
+        ChallengeRegistry.registerChallenge(new TheBestDefense());
         ChallengeRegistry.registerChallenge(new TheSadist());
         ChallengeRegistry.registerChallenge(new AuxiliaryPower());
         ChallengeRegistry.registerChallenge(new FlyingRobot());
@@ -504,7 +511,7 @@ public class CuratedChallenges implements
             Challenge challenge = new Challenge(
                     definition.getId(),
                     definition.getName(),
-                    definition.getCharacterClass().toString()
+                    definition.getCharacterClass()
             );
             challenge.startingDeck = definition.getStartingDeck();
             challenge.initializeTinyCards();

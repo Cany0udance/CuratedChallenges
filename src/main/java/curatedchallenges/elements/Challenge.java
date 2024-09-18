@@ -1,5 +1,6 @@
 package curatedchallenges.elements;
 
+import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import curatedchallenges.CuratedChallenges;
 import com.badlogic.gdx.graphics.Color;
@@ -21,7 +22,7 @@ import java.util.*;
 public class Challenge {
     public String id;
     public String name;
-    public String characterClass;
+    public AbstractPlayer.PlayerClass characterClass;
     public boolean selected;
     public Hitbox hb;
     public ArrayList<AbstractCard> startingDeck;
@@ -36,7 +37,7 @@ public class Challenge {
     private static final float ICON_SIZE = 32f * Settings.scale;
     private static final float ICON_SPACING = 10f * Settings.scale;
 
-    public Challenge(String id, String name, String characterClass) {
+    public Challenge(String id, String name, AbstractPlayer.PlayerClass characterClass) {
         this.id = id;
         this.name = name;
         this.characterClass = characterClass;
@@ -110,6 +111,10 @@ public class Challenge {
 
     private boolean isAchievementUnlocked(String achievementKey) {
         return UnlockTracker.isAchievementUnlocked(CuratedChallenges.makeID(achievementKey));
+    }
+
+    public AbstractPlayer.PlayerClass getCharacterClass() {
+        return this.characterClass;
     }
 
     @Override

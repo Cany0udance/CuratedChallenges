@@ -50,7 +50,7 @@ public class ChallengesScreen {
     private static final float EMBARK_BUTTON_Y = Settings.HEIGHT * 0.2f;
     public ArrayList<CustomModeCharacterButton> characterButtons;
     public ArrayList<Challenge> challenges;
-    public String selectedCharacter;
+    public AbstractPlayer.PlayerClass selectedCharacter;
     public boolean isScreenOpened;
     private ChallengesScreenRenderer renderer;
 
@@ -101,7 +101,7 @@ public class ChallengesScreen {
         Challenge challenge = new Challenge(
                 definition.getId(),
                 definition.getName(),
-                definition.getCharacterClass().toString()
+                definition.getCharacterClass()
         );
         challenge.startingDeck = definition.getStartingDeck();
         challenge.initializeTinyCards();
@@ -163,8 +163,8 @@ public class ChallengesScreen {
                 if (!button.selected) {
                     deselectOtherOptions(button);
                     button.selected = true;
-                    String newSelectedCharacter = button.c.chosenClass.toString();
-                    if (!newSelectedCharacter.equals(this.selectedCharacter)) {
+                    AbstractPlayer.PlayerClass newSelectedCharacter = button.c.chosenClass;
+                    if (newSelectedCharacter != this.selectedCharacter) {
                         deselectAllChallenges();
                         this.selectedCharacter = newSelectedCharacter;
                     }
@@ -227,7 +227,6 @@ public class ChallengesScreen {
         if (selectedChallenge == null) {
             return;
         }
-
         if (this.ascension20Button.enabled) {
             AbstractDungeon.isAscensionMode = true;
             AbstractDungeon.ascensionLevel = 20;
@@ -236,7 +235,8 @@ public class ChallengesScreen {
             AbstractDungeon.ascensionLevel = 0;
         }
 
-        AbstractPlayer.PlayerClass playerClass = getPlayerClassFromString(selectedChallenge.characterClass);
+        // Get the PlayerClass directly from the challenge definition
+        AbstractPlayer.PlayerClass playerClass = selectedChallenge.getCharacterClass();
         CardCrawlGame.chosenCharacter = playerClass;
 
         CardCrawlGame.mainMenuScreen.isFadingOut = true;
@@ -244,7 +244,6 @@ public class ChallengesScreen {
         Settings.isTrial = true;
         Settings.isDailyRun = false;
         Settings.isEndless = false;
-
         if (this.currentSeed.isEmpty()) {
             long sourceTime = System.nanoTime();
             com.megacrit.cardcrawl.random.Random rng = new com.megacrit.cardcrawl.random.Random(sourceTime);
@@ -252,16 +251,12 @@ public class ChallengesScreen {
         } else {
             Settings.seed = Long.parseLong(this.currentSeed);
         }
-
         AbstractDungeon.generateSeeds();
-
         CustomTrial trial = new CustomTrial();
-
         CardCrawlGame.trial = trial;
         AbstractPlayer.customMods = CardCrawlGame.trial.dailyModIDs();
         currentChallenge = selectedChallenge;
         CuratedChallenges.startChallengeRun(selectedChallenge.id);
-
         CardCrawlGame.mode = CardCrawlGame.GameMode.CHAR_SELECT;
     }
 
@@ -306,7 +301,7 @@ public class ChallengesScreen {
         if (this.selectedCharacter != null) {
             float startY = ChallengesScreenRenderer.DESCRIPTION_START_Y - CHALLENGE_LIST_Y_OFFSET;
             for (Challenge challenge : this.challenges) {
-                if (challenge.characterClass.equals(this.selectedCharacter)) {
+                if (challenge.characterClass == this.selectedCharacter) {
                     challenge.update(startY);
                     if (InputHelper.justClickedLeft && challenge.hb.hovered) {
                         selectChallenge(challenge);
@@ -319,10 +314,11 @@ public class ChallengesScreen {
 
     private void selectChallenge(Challenge selectedChallenge) {
         challenges.stream()
-                .filter(challenge -> challenge.characterClass.equals(this.selectedCharacter))
+                .filter(challenge -> challenge.characterClass == this.selectedCharacter)
                 .forEach(challenge -> challenge.selected = (challenge == selectedChallenge));
         CardCrawlGame.sound.playA("UI_CLICK_1", -0.4F);
     }
+
 
     private void deselectOtherOptions(CustomModeCharacterButton selectedButton) {
         characterButtons.stream()

@@ -40,9 +40,13 @@ public class RemoveAddItemsPatch {
             AbstractDungeon.commonCardPool.group.removeIf(shouldRemove);
             AbstractDungeon.uncommonCardPool.group.removeIf(shouldRemove);
             AbstractDungeon.rareCardPool.group.removeIf(shouldRemove);
+            AbstractDungeon.colorlessCardPool.group.removeIf(shouldRemove);
+            AbstractDungeon.curseCardPool.group.removeIf(shouldRemove);
             AbstractDungeon.srcCommonCardPool.group.removeIf(shouldRemove);
             AbstractDungeon.srcUncommonCardPool.group.removeIf(shouldRemove);
             AbstractDungeon.srcRareCardPool.group.removeIf(shouldRemove);
+            AbstractDungeon.srcColorlessCardPool.group.removeIf(shouldRemove);
+            AbstractDungeon.srcCurseCardPool.group.removeIf(shouldRemove);
         }
 
         private static void addCardsToPools(List<Class<? extends AbstractCard>> cardClasses) {
@@ -62,6 +66,14 @@ public class RemoveAddItemsPatch {
                             AbstractDungeon.rareCardPool.addToTop(card);
                             AbstractDungeon.srcRareCardPool.addToBottom(card);
                             break;
+                        case CURSE:
+                            AbstractDungeon.curseCardPool.addToTop(card);
+                            AbstractDungeon.srcCurseCardPool.addToBottom(card);
+                            break;
+                    }
+                    if (card.color == AbstractCard.CardColor.COLORLESS) {
+                        AbstractDungeon.colorlessCardPool.addToTop(card);
+                        AbstractDungeon.srcColorlessCardPool.addToBottom(card);
                     }
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();

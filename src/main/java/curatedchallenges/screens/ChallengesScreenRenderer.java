@@ -1,5 +1,6 @@
 package curatedchallenges.screens;
 
+import com.badlogic.gdx.graphics.Color;
 import curatedchallenges.effects.MenuFireEffect;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.screens.ChallengesScreen;
@@ -13,6 +14,7 @@ import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ChallengesScreenRenderer {
@@ -130,30 +132,70 @@ public class ChallengesScreenRenderer {
         StringBuilder line = new StringBuilder();
         float currentY = startY;
         float lineSpacing = useReducedSpacing ? REDUCED_LINE_SPACING : LINE_SPACING;
+        List<ColoredWord> coloredWords = new ArrayList<>();
 
         for (String word : words) {
             if (word.equals("NL")) {
-                FontHelper.renderFontLeftTopAligned(sb, FontHelper.cardDescFont_N, line.toString(), DESCRIPTION_X, currentY, Settings.CREAM_COLOR);
+                renderColoredLine(sb, coloredWords, DESCRIPTION_X, currentY);
                 currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
+                coloredWords.clear();
                 line = new StringBuilder();
             } else {
+                Color wordColor = Settings.CREAM_COLOR;
+                if (word.startsWith("#")) {
+                    wordColor = getColorFromTag(word.substring(0, 2));
+                    word = word.substring(2); // Remove color tag but keep the word
+                }
                 String potentialLine = line + (line.length() > 0 ? " " : "") + word;
                 if (FontHelper.getSmartWidth(FontHelper.cardDescFont_N, potentialLine, DESCRIPTION_WIDTH, lineSpacing) > DESCRIPTION_WIDTH) {
-                    FontHelper.renderFontLeftTopAligned(sb, FontHelper.cardDescFont_N, line.toString(), DESCRIPTION_X, currentY, Settings.CREAM_COLOR);
+                    renderColoredLine(sb, coloredWords, DESCRIPTION_X, currentY);
                     currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
+                    coloredWords.clear();
                     line = new StringBuilder(word);
+                    coloredWords.add(new ColoredWord(word, wordColor));
                 } else {
                     line.append(line.length() > 0 ? " " : "").append(word);
+                    coloredWords.add(new ColoredWord(word, wordColor));
                 }
             }
         }
 
-        if (line.length() > 0) {
-            FontHelper.renderFontLeftTopAligned(sb, FontHelper.cardDescFont_N, line.toString(), DESCRIPTION_X, currentY, Settings.CREAM_COLOR);
+        if (!coloredWords.isEmpty()) {
+            renderColoredLine(sb, coloredWords, DESCRIPTION_X, currentY);
             currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
         }
 
+        coloredWords.clear();
         return currentY;
+    }
+
+    private void renderColoredLine(SpriteBatch sb, List<ColoredWord> coloredWords, float x, float y) {
+        float currentX = x;
+        for (ColoredWord coloredWord : coloredWords) {
+            FontHelper.renderFont(sb, FontHelper.cardDescFont_N, coloredWord.word, currentX, y, coloredWord.color);
+            currentX += FontHelper.getSmartWidth(FontHelper.cardDescFont_N, coloredWord.word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
+        }
+    }
+
+    private Color getColorFromTag(String tag) {
+        switch (tag) {
+            case "#r": return Settings.RED_TEXT_COLOR;
+            case "#g": return Settings.GREEN_TEXT_COLOR;
+            case "#b": return Settings.BLUE_TEXT_COLOR;
+            case "#y": return Settings.GOLD_COLOR;
+            case "#p": return Settings.PURPLE_COLOR;
+            default: return Settings.CREAM_COLOR;
+        }
+    }
+
+    private static class ColoredWord {
+        String word;
+        Color color;
+
+        ColoredWord(String word, Color color) {
+            this.word = word;
+            this.color = color;
+        }
     }
 
     private String getDescriptionForHeader(Challenge challenge, String header) {

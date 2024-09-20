@@ -11,11 +11,15 @@ import com.megacrit.cardcrawl.cards.purple.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.potions.DexterityPotion;
+import com.megacrit.cardcrawl.potions.SpeedPotion;
+import com.megacrit.cardcrawl.potions.StancePotion;
+import com.megacrit.cardcrawl.powers.DexterityPower;
 import com.megacrit.cardcrawl.powers.EnvenomPower;
 import com.megacrit.cardcrawl.powers.SadisticPower;
 import com.megacrit.cardcrawl.powers.StrengthPower;
 import com.megacrit.cardcrawl.relics.*;
-import com.sun.xml.internal.bind.v2.model.annotation.Quick;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
 import curatedchallenges.winconditions.CompleteActWinCondition;
@@ -50,11 +54,9 @@ public class TheBestDefense implements ChallengeDefinition {
             deck.add(new Strike_Green());
         }
 
-        for (int i = 0; i < 2; i++) {
-            deck.add(new Slice());
+        for (int i = 0; i < 3; i++) {
+            deck.add(new QuickSlash());
         }
-
-        deck.add(new QuickSlash());
 
         deck.add(new Neutralize());
 
@@ -66,7 +68,6 @@ public class TheBestDefense implements ChallengeDefinition {
     @Override
     public ArrayList<AbstractRelic> getStartingRelics() {
         ArrayList<AbstractRelic> relics = new ArrayList<>();
-        relics.add(RelicLibrary.getRelic(NinjaScroll.ID).makeCopy());
         relics.add(RelicLibrary.getRelic(OrnamentalFan.ID).makeCopy());
         return relics;
     }
@@ -112,6 +113,11 @@ public class TheBestDefense implements ChallengeDefinition {
     @Override
     public List<String> getRelicIdsToRemove() {
         return Arrays.asList(PrismaticShard.ID);
+    }
+
+    @Override
+    public List<Class<? extends AbstractPotion>> getPotionsToRemove() {
+        return Arrays.asList(DexterityPotion.class, SpeedPotion.class);
     }
 
     @Override

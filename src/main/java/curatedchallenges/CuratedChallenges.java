@@ -6,10 +6,7 @@ import com.megacrit.cardcrawl.cards.curses.AscendersBane;
 import com.megacrit.cardcrawl.monsters.city.Snecko;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.potions.PotionSlot;
-import com.megacrit.cardcrawl.relics.AbstractRelic;
-import com.megacrit.cardcrawl.relics.DuVuDoll;
-import com.megacrit.cardcrawl.relics.PandorasBox;
-import com.megacrit.cardcrawl.relics.SneckoEye;
+import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.challenge.Defect.AuxiliaryPower;
 import curatedchallenges.challenge.Defect.FlyingRobot;
 import curatedchallenges.challenge.Defect.Gamblecore;
@@ -17,6 +14,7 @@ import curatedchallenges.challenge.Defect.Overclocked;
 import curatedchallenges.challenge.Ironclad.CheatDay;
 import curatedchallenges.challenge.Ironclad.CursedCombo;
 import curatedchallenges.challenge.Ironclad.Endoparasitic;
+import curatedchallenges.challenge.Ironclad.Necronomics;
 import curatedchallenges.challenge.Silent.Avarice;
 import curatedchallenges.challenge.Defect.CuriousCreatures;
 import curatedchallenges.challenge.Silent.GlassCannon;
@@ -25,6 +23,7 @@ import curatedchallenges.challenge.Silent.TheSadist;
 import curatedchallenges.challenge.Watcher.AmpedEnemies;
 import curatedchallenges.challenge.Watcher.Duet;
 import curatedchallenges.challenge.Watcher.EmotionalSupportFlower;
+import curatedchallenges.challenge.Watcher.FastTrack;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
@@ -76,7 +75,7 @@ public class CuratedChallenges implements
     private static final String SAVE_KEY = "CurrentChallengeId";
     private static final String CHALLENGE_RUN_KEY = "IsChallengeRun";
     public static String currentChallengeId = null;
-    private static final Map<String, Challenge> challengeMap = new HashMap<>();
+
     public static final Logger logger = LogManager.getLogger(modID); //Used to output to the console.
 
     //This is used to prefix the IDs of various objects like cards and relics,
@@ -445,7 +444,6 @@ public class CuratedChallenges implements
                 Settings.hasSapphireKey = true;
             }
 
-            // Update DuVuDoll and PandorasBox if present
             for (AbstractRelic relic : player.relics) {
                 if (relic instanceof DuVuDoll) {
                     ((DuVuDoll) relic).onMasterDeckChange();
@@ -455,6 +453,9 @@ public class CuratedChallenges implements
                 }
                 if (relic instanceof SneckoEye) {
                     ((SneckoEye) relic).onEquip();
+                }
+                if (relic instanceof Necronomicon) {
+                    ((Necronomicon) relic).onEquip();
                 }
             }
         }
@@ -484,25 +485,34 @@ public class CuratedChallenges implements
     }
 
     private void initializeChallenges() {
-        // Register built-in challenges
+        // Ironclad Challenges
+
+        ChallengeRegistry.registerChallenge(new Endoparasitic());
         ChallengeRegistry.registerChallenge(new CheatDay());
         ChallengeRegistry.registerChallenge(new CursedCombo());
-        ChallengeRegistry.registerChallenge(new Endoparasitic());
+        ChallengeRegistry.registerChallenge(new Necronomics());
+
+        // Silent Challenges
+
         ChallengeRegistry.registerChallenge(new Avarice());
-        ChallengeRegistry.registerChallenge(new CuriousCreatures());
         ChallengeRegistry.registerChallenge(new GlassCannon());
         ChallengeRegistry.registerChallenge(new TheBestDefense());
         ChallengeRegistry.registerChallenge(new TheSadist());
+
+        // Defect Challenges
+
         ChallengeRegistry.registerChallenge(new AuxiliaryPower());
         ChallengeRegistry.registerChallenge(new FlyingRobot());
+        ChallengeRegistry.registerChallenge(new CuriousCreatures());
         ChallengeRegistry.registerChallenge(new Gamblecore());
         ChallengeRegistry.registerChallenge(new Overclocked());
-        ChallengeRegistry.registerChallenge(new AmpedEnemies());
-        ChallengeRegistry.registerChallenge(new Duet());
-        ChallengeRegistry.registerChallenge(new EmotionalSupportFlower());
 
-        // At this point, other mods should have had the chance to register their challenges
-        // No need to call updateChallengeMap() here, as ChallengesScreen will use the registry directly
+        // Watcher Challenges
+
+        ChallengeRegistry.registerChallenge(new EmotionalSupportFlower());
+        ChallengeRegistry.registerChallenge(new Duet());
+        ChallengeRegistry.registerChallenge(new FastTrack());
+        ChallengeRegistry.registerChallenge(new AmpedEnemies());
     }
 
     public Challenge getChallengeById(String challengeId) {

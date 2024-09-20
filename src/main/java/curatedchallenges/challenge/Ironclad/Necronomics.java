@@ -1,30 +1,29 @@
 package curatedchallenges.challenge.Ironclad;
 
-import com.megacrit.cardcrawl.cards.curses.Parasite;
-import com.megacrit.cardcrawl.characters.AbstractPlayer;
-import com.megacrit.cardcrawl.events.AbstractEvent;
-import com.megacrit.cardcrawl.events.exordium.GoopPuddle;
-import com.megacrit.cardcrawl.events.exordium.ScrapOoze;
-import com.megacrit.cardcrawl.events.exordium.ShiningLight;
-import com.megacrit.cardcrawl.events.shrines.FountainOfCurseRemoval;
-import curatedchallenges.winconditions.CompleteActWinCondition;
-import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
-import curatedchallenges.interfaces.ChallengeDefinition;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.cards.curses.Parasite;
 import com.megacrit.cardcrawl.cards.red.Bash;
 import com.megacrit.cardcrawl.cards.red.Defend_Red;
 import com.megacrit.cardcrawl.cards.red.Strike_Red;
+import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.events.shrines.FountainOfCurseRemoval;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
+import com.megacrit.cardcrawl.relics.BurningBlood;
 import com.megacrit.cardcrawl.relics.DuVuDoll;
+import com.megacrit.cardcrawl.relics.Necronomicon;
+import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
+import curatedchallenges.winconditions.CompleteActWinCondition;
+import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Endoparasitic implements ChallengeDefinition {
-    public static final String ID = "ENDOPARASITIC";
+public class Necronomics implements ChallengeDefinition {
+    public static final String ID = "NECRONOMICS";
 
     @Override
     public String getId() {
@@ -33,7 +32,7 @@ public class Endoparasitic implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "#rEndoparasitic";
+        return "Necronomics";
     }
 
     @Override
@@ -44,10 +43,6 @@ public class Endoparasitic implements ChallengeDefinition {
     @Override
     public ArrayList<AbstractCard> getStartingDeck() {
         ArrayList<AbstractCard> deck = new ArrayList<>();
-
-        for (int i = 0; i < 6; i++) {
-            deck.add(new Parasite());
-        }
 
         for (int i = 0; i < 5; i++) {
             deck.add(new Strike_Red());
@@ -65,34 +60,27 @@ public class Endoparasitic implements ChallengeDefinition {
     @Override
     public ArrayList<AbstractRelic> getStartingRelics() {
         ArrayList<AbstractRelic> relics = new ArrayList<>();
-        relics.add(RelicLibrary.getRelic(DuVuDoll.ID).makeCopy());
+        relics.add(RelicLibrary.getRelic(BurningBlood.ID).makeCopy());
+        relics.add(RelicLibrary.getRelic(Necronomicon.ID).makeCopy());
         return relics;
     }
 
     @Override
     public String getSpecialRules() {
-        return "None";
+        return "Whenever you play a card, increase its cost by 1 for the rest of combat.";
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3 OR NL remove ALL Parasites from your deck.";
+        return "Complete Act 3.";
     }
 
     @Override
     public List<WinCondition> getWinConditionLogic() {
         List<WinCondition> conditions = new ArrayList<>();
         conditions.add(new CompleteActWinCondition(3));
-        conditions.add(new RemoveAllCardsWinCondition(Parasite.ID));
         return conditions;
-    }
-
-    @Override
-    public List<Class<? extends AbstractEvent>> getEventsToRemove() {
-        return Arrays.asList(
-                FountainOfCurseRemoval.class
-        );
     }
 
 }

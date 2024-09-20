@@ -15,13 +15,15 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import curatedchallenges.interfaces.WinCondition;
+import curatedchallenges.screens.ChallengesScreenRenderer;
 
 import java.util.*;
 
 
 public class Challenge {
     public String id;
-    public String name;
+    private String name;
+    private List<ColoredWord> coloredName;
     public AbstractPlayer.PlayerClass characterClass;
     public boolean selected;
     public Hitbox hb;
@@ -35,11 +37,14 @@ public class Challenge {
 
     private static final float NAME_OFFSET_X = 20f * Settings.scale;
     private static final float ICON_SIZE = 32f * Settings.scale;
-    private static final float ICON_SPACING = 10f * Settings.scale;
+    private static final float ICON_SPACING = 80f * Settings.scale;
+    private static final float DESCRIPTION_WIDTH = Settings.WIDTH * 0.4f;
+    private static final float LINE_SPACING = 30f * Settings.scale;
+
 
     public Challenge(String id, String name, AbstractPlayer.PlayerClass characterClass) {
         this.id = id;
-        this.name = name;
+        setName(name);
         this.characterClass = characterClass;
         this.selected = false;
         this.hb = new Hitbox(300f * Settings.scale, 80f * Settings.scale);
@@ -47,6 +52,40 @@ public class Challenge {
         this.tinyCards = new ArrayList<>();
         this.startingRelics = new ArrayList<>();
         this.startingPotions = new ArrayList<>();
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        this.coloredName = parseColoredText(name);
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    private List<ColoredWord> parseColoredText(String text) {
+        List<ColoredWord> result = new ArrayList<>();
+        String[] words = text.split(" ");
+        for (String word : words) {
+            Color wordColor = Settings.CREAM_COLOR;
+            if (word.startsWith("#")) {
+                wordColor = getColorFromTag(word.substring(0, 2));
+                word = word.substring(2);
+            }
+            result.add(new ColoredWord(word, wordColor));
+        }
+        return result;
+    }
+
+    private Color getColorFromTag(String tag) {
+        switch (tag) {
+            case "#r": return Settings.RED_TEXT_COLOR;
+            case "#g": return Settings.GREEN_TEXT_COLOR;
+            case "#b": return Settings.BLUE_TEXT_COLOR;
+            case "#y": return Settings.GOLD_COLOR;
+            case "#p": return Settings.PURPLE_COLOR;
+            default: return Settings.CREAM_COLOR;
+        }
     }
 
     public void initializeTinyCards() {
@@ -82,9 +121,13 @@ public class Challenge {
         // Render achievement icons
         renderAchievementIcons(sb);
 
-        // Render challenge name
+        // Render colored challenge name
         float adjustedX = this.hb.cX - 140f * Settings.scale + NAME_OFFSET_X;
-        FontHelper.renderFontLeftDownAligned(sb, FontHelper.cardTitleFont, this.name, adjustedX, this.hb.cY, Settings.CREAM_COLOR);
+        float currentX = adjustedX;
+        for (ColoredWord coloredWord : this.coloredName) {
+            FontHelper.renderFont(sb, FontHelper.cardTitleFont, coloredWord.word, currentX, this.hb.cY, coloredWord.color);
+            currentX += FontHelper.getSmartWidth(FontHelper.cardTitleFont, coloredWord.word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
+        }
 
         // Render checkbox
         sb.setColor(this.selected ? Settings.GREEN_TEXT_COLOR : Color.WHITE);
@@ -101,11 +144,11 @@ public class Challenge {
 
         if (isAchievementUnlocked(this.id)) {
             sb.draw(ImageMaster.TICK, iconX, iconY, ICON_SIZE / 2f, ICON_SIZE / 2f, ICON_SIZE, ICON_SIZE, 1f, 1f, 0f, 0, 0, 64, 64, false, false);
-            iconX += ICON_SIZE + ICON_SPACING;
+            iconX += ICON_SIZE - ICON_SPACING;
         }
 
         if (isAchievementUnlocked(this.id + "_A20")) {
-            sb.draw(ImageMaster.WARNING_ICON_VFX, iconX, iconY, ICON_SIZE / 2f, ICON_SIZE / 2f, ICON_SIZE, ICON_SIZE, 1f, 1f, 0f, 0, 0, 128, 128, false, false);
+            sb.draw(ImageMaster.TP_ASCENSION, iconX, iconY, ICON_SIZE / 2f, ICON_SIZE / 2f, ICON_SIZE, ICON_SIZE, 1.5f, 1.5f, 0f, 0, 0, 64, 64, false, false);
         }
     }
 
@@ -120,6 +163,16 @@ public class Challenge {
     @Override
     public String toString() {
         return "CuratedChallenge{id='" + id + "', name='" + name + "'}";
+    }
+
+    private static class ColoredWord {
+        String word;
+        Color color;
+
+        ColoredWord(String word, Color color) {
+            this.word = word;
+            this.color = color;
+        }
     }
 
 }

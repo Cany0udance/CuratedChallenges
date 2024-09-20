@@ -10,7 +10,7 @@ import curatedchallenges.util.ChallengeVictoryHandler;
         clz = AbstractPlayer.class,
         method = "gainGold"
 )
-public class AbstractPlayerGainGoldPatch {
+public class GainGoldPatch {
     @SpirePostfixPatch
     public static void Postfix(AbstractPlayer __instance, int amount) {
         if (__instance instanceof AbstractPlayer && CuratedChallenges.currentChallengeId != null) {

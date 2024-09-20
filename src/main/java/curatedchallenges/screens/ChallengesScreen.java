@@ -40,6 +40,11 @@ public class ChallengesScreen {
     public ArrayList<MenuFireEffect> fireEffects;
     private float fireEffectTimer;
     private static final float FIRE_EFFECT_INTERVAL = 0.025F;
+    private AbstractRelic currentPopupRelic = null;
+    private int currentRelicIndex;
+    private ArrayList<AbstractRelic> currentRelicList;
+    private boolean isRelicPopupOpen = false;
+    private AbstractRelic clickStartedRelic = null;
 
     private static final float ASCENSION20_BUTTON_X = Settings.WIDTH * 0.5f;
     private static final float ASCENSION20_BUTTON_Y = Settings.HEIGHT * 0.75f;
@@ -278,17 +283,52 @@ public class ChallengesScreen {
     private void updateRelics() {
         Challenge selectedChallenge = getSelectedChallenge();
         if (selectedChallenge != null) {
+            boolean clickedOutside = InputHelper.justClickedLeft && !selectedChallenge.startingRelics.stream().anyMatch(relic -> relic.hb.hovered);
+
+            if (clickedOutside && !isRelicPopupOpen) {
+                currentRelicList = null;
+                clickStartedRelic = null;
+            }
+
             for (AbstractRelic relic : selectedChallenge.startingRelics) {
                 relic.hb.update();
                 if (relic.hb.hovered) {
                     relic.scale = Settings.scale * 1.25f;
                     CardCrawlGame.cursor.changeType(GameCursor.CursorType.INSPECT);
-                    if (InputHelper.justClickedLeft || InputHelper.justClickedRight) {
-                        CardCrawlGame.relicPopup.open(relic, selectedChallenge.startingRelics);
+
+                    if (InputHelper.justClickedLeft) {
+                        clickStartedRelic = relic;
                     }
                 } else {
                     relic.scale = Settings.scale;
                 }
+            }
+
+            if (clickStartedRelic != null && InputHelper.justReleasedClickLeft) {
+                if (clickStartedRelic.hb.hovered) {
+                    currentRelicList = selectedChallenge.startingRelics;
+                    openRelicPopup(clickStartedRelic);
+                }
+                clickStartedRelic = null;
+            }
+
+            updateRelicPopupState();
+        }
+    }
+
+    private void openRelicPopup(AbstractRelic relic) {
+        if (currentRelicList != null) {
+            CardCrawlGame.relicPopup.open(relic, currentRelicList);
+        } else {
+            CardCrawlGame.relicPopup.open(relic);
+        }
+        isRelicPopupOpen = true;
+    }
+
+    private void updateRelicPopupState() {
+        if (isRelicPopupOpen) {
+            if (!CardCrawlGame.relicPopup.isOpen) {
+                isRelicPopupOpen = false;
             }
         }
     }

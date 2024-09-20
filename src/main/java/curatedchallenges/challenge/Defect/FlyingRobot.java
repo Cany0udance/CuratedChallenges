@@ -68,7 +68,7 @@ public class FlyingRobot implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Map generation will only have two paths. NL At the start of each Act, refresh your Wing Boots.";
+        return "Map generation will only have two unconnected paths. NL At the start of each Act, refresh your Wing Boots.";
 
     }
 

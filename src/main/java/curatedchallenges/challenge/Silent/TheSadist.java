@@ -72,7 +72,7 @@ public class TheSadist implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "At the start of combat, NL lose 3 Strength, gain 1 Envenom, and gain 3 Sadistic.";
+        return "At the start of combat, lose 3 Strength, gain 1 Envenom, and gain 3 Sadistic.";
 
     }
 

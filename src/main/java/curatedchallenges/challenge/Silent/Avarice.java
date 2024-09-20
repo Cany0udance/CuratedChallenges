@@ -79,13 +79,13 @@ public class Avarice implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Shops will only appear once per Act, NL where the chest normally spawns. NL The first time you spend Gold at a shop, NL obtain an Ectoplasm.";
+        return "Shops will only appear once per Act, where the chest normally spawns. NL The first time you spend Gold at a shop, obtain an Ectoplasm.";
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3 OR NL have at least 1,500 Gold.";
+        return "Complete Act 3 OR NL Have at least 1,500 Gold.";
     }
 
     @Override

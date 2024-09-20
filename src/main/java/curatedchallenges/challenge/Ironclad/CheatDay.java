@@ -76,7 +76,7 @@ public class CheatDay implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Start with half max HP. NL At the start of combat, apply the NL effects of the Fasting power.";
+        return "Start with half max HP. NL At the start of combat, apply the effects of the Fasting power.";
 
     }
 

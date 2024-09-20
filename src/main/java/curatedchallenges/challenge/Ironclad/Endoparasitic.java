@@ -77,7 +77,7 @@ public class Endoparasitic implements ChallengeDefinition {
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3 OR NL remove ALL Parasites from your deck.";
+        return "Complete Act 3 OR NL Remove ALL Parasites from your deck.";
     }
 
     @Override

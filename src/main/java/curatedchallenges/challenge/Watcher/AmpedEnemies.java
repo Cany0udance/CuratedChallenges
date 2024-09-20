@@ -67,7 +67,7 @@ public class AmpedEnemies implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Start the run with a Smoke Bomb. NL At the start of combat, apply an Emerald Elite buff NL to ALL enemies.";
+        return "Start the run with a Smoke Bomb. NL At the start of combat, apply an Emerald Elite buff to ALL enemies.";
     }
 
     @Override

@@ -26,6 +26,9 @@ public class ChallengesScreenRenderer {
     private static final float SECTION_SPACING = 20f * Settings.scale;
     private static final float TIP_OFFSET_X = 20f;
     private static final float TIP_OFFSET_Y = 20f;
+    private static final int CHAR_LIMIT_PER_LINE = 50; // Adjust this value as needed
+    private static final String BULLET_SYMBOL = "-";
+    private static final float BULLET_SCALE = 1.2f;
     private static final String[] HEADERS = {"Starting Deck", "Starting Relics", "Special Rules", "Win Conditions"};
 
     public void render(SpriteBatch sb, ChallengesScreen screen) {
@@ -128,52 +131,65 @@ public class ChallengesScreenRenderer {
     }
 
     private float renderWrappedText(SpriteBatch sb, String text, float startY, boolean useReducedSpacing) {
-        String[] words = text.split(" ");
-        StringBuilder line = new StringBuilder();
+        String[] lines = text.split("NL");
         float currentY = startY;
         float lineSpacing = useReducedSpacing ? REDUCED_LINE_SPACING : LINE_SPACING;
-        List<ColoredWord> coloredWords = new ArrayList<>();
 
-        for (String word : words) {
-            if (word.equals("NL")) {
-                renderColoredLine(sb, coloredWords, DESCRIPTION_X, currentY);
-                currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
-                coloredWords.clear();
-                line = new StringBuilder();
-            } else {
-                Color wordColor = Settings.CREAM_COLOR;
-                if (word.startsWith("#")) {
-                    wordColor = getColorFromTag(word.substring(0, 2));
-                    word = word.substring(2); // Remove color tag but keep the word
-                }
-                String potentialLine = line + (line.length() > 0 ? " " : "") + word;
-                if (FontHelper.getSmartWidth(FontHelper.cardDescFont_N, potentialLine, DESCRIPTION_WIDTH, lineSpacing) > DESCRIPTION_WIDTH) {
-                    renderColoredLine(sb, coloredWords, DESCRIPTION_X, currentY);
-                    currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
-                    coloredWords.clear();
-                    line = new StringBuilder(word);
-                    coloredWords.add(new ColoredWord(word, wordColor));
-                } else {
-                    line.append(line.length() > 0 ? " " : "").append(word);
-                    coloredWords.add(new ColoredWord(word, wordColor));
-                }
-            }
+        for (String line : lines) {
+            currentY = renderBulletedLine(sb, line.trim(), DESCRIPTION_X, currentY, lineSpacing, true);
         }
 
-        if (!coloredWords.isEmpty()) {
-            renderColoredLine(sb, coloredWords, DESCRIPTION_X, currentY);
-            currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
-        }
-
-        coloredWords.clear();
         return currentY;
     }
 
-    private void renderColoredLine(SpriteBatch sb, List<ColoredWord> coloredWords, float x, float y) {
+    private float renderBulletedLine(SpriteBatch sb, String text, float x, float y, float lineSpacing, boolean addBullet) {
+        List<String> wrappedLines = wrapText(text, CHAR_LIMIT_PER_LINE);
+        float currentY = y;
+
+        for (int i = 0; i < wrappedLines.size(); i++) {
+            String line = wrappedLines.get(i);
+            String prefix = (i == 0 && addBullet) ? "- " : "  ";
+            renderColoredLine(sb, line, x, currentY, prefix);
+            currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
+        }
+
+        return currentY;
+    }
+
+    private List<String> wrapText(String text, int charLimit) {
+        List<String> wrappedLines = new ArrayList<>();
+        StringBuilder currentLine = new StringBuilder();
+        String[] words = text.split("\\s+");
+
+        for (String word : words) {
+            if (currentLine.length() + word.length() > charLimit) {
+                wrappedLines.add(currentLine.toString().trim());
+                currentLine = new StringBuilder();
+            }
+            currentLine.append(word).append(" ");
+        }
+
+        if (currentLine.length() > 0) {
+            wrappedLines.add(currentLine.toString().trim());
+        }
+
+        return wrappedLines;
+    }
+
+    private void renderColoredLine(SpriteBatch sb, String line, float x, float y, String prefix) {
         float currentX = x;
-        for (ColoredWord coloredWord : coloredWords) {
-            FontHelper.renderFont(sb, FontHelper.cardDescFont_N, coloredWord.word, currentX, y, coloredWord.color);
-            currentX += FontHelper.getSmartWidth(FontHelper.cardDescFont_N, coloredWord.word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
+        FontHelper.renderFont(sb, FontHelper.cardDescFont_N, prefix, currentX, y, Settings.CREAM_COLOR);
+        currentX += FontHelper.getSmartWidth(FontHelper.cardDescFont_N, prefix, DESCRIPTION_WIDTH, LINE_SPACING);
+
+        String[] words = line.split("\\s+");
+        for (String word : words) {
+            Color wordColor = Settings.CREAM_COLOR;
+            if (word.startsWith("#")) {
+                wordColor = getColorFromTag(word.substring(0, 2));
+                word = word.substring(2);
+            }
+            FontHelper.renderFont(sb, FontHelper.cardDescFont_N, word + " ", currentX, y, wordColor);
+            currentX += FontHelper.getSmartWidth(FontHelper.cardDescFont_N, word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
         }
     }
 

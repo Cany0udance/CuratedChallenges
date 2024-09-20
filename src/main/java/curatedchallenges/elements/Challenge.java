@@ -116,25 +116,45 @@ public class Challenge {
     }
 
     public void render(SpriteBatch sb) {
-        sb.setColor(Color.WHITE);
-
-        // Render achievement icons
-        renderAchievementIcons(sb);
-
-        // Render colored challenge name
-        float adjustedX = this.hb.cX - 140f * Settings.scale + NAME_OFFSET_X;
-        float currentX = adjustedX;
-        for (ColoredWord coloredWord : this.coloredName) {
-            FontHelper.renderFont(sb, FontHelper.cardTitleFont, coloredWord.word, currentX, this.hb.cY, coloredWord.color);
-            currentX += FontHelper.getSmartWidth(FontHelper.cardTitleFont, coloredWord.word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
-        }
+        float scale = Settings.isMobile ? Settings.scale * 1.2F : Settings.scale;
+        float offset_x = this.hb.cX - 140f * Settings.scale;
 
         // Render checkbox
-        sb.setColor(this.selected ? Settings.GREEN_TEXT_COLOR : Color.WHITE);
-        sb.draw(ImageMaster.CHECKBOX, this.hb.cX - 180f * Settings.scale, this.hb.cY - 32f, 32f, 32f, 64f, 64f, Settings.scale, Settings.scale, 0f, 0, 0, 64, 64, false, false);
-        if (this.selected) {
-            sb.draw(ImageMaster.TICK, this.hb.cX - 180f * Settings.scale, this.hb.cY - 32f, 32f, 32f, 64f, 64f, Settings.scale, Settings.scale, 0f, 0, 0, 64, 64, false, false);
+        if (this.hb.hovered) {
+            sb.setColor(Color.WHITE);
+            sb.draw(ImageMaster.CHECKBOX, offset_x - 32.0F, this.hb.cY - 32.0F, 32.0F, 32.0F, 64.0F, 64.0F, scale * 1.2F, scale * 1.2F, 0.0F, 0, 0, 64, 64, false, false);
+            sb.setColor(Color.GOLD);
+            sb.setBlendFunction(770, 1);
+            sb.draw(ImageMaster.CHECKBOX, offset_x - 32.0F, this.hb.cY - 32.0F, 32.0F, 32.0F, 64.0F, 64.0F, scale * 1.2F, scale * 1.2F, 0.0F, 0, 0, 64, 64, false, false);
+            sb.setBlendFunction(770, 771);
+        } else {
+            sb.setColor(Color.WHITE);
+            sb.draw(ImageMaster.CHECKBOX, offset_x - 32.0F, this.hb.cY - 32.0F, 32.0F, 32.0F, 64.0F, 64.0F, scale, scale, 0.0F, 0, 0, 64, 64, false, false);
         }
+
+        if (this.selected) {
+            sb.setColor(Color.WHITE);
+            sb.draw(ImageMaster.TICK, offset_x - 32.0F, this.hb.cY - 32.0F, 32.0F, 32.0F, 64.0F, 64.0F, scale, scale, 0.0F, 0, 0, 64, 64, false, false);
+        }
+
+        // Render colored challenge name
+        float nameOffsetX = offset_x + 46.0F * Settings.scale;
+        float nameOffsetY = this.hb.cY + 12.0F * Settings.scale;
+
+        // Toggle this line to enable/disable the gold hover effect for the title
+        boolean useGoldHoverEffect = false; // Set to true to enable the gold hover effect
+
+        float currentX = nameOffsetX;
+        for (ColoredWord coloredWord : this.coloredName) {
+            Color textColor = (useGoldHoverEffect && this.hb.hovered) ? Settings.GOLD_COLOR : coloredWord.color;
+            FontHelper.renderFont(sb, FontHelper.charDescFont, coloredWord.word, currentX, nameOffsetY, textColor);
+            currentX += FontHelper.getSmartWidth(FontHelper.charDescFont, coloredWord.word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
+        }
+
+        // Render achievement icons
+        sb.setColor(Color.WHITE);  // Ensure full opacity
+        renderAchievementIcons(sb);
+
         this.hb.render(sb);
     }
 

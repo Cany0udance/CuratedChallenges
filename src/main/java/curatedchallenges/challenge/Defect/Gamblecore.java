@@ -65,7 +65,7 @@ public class Gamblecore implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "LET'S GO GAMBLING!!!! NL At the start of each Act, NL reroll your cards into others of the same rarity and color. NL Rerolled cards keep their upgrades.";
+        return "LET'S GO GAMBLING!!!! NL At the start of each Act, reroll your cards into others of the same rarity and color. NL Rerolled cards keep their upgrades.";
 
     }
 

@@ -115,7 +115,9 @@ public class Challenge {
         this.hb.update();
     }
 
-    public void render(SpriteBatch sb) {
+    public void render(SpriteBatch sb, float scrollY) {
+        // Adjust all Y positions by adding scrollY
+        float adjustedY = this.hb.cY + scrollY;
         float scale = Settings.isMobile ? Settings.scale * 1.2F : Settings.scale;
         float offset_x = this.hb.cX - 140f * Settings.scale;
 

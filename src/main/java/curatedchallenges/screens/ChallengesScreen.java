@@ -1,5 +1,8 @@
 package curatedchallenges.screens;
 
+import com.megacrit.cardcrawl.helpers.MathHelper;
+import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
+import com.megacrit.cardcrawl.screens.mainMenu.ScrollBarListener;
 import curatedchallenges.util.ChallengeRegistry;
 import curatedchallenges.CuratedChallenges;
 import curatedchallenges.buttons.CustomToggleButton;
@@ -29,7 +32,7 @@ import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ChallengesScreen {
+public class ChallengesScreen implements ScrollBarListener {
     private String currentSeed = "";
     private static final float CHARACTER_ICON_X = Settings.WIDTH * 0.5f;
     private static final float CHARACTER_ICON_Y = Settings.HEIGHT * 0.85f;
@@ -40,19 +43,23 @@ public class ChallengesScreen {
     public ArrayList<MenuFireEffect> fireEffects;
     private float fireEffectTimer;
     private static final float FIRE_EFFECT_INTERVAL = 0.025F;
-    private AbstractRelic currentPopupRelic = null;
-    private int currentRelicIndex;
     private ArrayList<AbstractRelic> currentRelicList;
     private boolean isRelicPopupOpen = false;
     private AbstractRelic clickStartedRelic = null;
 
-    private static final float ASCENSION20_BUTTON_X = Settings.WIDTH * 0.5f;
+    public float scrollY;
+    private float targetY;
+    private boolean grabbedScreen = false;
+    private float grabStartY = 0.0F;
+    private float scrollLowerBound = 0.0F;
+    private float scrollUpperBound = 0.0F;
+    private ScrollBar scrollBar;
+
+    public static final float ASCENSION20_BUTTON_X = Settings.WIDTH * 0.5f;
     private static final float ASCENSION20_BUTTON_Y = Settings.HEIGHT * 0.75f;
 
     public MenuCancelButton cancelButton;
     public GridSelectConfirmButton embarkButton;
-    private static final float EMBARK_BUTTON_X = Settings.WIDTH * 0.8f;
-    private static final float EMBARK_BUTTON_Y = Settings.HEIGHT * 0.2f;
     public ArrayList<CustomModeCharacterButton> characterButtons;
     public ArrayList<Challenge> challenges;
     public AbstractPlayer.PlayerClass selectedCharacter;
@@ -81,6 +88,13 @@ public class ChallengesScreen {
         this.fireEffects = new ArrayList<>();
         this.fireEffectTimer = 0.0F;
         this.renderer = new ChallengesScreenRenderer();
+        this.scrollBar = new ScrollBar(this);
+        calculateScrollBounds();
+    }
+
+    private void calculateScrollBounds() {
+        this.scrollUpperBound = Math.max(0, this.challenges.size() * 20f * Settings.scale - Settings.HEIGHT * 0.7f);
+        this.scrollLowerBound = 0.0F;
     }
 
     private void initializeCharacterButtons() {
@@ -140,6 +154,29 @@ public class ChallengesScreen {
         CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.MAIN_MENU;
         this.isScreenOpened = false;
         this.fireEffects.clear();
+        resetScrollBar();
+        resetSelectedChallenge();
+        resetCharacterSelection();
+    }
+
+    private void resetScrollBar() {
+        calculateScrollBounds();
+        this.scrollY = 0;
+        this.targetY = 0;
+        this.scrollBar.parentScrolledToPercent(0);
+    }
+
+    private void resetSelectedChallenge() {
+        this.selectedCharacter = null;
+        for (Challenge challenge : this.challenges) {
+            challenge.selected = false;
+        }
+    }
+
+    private void resetCharacterSelection() {
+        for (CustomModeCharacterButton button : this.characterButtons) {
+            button.selected = false;
+        }
     }
 
     public void update() {
@@ -190,9 +227,57 @@ public class ChallengesScreen {
             this.fireEffects.clear();
         }
 
+
+        updateScrolling();
+        this.scrollBar.update();
+
         updateChallenges();
         updateRelics();
         this.updateEmbarkButton();
+    }
+
+    private void updateScrolling() {
+        int y = InputHelper.mY;
+        if (!this.grabbedScreen) {
+            if (InputHelper.scrolledDown) {
+                this.targetY += Settings.SCROLL_SPEED;
+            } else if (InputHelper.scrolledUp) {
+                this.targetY -= Settings.SCROLL_SPEED;
+            }
+            if (InputHelper.justClickedLeft) {
+                this.grabbedScreen = true;
+                this.grabStartY = y - this.targetY;
+            }
+        } else if (InputHelper.isMouseDown) {
+            this.targetY = y - this.grabStartY;
+        } else {
+            this.grabbedScreen = false;
+        }
+
+        this.scrollY = MathHelper.scrollSnapLerpSpeed(this.scrollY, this.targetY);
+        resetTargetYIfNeeded();
+        updateBarPosition();
+    }
+
+    private void resetTargetYIfNeeded() {
+        if (this.targetY < this.scrollLowerBound) {
+            this.targetY = MathHelper.scrollSnapLerpSpeed(this.targetY, this.scrollLowerBound);
+        } else if (this.targetY > this.scrollUpperBound) {
+            this.targetY = MathHelper.scrollSnapLerpSpeed(this.targetY, this.scrollUpperBound);
+        }
+    }
+
+    @Override
+    public void scrolledUsingBar(float newPercent) {
+        float newPosition = MathHelper.valueFromPercentBetween(this.scrollLowerBound, this.scrollUpperBound, newPercent);
+        this.scrollY = newPosition;
+        this.targetY = newPosition;
+        updateBarPosition();
+    }
+
+    private void updateBarPosition() {
+        float percent = MathHelper.percentFromValueBetween(this.scrollLowerBound, this.scrollUpperBound, this.scrollY);
+        this.scrollBar.parentScrolledToPercent(percent);
     }
 
     private void updateFireEffects() {
@@ -339,7 +424,7 @@ public class ChallengesScreen {
 
     private void updateChallenges() {
         if (this.selectedCharacter != null) {
-            float startY = ChallengesScreenRenderer.DESCRIPTION_START_Y - CHALLENGE_LIST_Y_OFFSET;
+            float startY = ChallengesScreenRenderer.DESCRIPTION_START_Y - CHALLENGE_LIST_Y_OFFSET + this.scrollY;
             for (Challenge challenge : this.challenges) {
                 if (challenge.characterClass == this.selectedCharacter) {
                     challenge.update(startY);
@@ -377,7 +462,7 @@ public class ChallengesScreen {
     }
 
     public void render(SpriteBatch sb) {
-        this.renderer.render(sb, this);
+        this.renderer.render(sb, this, this.scrollY);
     }
 
 }

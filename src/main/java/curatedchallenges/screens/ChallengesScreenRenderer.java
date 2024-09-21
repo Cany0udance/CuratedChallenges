@@ -1,6 +1,8 @@
 package curatedchallenges.screens;
 
 import com.badlogic.gdx.graphics.Color;
+import com.megacrit.cardcrawl.screens.custom.CustomModeCharacterButton;
+import curatedchallenges.buttons.CustomToggleButton;
 import curatedchallenges.effects.MenuFireEffect;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.screens.ChallengesScreen;
@@ -12,6 +14,7 @@ import com.megacrit.cardcrawl.helpers.TipHelper;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,26 +34,50 @@ public class ChallengesScreenRenderer {
     private static final float BULLET_SCALE = 1.2f;
     private static final String[] HEADERS = {"Starting Deck", "Starting Relics", "Special Rules", "Win Conditions"};
 
-    public void render(SpriteBatch sb, ChallengesScreen screen) {
+    public void render(SpriteBatch sb, ChallengesScreen screen, float scrollY) {
         screen.cancelButton.render(sb);
-        screen.characterButtons.forEach(button -> button.render(sb));
+        renderCharacterButtons(sb, screen, scrollY);
 
         if (screen.selectedCharacter != null) {
             screen.challenges.stream()
                     .filter(challenge -> challenge.characterClass.equals(screen.selectedCharacter))
-                    .forEach(challenge -> challenge.render(sb));
+                    .forEach(challenge -> challenge.render(sb, scrollY));
         }
 
         Challenge selectedChallenge = screen.getSelectedChallenge();
         if (selectedChallenge != null) {
-            renderChallengeDescription(sb, selectedChallenge);
+            renderChallengeDescription(sb, selectedChallenge, scrollY);
             renderRelicTooltips(sb, selectedChallenge);
-            screen.ascension20Button.render(sb);
+            renderAscension20Button(sb, screen, scrollY);
             screen.embarkButton.render(sb);
 
             for (MenuFireEffect effect : screen.fireEffects) {
                 effect.render(sb);
             }
+        }
+    }
+
+    private void renderCharacterButtons(SpriteBatch sb, ChallengesScreen screen, float scrollY) {
+        for (CustomModeCharacterButton button : screen.characterButtons) {
+            float adjustedY = button.hb.cY + scrollY;
+            button.move(button.hb.cX, adjustedY);
+            button.render(sb);
+            button.move(button.hb.cX, button.hb.cY - scrollY); // Reset the position after rendering
+        }
+    }
+
+    private void renderAscension20Button(SpriteBatch sb, ChallengesScreen screen, float scrollY) {
+        try {
+            Field yField = CustomToggleButton.class.getDeclaredField("y");
+            yField.setAccessible(true);
+            float originalY = yField.getFloat(screen.ascension20Button);
+            float adjustedY = originalY + scrollY;
+            yField.setFloat(screen.ascension20Button, adjustedY);
+            screen.ascension20Button.move(ChallengesScreen.ASCENSION20_BUTTON_X, adjustedY);
+            screen.ascension20Button.render(sb);
+            yField.setFloat(screen.ascension20Button, originalY); // Reset the position after rendering
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 
@@ -64,22 +91,22 @@ public class ChallengesScreenRenderer {
                 });
     }
 
-    private void renderChallengeDescription(SpriteBatch sb, Challenge challenge) {
+    private void renderChallengeDescription(SpriteBatch sb, Challenge challenge, float scrollY) {
         float currentY = DESCRIPTION_START_Y;
 
         for (int i = 0; i < HEADERS.length; i++) {
             String header = HEADERS[i];
-            FontHelper.renderFontLeftTopAligned(sb, FontHelper.panelNameFont, header, DESCRIPTION_X, currentY, Settings.GOLD_COLOR);
+            FontHelper.renderFontLeftTopAligned(sb, FontHelper.panelNameFont, header, DESCRIPTION_X, currentY + scrollY, Settings.GOLD_COLOR);
             currentY -= FontHelper.getHeight(FontHelper.panelNameFont) + LINE_SPACING;
 
             if (header.equals("Starting Relics")) {
-                currentY = renderRelics(sb, challenge, currentY);
+                currentY = renderRelics(sb, challenge, currentY, scrollY);
             } else if (header.equals("Starting Deck")) {
-                currentY = renderTinyCards(sb, challenge, currentY);
+                currentY = renderTinyCards(sb, challenge, currentY, scrollY);
             } else {
                 String description = getDescriptionForHeader(challenge, header);
                 boolean useReducedSpacing = header.equals("Special Rules") || header.equals("Win Conditions");
-                currentY = renderWrappedText(sb, description, currentY, useReducedSpacing);
+                currentY = renderWrappedText(sb, description, currentY, useReducedSpacing, scrollY);
             }
 
             if (i < HEADERS.length - 1) {
@@ -88,7 +115,7 @@ public class ChallengesScreenRenderer {
         }
     }
 
-    private float renderRelics(SpriteBatch sb, Challenge challenge, float startY) {
+    private float renderRelics(SpriteBatch sb, Challenge challenge, float startY, float scrollY) {
         float relicX = DESCRIPTION_X;
         float relicY = startY;
         float maxRelicWidth = 64f * Settings.scale;
@@ -96,7 +123,7 @@ public class ChallengesScreenRenderer {
 
         for (AbstractRelic relic : challenge.startingRelics) {
             relic.currentX = relicX + maxRelicWidth / 2f;
-            relic.currentY = relicY - maxRelicWidth / 2f;
+            relic.currentY = relicY - maxRelicWidth / 2f + scrollY;
             relic.render(sb, false, Settings.TWO_THIRDS_TRANSPARENT_BLACK_COLOR);
             relic.hb.move(relic.currentX, relic.currentY);
             relic.hb.render(sb);
@@ -111,13 +138,13 @@ public class ChallengesScreenRenderer {
         return relicY - maxRelicWidth - (20f * Settings.scale);
     }
 
-    private float renderTinyCards(SpriteBatch sb, Challenge challenge, float startY) {
+    private float renderTinyCards(SpriteBatch sb, Challenge challenge, float startY, float scrollY) {
         float cardX = DESCRIPTION_X;
         float cardY = startY;
         float maxWidth = challenge.tinyCards.stream().map(card -> card.hb.width).max(Float::compare).orElse(0f);
 
         for (TinyCard tinyCard : challenge.tinyCards) {
-            tinyCard.hb.move(cardX + tinyCard.hb.width / 2f, cardY - tinyCard.hb.height / 2f);
+            tinyCard.hb.move(cardX + tinyCard.hb.width / 2f, cardY - tinyCard.hb.height / 2f + scrollY);
             tinyCard.render(sb);
 
             cardY -= tinyCard.hb.height + 5f * Settings.scale;
@@ -130,26 +157,26 @@ public class ChallengesScreenRenderer {
         return Math.min(startY, cardY) - (20f * Settings.scale);
     }
 
-    private float renderWrappedText(SpriteBatch sb, String text, float startY, boolean useReducedSpacing) {
+    private float renderWrappedText(SpriteBatch sb, String text, float startY, boolean useReducedSpacing, float scrollY) {
         String[] lines = text.split("NL");
         float currentY = startY;
         float lineSpacing = useReducedSpacing ? REDUCED_LINE_SPACING : LINE_SPACING;
 
         for (String line : lines) {
-            currentY = renderBulletedLine(sb, line.trim(), DESCRIPTION_X, currentY, lineSpacing, true);
+            currentY = renderBulletedLine(sb, line.trim(), DESCRIPTION_X, currentY, lineSpacing, true, scrollY);
         }
 
         return currentY;
     }
 
-    private float renderBulletedLine(SpriteBatch sb, String text, float x, float y, float lineSpacing, boolean addBullet) {
+    private float renderBulletedLine(SpriteBatch sb, String text, float x, float y, float lineSpacing, boolean addBullet, float scrollY) {
         List<String> wrappedLines = wrapText(text, CHAR_LIMIT_PER_LINE);
         float currentY = y;
 
         for (int i = 0; i < wrappedLines.size(); i++) {
             String line = wrappedLines.get(i);
             String prefix = (i == 0 && addBullet) ? "- " : "  ";
-            renderColoredLine(sb, line, x, currentY, prefix);
+            renderColoredLine(sb, line, x, currentY + scrollY, prefix);
             currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
         }
 

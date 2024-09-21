@@ -57,4 +57,10 @@ public class CustomToggleButton {
 
         this.hb.render(sb);
     }
+
+    public void move(float x, float y) {
+        this.x = x;
+        this.y = y;
+        this.hb.move(x + 125.0F * Settings.scale, y);
+    }
 }

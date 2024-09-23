@@ -33,7 +33,7 @@ public class Endoparasitic implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "#rEndoparasitic";
+        return "Endoparasitic";
     }
 
     @Override

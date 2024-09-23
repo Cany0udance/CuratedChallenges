@@ -95,10 +95,4 @@ public class Avarice implements ChallengeDefinition {
         conditions.add(new GoldThresholdWinCondition(1500));
         return conditions;
     }
-
-    @Override
-    public String getTopPanelSummary() {
-        return "#ySpecial #yRules: NL NL - Shops will only appear once per Act, where the chest normally spawns. NL NL - The first time you spend Gold at a shop, obtain an Ectoplasm. NL NL #yWin #yConditions: Complete Act 3 OR have at least 1,500 Gold.";
-    }
-
 }

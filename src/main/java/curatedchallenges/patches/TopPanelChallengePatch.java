@@ -1,6 +1,6 @@
 package curatedchallenges.patches;
 
-import basemod.BaseMod;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
@@ -40,7 +40,7 @@ public class TopPanelChallengePatch {
                 float dailyModX = dailyModXField.getFloat(__instance);
                 float iconY = iconYField.getFloat(null);
 
-                challengeIconX = dailyModX + 52.0F * Settings.scale;
+                challengeIconX = dailyModX;
                 float hitboxSize = Math.max(challengeIcon.getWidth(), challengeIcon.getHeight()) * Settings.scale;
                 challengeHb = new Hitbox(hitboxSize, hitboxSize);
                 // Adjust the Y position of the hitbox
@@ -50,8 +50,6 @@ public class TopPanelChallengePatch {
             }
         }
     }
-
-
 
     @SpirePatch(clz = TopPanel.class, method = "render")
     public static class RenderPatch {
@@ -63,13 +61,12 @@ public class TopPanelChallengePatch {
                     int iconWidth = challengeIcon.getWidth();
                     int iconHeight = challengeIcon.getHeight();
                     float scale = Settings.scale;
-                    float hoverScale = 1.3f;
 
-                    if (challengeHb.hovered) {
-                        scale *= hoverScale;
-                    }
+                    float renderY = iconY + 32.0F * Settings.scale;
 
-                    float renderY = iconY + 32.0F * Settings.scale; // Adjust this value as needed
+                    // Set color to fully opaque white
+                    sb.setColor(Color.WHITE);
+
                     sb.draw(challengeIcon,
                             challengeIconX - (iconWidth * scale / 2f),
                             renderY - (iconHeight * scale / 2f),
@@ -135,7 +132,7 @@ public class TopPanelChallengePatch {
                     float dailyModX = dailyModXField.getFloat(__instance);
                     float iconY = iconYField.getFloat(null);
 
-                    challengeIconX = dailyModX + 52.0F * Settings.scale;
+                    challengeIconX = dailyModX;
                     challengeHb.move(challengeIconX, iconY);
                 } catch (Exception e) {
                     e.printStackTrace();

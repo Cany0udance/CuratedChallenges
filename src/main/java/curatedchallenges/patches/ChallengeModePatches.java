@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class ChallengeModePatches {
-    private static final Texture CHALLENGE_MODE_BUTTON_TEXTURE = new Texture("curatedchallenges/images/missing.png");
+    private static final Texture CHALLENGE_MODE_BUTTON_TEXTURE = new Texture("curatedchallenges/images/ChallengesScreenImage.png");
 
     public static class Enums {
         @SpireEnum

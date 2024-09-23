@@ -9,10 +9,7 @@ import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.events.shrines.FountainOfCurseRemoval;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
-import com.megacrit.cardcrawl.relics.AbstractRelic;
-import com.megacrit.cardcrawl.relics.BurningBlood;
-import com.megacrit.cardcrawl.relics.DuVuDoll;
-import com.megacrit.cardcrawl.relics.Necronomicon;
+import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
 import curatedchallenges.winconditions.CompleteActWinCondition;
@@ -73,13 +70,18 @@ public class Necronomics implements ChallengeDefinition {
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return "Complete Act 4.";
+    }
+
+    @Override
+    public List<String> getRelicIdsToRemove() {
+        return Arrays.asList(SneckoEye.ID);
     }
 
     @Override
     public List<WinCondition> getWinConditionLogic() {
         List<WinCondition> conditions = new ArrayList<>();
-        conditions.add(new CompleteActWinCondition(3));
+        conditions.add(new CompleteActWinCondition(4));
         return conditions;
     }
 

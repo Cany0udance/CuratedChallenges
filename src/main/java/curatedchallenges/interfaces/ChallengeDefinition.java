@@ -24,6 +24,14 @@ public interface ChallengeDefinition {
         return new ArrayList<>();
     }
 
+    default Integer getStartingGold() {
+        return null; // Return null if not specified
+    }
+
+    default Integer getCardRewardAdjustment() {
+        return null; // Return null if not specified
+    }
+
     // New method for start of run effects
     default void applyStartOfRunEffect(AbstractPlayer p) {
         // Default implementation does nothing
@@ -55,8 +63,30 @@ public interface ChallengeDefinition {
     }
 
     default String getTopPanelSummary() {
-        return getName() + ": " + getSpecialRules();
+        StringBuilder summary = new StringBuilder();
+        summary.append("#ySpecial #yRules:").append(" NL NL ");
+
+        String[] specialRules = getSpecialRules().split("NL");
+        for (int i = 0; i < specialRules.length; i++) {
+            summary.append("- ").append(specialRules[i].trim());
+            if (i < specialRules.length - 1) {
+                summary.append(" NL NL ");
+            }
+        }
+
+        summary.append(" NL NL #yWin #yConditions:").append(" NL NL ");
+
+        String[] winConditions = getWinConditions().split("NL");
+        for (int i = 0; i < winConditions.length; i++) {
+            summary.append("- ").append(winConditions[i].trim());
+            if (i < winConditions.length - 1) {
+                summary.append(" NL NL ");
+            }
+        }
+
+        return summary.toString().trim();
     }
+
 
     default List<Class<? extends AbstractCard>> getCardsToRemove() {
         return Collections.emptyList();

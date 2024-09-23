@@ -31,6 +31,7 @@ public class Challenge {
     public ArrayList<TinyCard> tinyCards;
     public ArrayList<AbstractRelic> startingRelics;
     public ArrayList<AbstractPotion> startingPotions;
+    public Integer startingGold;
     public String specialRules;
     public String winConditions; // This is the display string
     public List<WinCondition> winConditionLogic; // This is the actual logic
@@ -61,6 +62,10 @@ public class Challenge {
 
     public String getName() {
         return this.name;
+    }
+
+    public Integer getStartingGold() {
+        return this.startingGold;
     }
 
     private List<ColoredWord> parseColoredText(String text) {

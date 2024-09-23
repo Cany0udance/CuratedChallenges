@@ -2,7 +2,11 @@ package curatedchallenges;
 
 import basemod.BaseMod;
 import basemod.interfaces.*;
+import basemod.patches.com.megacrit.cardcrawl.ui.panels.TopPanel.TopPanelPatches;
+import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.cards.curses.AscendersBane;
+import com.megacrit.cardcrawl.helpers.PotionHelper;
+import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.monsters.city.Snecko;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.potions.PotionSlot;
@@ -27,10 +31,7 @@ import curatedchallenges.challenge.Watcher.FastTrack;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
-import curatedchallenges.util.ChallengeRegistry;
-import curatedchallenges.util.GeneralUtils;
-import curatedchallenges.util.KeywordInfo;
-import curatedchallenges.util.TextureLoader;
+import curatedchallenges.util.*;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
@@ -57,6 +58,7 @@ import org.scannotation.AnnotationDB;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Predicate;
 
 @SpireInitializer
 public class CuratedChallenges implements
@@ -72,7 +74,7 @@ public class CuratedChallenges implements
     public static String modID; //Edit your pom.xml to change this
     static { loadModInfo(); }
     private static final String resourcesFolder = checkResourcesPath();
-    private static final String SAVE_KEY = "CurrentChallengeId";
+    public static final String SAVE_KEY = "CurrentChallengeId";
     private static final String CHALLENGE_RUN_KEY = "IsChallengeRun";
     public static String currentChallengeId = null;
 
@@ -105,6 +107,7 @@ public class CuratedChallenges implements
         //If you want to set up a config panel, that will be done here.
         //The Mod Badges page has a basic example of this, but setting up config is overall a bit complex.
         BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors), info.Description, null);
+        BaseMod.addSaveField(ChallengeInfo.SAVE_KEY, new ChallengeInfo());
         initializeChallenges();
     }
 
@@ -351,14 +354,151 @@ public class CuratedChallenges implements
     public void receiveStartGame() {
         loadChallengeData();
         BaseMod.logger.info("Game started. isTrial: " + Settings.isTrial + ", currentChallengeId: " + currentChallengeId);
-
         if (Settings.isTrial && currentChallengeId != null) {
             BaseMod.logger.info("Starting challenge run. Current Challenge ID: " + currentChallengeId);
+            // Apply challenge modifications after a short delay to ensure all game systems are initialized
+            applyChallengeModifications();
         } else {
             BaseMod.logger.info("Starting regular run. Clearing any lingering challenge data.");
             clearChallengeData();
         }
     }
+
+    private static void applyChallengeModifications() {
+        ChallengeDefinition currentChallenge = ChallengeRegistry.getChallenge(currentChallengeId);
+        if (currentChallenge != null) {
+            modifyCardPools(currentChallenge);
+            modifyRelicPools(currentChallenge);
+            modifyPotionPools(currentChallenge);
+        }
+    }
+
+    private static void modifyCardPools(ChallengeDefinition challenge) {
+        if (challenge != null) {
+            // Remove cards
+            List<Class<? extends AbstractCard>> cardsToRemove = challenge.getCardsToRemove();
+            Predicate<AbstractCard> shouldRemove = card -> cardsToRemove.stream().anyMatch(cls -> cls.isInstance(card));
+            removeCardsFromPools(shouldRemove);
+
+            // Add cards
+            List<Class<? extends AbstractCard>> cardsToAdd = challenge.getCardsToAdd();
+            addCardsToPools(cardsToAdd);
+        }
+    }
+
+    private static void removeCardsFromPools(Predicate<AbstractCard> shouldRemove) {
+        AbstractDungeon.commonCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.uncommonCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.rareCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.colorlessCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.curseCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.srcCommonCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.srcUncommonCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.srcRareCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.srcColorlessCardPool.group.removeIf(shouldRemove);
+        AbstractDungeon.srcCurseCardPool.group.removeIf(shouldRemove);
+    }
+
+    private static void addCardsToPools(List<Class<? extends AbstractCard>> cardClasses) {
+        for (Class<? extends AbstractCard> cardClass : cardClasses) {
+            try {
+                AbstractCard card = cardClass.newInstance();
+                switch (card.rarity) {
+                    case COMMON:
+                        AbstractDungeon.commonCardPool.addToTop(card);
+                        AbstractDungeon.srcCommonCardPool.addToBottom(card);
+                        break;
+                    case UNCOMMON:
+                        AbstractDungeon.uncommonCardPool.addToTop(card);
+                        AbstractDungeon.srcUncommonCardPool.addToBottom(card);
+                        break;
+                    case RARE:
+                        AbstractDungeon.rareCardPool.addToTop(card);
+                        AbstractDungeon.srcRareCardPool.addToBottom(card);
+                        break;
+                    case CURSE:
+                        AbstractDungeon.curseCardPool.addToTop(card);
+                        AbstractDungeon.srcCurseCardPool.addToBottom(card);
+                        break;
+                }
+                if (card.color == AbstractCard.CardColor.COLORLESS) {
+                    AbstractDungeon.colorlessCardPool.addToTop(card);
+                    AbstractDungeon.srcColorlessCardPool.addToBottom(card);
+                }
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void modifyRelicPools(ChallengeDefinition challenge) {
+        // Remove starter relics from pools
+        ArrayList<AbstractRelic> starterRelics = challenge.getStartingRelics();
+        for (AbstractRelic relic : starterRelics) {
+            removeRelicFromPools(relic.relicId);
+        }
+        // Remove relics
+        List<String> relicsToRemove = challenge.getRelicIdsToRemove();
+        for (String relicId : relicsToRemove) {
+            removeRelicFromPools(relicId);
+        }
+        // Add relics
+        List<String> relicsToAdd = challenge.getRelicIdsToAdd();
+        addRelicsToPools(relicsToAdd);
+    }
+
+    private static void removeRelicFromPools(String relicId) {
+        AbstractDungeon.commonRelicPool.remove(relicId);
+        AbstractDungeon.uncommonRelicPool.remove(relicId);
+        AbstractDungeon.rareRelicPool.remove(relicId);
+        AbstractDungeon.bossRelicPool.remove(relicId);
+        AbstractDungeon.shopRelicPool.remove(relicId);
+    }
+
+    private static void addRelicsToPools(List<String> relicIds) {
+        for (String relicId : relicIds) {
+            AbstractRelic relic = RelicLibrary.getRelic(relicId);
+            if (relic != null) {
+                switch (relic.tier) {
+                    case COMMON:
+                        AbstractDungeon.commonRelicPool.add(relicId);
+                        break;
+                    case UNCOMMON:
+                        AbstractDungeon.uncommonRelicPool.add(relicId);
+                        break;
+                    case RARE:
+                        AbstractDungeon.rareRelicPool.add(relicId);
+                        break;
+                    case BOSS:
+                        AbstractDungeon.bossRelicPool.add(relicId);
+                        break;
+                    case SHOP:
+                        AbstractDungeon.shopRelicPool.add(relicId);
+                        break;
+                }
+            }
+        }
+    }
+
+    private static void modifyPotionPools(ChallengeDefinition challenge) {
+        // Remove potions
+        List<Class<? extends AbstractPotion>> potionsToRemove = challenge.getPotionsToRemove();
+        PotionHelper.potions.removeIf(potionId -> {
+            AbstractPotion potion = PotionHelper.getPotion(potionId);
+            return potionsToRemove.stream().anyMatch(cls -> cls.isInstance(potion));
+        });
+        // Add potions
+        List<Class<? extends AbstractPotion>> potionsToAdd = challenge.getPotionsToAdd();
+        for (Class<? extends AbstractPotion> potionClass : potionsToAdd) {
+            try {
+                AbstractPotion potion = potionClass.newInstance();
+                PotionHelper.potions.add(potion.ID);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     public static void startChallengeRun(String challengeId) {
         currentChallengeId = challengeId;
@@ -391,6 +531,7 @@ public class CuratedChallenges implements
     public static void applyStartOfActEffect(AbstractPlayer player, int actNumber) {
         ChallengeDefinition challenge = ChallengeRegistry.getChallenge(currentChallengeId);
         if (challenge != null) {
+            applyChallengeModifications();
             challenge.applyStartOfActEffect(player, actNumber);
             BaseMod.logger.info("Applied start of act effect for challenge: " + currentChallengeId + ", Act: " + actNumber);
         }
@@ -431,6 +572,12 @@ public class CuratedChallenges implements
             for (int i = 0; i < challenge.startingPotions.size() && i < player.potionSlots; i++) {
                 AbstractPotion potionCopy = challenge.startingPotions.get(i).makeCopy();
                 player.obtainPotion(i, potionCopy);
+            }
+
+            // Initialize starting gold
+            Integer startingGold = challenge.getStartingGold();
+            if (startingGold != null) {
+                player.gold = startingGold;
             }
 
             // Check for Act 4 win condition
@@ -488,16 +635,16 @@ public class CuratedChallenges implements
         // Ironclad Challenges
 
         ChallengeRegistry.registerChallenge(new Endoparasitic());
-        ChallengeRegistry.registerChallenge(new CheatDay());
         ChallengeRegistry.registerChallenge(new CursedCombo());
         ChallengeRegistry.registerChallenge(new Necronomics());
+        ChallengeRegistry.registerChallenge(new CheatDay());
 
         // Silent Challenges
 
-        ChallengeRegistry.registerChallenge(new Avarice());
-        ChallengeRegistry.registerChallenge(new GlassCannon());
-        ChallengeRegistry.registerChallenge(new TheBestDefense());
         ChallengeRegistry.registerChallenge(new TheSadist());
+        ChallengeRegistry.registerChallenge(new Avarice());
+        ChallengeRegistry.registerChallenge(new TheBestDefense());
+        ChallengeRegistry.registerChallenge(new GlassCannon());
 
         // Defect Challenges
 
@@ -526,7 +673,8 @@ public class CuratedChallenges implements
             challenge.startingDeck = definition.getStartingDeck();
             challenge.initializeTinyCards();
             challenge.startingRelics = definition.getStartingRelics();
-            challenge.startingPotions = definition.getStartingPotions(); // Add this line
+            challenge.startingPotions = definition.getStartingPotions();
+            challenge.startingGold = definition.getStartingGold();
             challenge.specialRules = definition.getSpecialRules();
             challenge.winConditions = definition.getWinConditions();
             challenge.winConditionLogic = definition.getWinConditionLogic();

@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.helpers.PowerTip;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.orbs.*;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
+import com.megacrit.cardcrawl.relics.CrackedCore;
 import com.megacrit.cardcrawl.relics.GoldPlatedCables;
 import com.megacrit.cardcrawl.relics.WingBoots;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -45,13 +46,17 @@ public class FlyingRobot implements ChallengeDefinition {
     public ArrayList<AbstractCard> getStartingDeck() {
         ArrayList<AbstractCard> deck = new ArrayList<>();
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             deck.add(new Strike_Blue());
         }
 
-        for (int i = 0; i < 4; i++) {
+        deck.add(new Claw());
+
+        for (int i = 0; i < 3; i++) {
             deck.add(new Defend_Blue());
         }
+
+        deck.add(new Leap());
 
         deck.add(new Zap());
         deck.add(new Dualcast());
@@ -62,13 +67,14 @@ public class FlyingRobot implements ChallengeDefinition {
     @Override
     public ArrayList<AbstractRelic> getStartingRelics() {
         ArrayList<AbstractRelic> relics = new ArrayList<>();
+        relics.add(RelicLibrary.getRelic(CrackedCore.ID).makeCopy());
         relics.add(RelicLibrary.getRelic(WingBoots.ID).makeCopy());
         return relics;
     }
 
     @Override
     public String getSpecialRules() {
-        return "Map generation will only have two unconnected paths. NL At the start of each Act, refresh your Wing Boots.";
+        return "Map generation will only have two unconnected paths. NL At the start of each Act, refresh your Wing Boots. NL Wing Boots only holds 2 charges rather than 3.";
 
     }
 
@@ -89,7 +95,7 @@ public class FlyingRobot implements ChallengeDefinition {
         if (actNumber > 1) {
             AbstractRelic wingBoots = p.getRelic(WingBoots.ID);
             if (wingBoots != null) {
-                wingBoots.setCounter(3);
+                wingBoots.setCounter(2);
                 wingBoots.usedUp = false;
                 wingBoots.grayscale = false;
 

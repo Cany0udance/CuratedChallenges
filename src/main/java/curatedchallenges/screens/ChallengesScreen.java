@@ -3,6 +3,7 @@ package curatedchallenges.screens;
 import com.megacrit.cardcrawl.helpers.MathHelper;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBarListener;
+import curatedchallenges.patches.ChallengeModePatches;
 import curatedchallenges.util.ChallengeRegistry;
 import curatedchallenges.CuratedChallenges;
 import curatedchallenges.buttons.CustomToggleButton;
@@ -126,8 +127,8 @@ public class ChallengesScreen implements ScrollBarListener {
         challenge.initializeTinyCards();
         challenge.startingRelics = initializeRelics(definition.getStartingRelics());
         challenge.specialRules = definition.getSpecialRules();
-        challenge.winConditions = definition.getWinConditions(); // String for display
-        challenge.winConditionLogic = definition.getWinConditionLogic(); // Actual logic
+        challenge.winConditions = definition.getWinConditions();
+        challenge.winConditionLogic = definition.getWinConditionLogic();
         this.challenges.add(challenge);
     }
 
@@ -151,7 +152,7 @@ public class ChallengesScreen implements ScrollBarListener {
     public void close() {
         CardCrawlGame.mainMenuScreen.lighten();
         this.cancelButton.hide();
-        CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.MAIN_MENU;
+        CardCrawlGame.mainMenuScreen.panelScreen.open(ChallengeModePatches.Enums.CHALLENGE);
         this.isScreenOpened = false;
         this.fireEffects.clear();
         resetScrollBar();

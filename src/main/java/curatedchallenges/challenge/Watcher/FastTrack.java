@@ -8,10 +8,7 @@ import com.megacrit.cardcrawl.cards.green.Survivor;
 import com.megacrit.cardcrawl.cards.purple.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
-import com.megacrit.cardcrawl.potions.AbstractPotion;
-import com.megacrit.cardcrawl.potions.LiquidBronze;
-import com.megacrit.cardcrawl.potions.SmokeBomb;
-import com.megacrit.cardcrawl.potions.StancePotion;
+import com.megacrit.cardcrawl.potions.*;
 import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
@@ -77,7 +74,7 @@ public class FastTrack implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Start in The City.";
+        return "Skip Act 1 entirely. NL Start with 250 Gold, Liquid Bronze, and a Fear Potion.";
     }
 
     @Override
@@ -89,7 +86,13 @@ public class FastTrack implements ChallengeDefinition {
     public ArrayList<AbstractPotion> getStartingPotions() {
         ArrayList<AbstractPotion> potions = new ArrayList<>();
         potions.add(new LiquidBronze());
+        potions.add(new FearPotion());
         return potions;
+    }
+
+    @Override
+    public Integer getStartingGold() {
+        return 250;
     }
 
     @Override

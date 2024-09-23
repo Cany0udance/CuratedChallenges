@@ -74,7 +74,7 @@ public class TheBestDefense implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "ALL cards that directly grant Block are removed from the card pool.";
+        return "ALL cards that directly grant Block are removed from the card pool. NL Card rewards have 1 less card to choose from.";
 
     }
 
@@ -121,8 +121,8 @@ public class TheBestDefense implements ChallengeDefinition {
     }
 
     @Override
-    public String getTopPanelSummary() {
-        return "#ySpecial #yRules: NL NL - ALL cards that directly grant Block have been removed from the card pool. NL NL #yWin #yConditions: Complete Act 3.";
+    public Integer getCardRewardAdjustment() {
+        return 12;
     }
 
 }

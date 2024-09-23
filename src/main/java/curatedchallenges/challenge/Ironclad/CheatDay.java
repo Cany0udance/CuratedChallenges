@@ -5,13 +5,14 @@ import com.megacrit.cardcrawl.actions.animations.VFXAction;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.curses.Parasite;
-import com.megacrit.cardcrawl.cards.red.Bash;
-import com.megacrit.cardcrawl.cards.red.Defend_Red;
-import com.megacrit.cardcrawl.cards.red.Feed;
-import com.megacrit.cardcrawl.cards.red.Strike_Red;
+import com.megacrit.cardcrawl.cards.red.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.potions.Elixir;
+import com.megacrit.cardcrawl.potions.FearPotion;
+import com.megacrit.cardcrawl.potions.LiquidBronze;
 import com.megacrit.cardcrawl.powers.DexterityPower;
 import com.megacrit.cardcrawl.powers.StrengthPower;
 import com.megacrit.cardcrawl.powers.watcher.EnergyDownPower;
@@ -55,9 +56,11 @@ public class CheatDay implements ChallengeDefinition {
             deck.add(new Strike_Red());
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             deck.add(new Defend_Red());
         }
+
+        deck.add(new Clash());
 
         deck.add(new Feed());
 
@@ -76,7 +79,7 @@ public class CheatDay implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Start with half max HP. NL At the start of combat, apply the effects of the Fasting power.";
+        return "Start with half max HP. NL At the start of combat, gain the effects of the Fasting power.";
 
     }
 

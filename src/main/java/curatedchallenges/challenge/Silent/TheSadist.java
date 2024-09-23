@@ -72,19 +72,19 @@ public class TheSadist implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "At the start of combat, lose 3 Strength, gain 1 Envenom, and gain 3 Sadistic.";
+        return "Before the start of combat, lose 3 Strength, gain 1 Envenom, and gain 3 Sadistic.";
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return "Complete Act 4.";
     }
 
     @Override
     public List<WinCondition> getWinConditionLogic() {
         List<WinCondition> conditions = new ArrayList<>();
-        conditions.add(new CompleteActWinCondition(3));
+        conditions.add(new CompleteActWinCondition(4));
         return conditions;
     }
 
@@ -101,11 +101,6 @@ public class TheSadist implements ChallengeDefinition {
         // Player gains 5 stacks of Sadistic Nature
         AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(p, p,
                 new SadisticPower(p, 3), 3));
-    }
-
-    @Override
-    public String getTopPanelSummary() {
-        return "#ySpecial #yRules: NL NL - Start the run with 1 max HP. NL NL #yWin #yConditions: Complete Act 3.";
     }
 
 }

@@ -1,4 +1,4 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.challenges.FlyingRobot;
 
 import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.megacrit.cardcrawl.core.Settings;

@@ -97,9 +97,4 @@ public class GlassCannon implements ChallengeDefinition {
         return conditions;
     }
 
-    @Override
-    public String getTopPanelSummary() {
-        return "#ySpecial #yRules: NL NL - Start the run with 1 max HP. NL NL #yWin #yConditions: Complete Act 3.";
-    }
-
 }

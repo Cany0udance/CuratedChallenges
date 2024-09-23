@@ -72,18 +72,18 @@ public class Duet implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "ALL Watcher Attack cards have been replaced by Ironclad Attack cards.";
+        return "ALL Ironclad cards are added to the card pool. You cannot play two consecutive cards of the same color. NL Draw 1 additional card per turn. NL Shuffling is changed to draw alternating card colors when possible.";
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return "Complete Act 4.";
     }
 
     @Override
     public List<WinCondition> getWinConditionLogic() {
         List<WinCondition> conditions = new ArrayList<>();
-        conditions.add(new CompleteActWinCondition(3));
+        conditions.add(new CompleteActWinCondition(4));
         return conditions;
     }
 

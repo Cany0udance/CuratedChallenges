@@ -7,10 +7,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.PowerTip;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
-import com.megacrit.cardcrawl.relics.AbstractRelic;
-import com.megacrit.cardcrawl.relics.RunicPyramid;
-import com.megacrit.cardcrawl.relics.SneckoEye;
-import com.megacrit.cardcrawl.relics.WingBoots;
+import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
 import curatedchallenges.winconditions.CompleteActWinCondition;
@@ -18,6 +15,7 @@ import curatedchallenges.winconditions.CompleteActWinCondition;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static basemod.BaseMod.logger;
@@ -64,6 +62,11 @@ public class CursedCombo implements ChallengeDefinition {
         ArrayList<AbstractRelic> relics = new ArrayList<>();
         relics.add(RelicLibrary.getRelic(SneckoEye.ID).makeCopy());
         return relics;
+    }
+
+    @Override
+    public List<String> getRelicIdsToRemove() {
+        return Arrays.asList(RunicPyramid.ID);
     }
 
     @Override

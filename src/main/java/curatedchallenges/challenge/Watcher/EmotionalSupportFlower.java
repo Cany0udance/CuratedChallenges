@@ -66,9 +66,7 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "ALL cards that enable Stance-entering have been removed. NL " +
-                "When Happy Flower is at 1 or 2, enter Calm. NL " +
-                "When Happy Flower is at 0, enter Wrath.";
+        return "ALL usual methods of Stance-entering have been removed. NL When Happy Flower is at 1 or 2, enter Calm. NL When Happy Flower is at 0, enter Wrath. NL Card rewards have 1 less card to choose from.";
     }
 
     @Override
@@ -113,6 +111,11 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
     @Override
     public List<Class<? extends AbstractPotion>> getPotionsToRemove() {
         return Arrays.asList(StancePotion.class);
+    }
+
+    @Override
+    public Integer getCardRewardAdjustment() {
+        return -1;
     }
 
 }

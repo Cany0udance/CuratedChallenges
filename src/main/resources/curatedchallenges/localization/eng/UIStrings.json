@@ -1,16 +1,172 @@
 {
-  "${modID}:ChallengesTab": {
+  "CuratedChallenges:ChallengesTab": {
     "TEXT": [
       "Challenges",
-      "Slay the Spire with these curated challenges!"
-    ],
-    "EXTRA_TEXT": [
-      "This is another",
-      "array of Strings."
-    ],
-    "TEXT_DICT": {
-      "This": "Contains pairs of Strings, used to get values based on keys.",
-      "This is a key": "This is a value."
-    }
+      "Slay the Spire with these challenging twists!"
+    ]
+  },
+  "CuratedChallenges:AuxiliaryPower": {
+    "TEXT": [
+      "Auxiliary Power",
+      "Draw #b2 fewer cards per turn. NL Start with an additional orb slot. NL At the start of combat, channel one of each orb in random order.",
+      "Complete Act 4."
+    ]
+  },
+  "CuratedChallenges:CuriousCreatures": {
+    "TEXT": [
+      "Curious Creatures",
+      "Before the start of combat, ALL enemies gain #b1 #yCuriosity.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:FlyingRobot": {
+    "TEXT": [
+      "Flying Robot",
+      "Map generation will only have two unconnected paths. NL At the start of each Act, refresh your Wing Boots. NL Wing Boots only holds #b2 charges rather than #b3.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:Gamblecore": {
+    "TEXT": [
+      "Gamblecore",
+      "LET'S GO GAMBLING!!!! NL At the start of each Act, reroll your cards into others of the same rarity and color. NL Rerolled cards keep their upgrades.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:Overclocked": {
+    "TEXT": [
+      "Overclocked",
+      "At the start of your turn, gain the effects of #yCombust.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:CheatDay": {
+    "TEXT": [
+      "Cheat Day",
+      "Start with half max HP. NL Before the start of combat, gain the effects of #yFasting.",
+      "Complete Act 3 OR NL have at least #b200 Max HP."
+    ]
+  },
+  "CuratedChallenges:CursedCombo": {
+    "TEXT": [
+      "Cursed Combo",
+      "At the start of Act 2, obtain a #yRunic #yPyramid.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:Endoparasitic": {
+    "TEXT": [
+      "Endoparasitic",
+      "None",
+      "Complete Act 3 OR NL Remove ALL #yParasites from your deck."
+    ]
+  },
+  "CuratedChallenges:Necronomics": {
+    "TEXT": [
+      "Necronomics",
+      "Whenever you play a card, increase its cost by #b1 for the rest of combat.",
+      "Complete Act 4."
+    ]
+  },
+  "CuratedChallenges:Avarice": {
+    "TEXT": [
+      "Avarice",
+      "Shops will only appear once per Act, where the chest normally spawns. NL The first time you spend #yGold at a shop, obtain an #yEctoplasm.",
+      "Complete Act 3 OR NL Have at least #b1,500 #yGold."
+    ]
+  },
+  "CuratedChallenges:GlassCannon": {
+    "TEXT": [
+      "Glass Cannon",
+      "Start with #b1 max HP.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:TheBestDefense": {
+    "TEXT": [
+      "The Best Defense...",
+      "ALL cards that directly grant Block are removed from the card pool. NL Card rewards have #b1 less card to choose from.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:TheSadist": {
+    "TEXT": [
+      "The Sadist",
+      "Before the start of combat, lose #b3 #yStrength, gain #b1 #yEnvenom, and gain #b3 #ySadistic.",
+      "Complete Act 4."
+    ]
+  },
+  "CuratedChallenges:AmpedEnemies": {
+    "TEXT": [
+      "Amped Enemies",
+      "Start the run with a #ySmoke #yBomb. NL At the start of combat, apply an Emerald Elite buff to ALL enemies.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:Duet": {
+    "TEXT": [
+      "Duet",
+      "ALL Ironclad cards are added to the card pool. NL During combat, you cannot play two consecutive cards of the same color. NL Draw #b1 additional card per turn. NL Shuffling is changed to draw alternating card colors when possible.",
+      "Complete Act 4."
+    ]
+  },
+  "CuratedChallenges:EmotionalSupportFlower": {
+    "TEXT": [
+      "Emotional Support Flower",
+      "ALL usual methods of Stance-entering have been removed. NL When Happy Flower is at #b1 or #b2, enter Calm. NL When Happy Flower is at #b0, enter Wrath. NL Card rewards have #b1 less card to choose from.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:FastTrack": {
+    "TEXT": [
+      "Fast Track",
+      "Skip Act 1 entirely. NL Start with #b250 #yGold, #yLiquid #yBronze, and a #yFear #yPotion.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:TopPanel": {
+    "TEXT": [
+      "#ySpecial #yRules:",
+      " NL NL #yWin #yConditions:"
+    ]
+  },
+  "CuratedChallenges:DuetSpeech": {
+    "TEXT": [
+      "I can't play another ",
+      " card yet!"
+    ]
+  },
+  "CuratedChallenges:ChallengeScreens": {
+    "TEXT": [
+      "Challenges",
+      "Play a run with special rules!",
+      "Curated Challenges",
+      "Play with unique curated challenges!"
+    ]
+  },
+  "CuratedChallenges:DeathScreenText": {
+    "TEXT": [
+      "Challenge Failed!"
+    ]
+  },
+  "CuratedChallenges:NeowTalk": {
+    "TEXT": [
+      "~Good...~ NL ~..luck...~"
+    ]
+  },
+  "CuratedChallenges:VictoryScreenText": {
+    "TEXT": [
+      "Challenge Complete!"
+    ]
+  },
+  "CuratedChallenges:ChallengeScreen": {
+    "TEXT": [
+      "Ascension 20 Mode",
+      "Enable to start the run on Ascension 20",
+      "Starting Deck",
+      "Starting Relics",
+      "Special Rules",
+      "Win Conditions"
+    ]
   }
 }

@@ -63,7 +63,6 @@ import java.util.function.Predicate;
 @SpireInitializer
 public class CuratedChallenges implements
         EditStringsSubscriber,
-        EditKeywordsSubscriber,
         PostInitializeSubscriber,
         OnPlayerTurnStartSubscriber,
         OnStartBattleSubscriber,
@@ -144,50 +143,8 @@ public class CuratedChallenges implements
     private void loadLocalization(String lang) {
         //While this does load every type of localization, most of these files are just outlines so that you can see how they're formatted.
         //Feel free to comment out/delete any that you don't end up using.
-        BaseMod.loadCustomStringsFile(CardStrings.class,
-                localizationPath(lang, "CardStrings.json"));
-        BaseMod.loadCustomStringsFile(CharacterStrings.class,
-                localizationPath(lang, "CharacterStrings.json"));
-        BaseMod.loadCustomStringsFile(EventStrings.class,
-                localizationPath(lang, "EventStrings.json"));
-        BaseMod.loadCustomStringsFile(OrbStrings.class,
-                localizationPath(lang, "OrbStrings.json"));
-        BaseMod.loadCustomStringsFile(PotionStrings.class,
-                localizationPath(lang, "PotionStrings.json"));
-        BaseMod.loadCustomStringsFile(PowerStrings.class,
-                localizationPath(lang, "PowerStrings.json"));
-        BaseMod.loadCustomStringsFile(RelicStrings.class,
-                localizationPath(lang, "RelicStrings.json"));
         BaseMod.loadCustomStringsFile(UIStrings.class,
                 localizationPath(lang, "UIStrings.json"));
-    }
-
-    @Override
-    public void receiveEditKeywords()
-    {
-        Gson gson = new Gson();
-        String json = Gdx.files.internal(localizationPath(defaultLanguage, "Keywords.json")).readString(String.valueOf(StandardCharsets.UTF_8));
-        KeywordInfo[] keywords = gson.fromJson(json, KeywordInfo[].class);
-        for (KeywordInfo keyword : keywords) {
-            keyword.prep();
-            registerKeyword(keyword);
-        }
-
-        if (!defaultLanguage.equals(getLangString())) {
-            try
-            {
-                json = Gdx.files.internal(localizationPath(getLangString(), "Keywords.json")).readString(String.valueOf(StandardCharsets.UTF_8));
-                keywords = gson.fromJson(json, KeywordInfo[].class);
-                for (KeywordInfo keyword : keywords) {
-                    keyword.prep();
-                    registerKeyword(keyword);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.warn(modID + " does not support " + getLangString() + " keywords.");
-            }
-        }
     }
 
     private void registerKeyword(KeywordInfo info) {
@@ -271,7 +228,7 @@ public class CuratedChallenges implements
     @Override
     public void receiveOnBattleStart(AbstractRoom abstractRoom) {
         String challengeId = readChallengeIdFromSaveFile();
-        BaseMod.logger.info("Current Challenge ID from save file: " + challengeId);
+    //    BaseMod.logger.info("Current Challenge ID from save file: " + challengeId);
 
         if (challengeId != null && !challengeId.isEmpty()) {
             ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
@@ -300,7 +257,7 @@ public class CuratedChallenges implements
                 return "No challenge ID found in save file";
             }
         } catch (IOException e) {
-            BaseMod.logger.error("Error reading challenge ID from save file: " + e.getMessage());
+      //      BaseMod.logger.error("Error reading challenge ID from save file: " + e.getMessage());
             return "Error reading save file";
         }
     }
@@ -316,9 +273,9 @@ public class CuratedChallenges implements
                 config.remove(CHALLENGE_RUN_KEY);
             }
             config.save();
-            BaseMod.logger.info("Saved challenge data. ID: " + currentChallengeId);
+      //      BaseMod.logger.info("Saved challenge data. ID: " + currentChallengeId);
         } catch (IOException e) {
-            BaseMod.logger.error("Error saving challenge data: " + e.getMessage());
+       //     BaseMod.logger.error("Error saving challenge data: " + e.getMessage());
         }
     }
 
@@ -327,13 +284,13 @@ public class CuratedChallenges implements
             SpireConfig config = new SpireConfig(modID, "SaveData");
             if (config.getBool(CHALLENGE_RUN_KEY)) {
                 currentChallengeId = config.getString(SAVE_KEY);
-                BaseMod.logger.info("Loaded challenge data. ID: " + currentChallengeId);
+           //     BaseMod.logger.info("Loaded challenge data. ID: " + currentChallengeId);
             } else {
                 currentChallengeId = null;
-                BaseMod.logger.info("No challenge data found.");
+        //        BaseMod.logger.info("No challenge data found.");
             }
         } catch (IOException e) {
-            BaseMod.logger.error("Error loading challenge data: " + e.getMessage());
+        //    BaseMod.logger.error("Error loading challenge data: " + e.getMessage());
         }
     }
 
@@ -344,22 +301,22 @@ public class CuratedChallenges implements
             config.remove(CHALLENGE_RUN_KEY);
             config.save();
             currentChallengeId = null;
-            BaseMod.logger.info("Cleared challenge data.");
+         //   BaseMod.logger.info("Cleared challenge data.");
         } catch (IOException e) {
-            BaseMod.logger.error("Error clearing challenge data: " + e.getMessage());
+       //     BaseMod.logger.error("Error clearing challenge data: " + e.getMessage());
         }
     }
 
     @Override
     public void receiveStartGame() {
         loadChallengeData();
-        BaseMod.logger.info("Game started. isTrial: " + Settings.isTrial + ", currentChallengeId: " + currentChallengeId);
+      //  BaseMod.logger.info("Game started. isTrial: " + Settings.isTrial + ", currentChallengeId: " + currentChallengeId);
         if (Settings.isTrial && currentChallengeId != null) {
-            BaseMod.logger.info("Starting challenge run. Current Challenge ID: " + currentChallengeId);
+       //     BaseMod.logger.info("Starting challenge run. Current Challenge ID: " + currentChallengeId);
             // Apply challenge modifications after a short delay to ensure all game systems are initialized
             applyChallengeModifications();
         } else {
-            BaseMod.logger.info("Starting regular run. Clearing any lingering challenge data.");
+       //     BaseMod.logger.info("Starting regular run. Clearing any lingering challenge data.");
             clearChallengeData();
         }
     }
@@ -507,16 +464,16 @@ public class CuratedChallenges implements
 
     @Override
     public void receivePostDungeonInitialize() {
-        BaseMod.logger.info("receivePostDungeonInitialize called");
-        BaseMod.logger.info("Settings.isTrial: " + Settings.isTrial);
-        BaseMod.logger.info("currentChallengeId: " + currentChallengeId);
+      //  BaseMod.logger.info("receivePostDungeonInitialize called");
+      //  BaseMod.logger.info("Settings.isTrial: " + Settings.isTrial);
+      //  BaseMod.logger.info("currentChallengeId: " + currentChallengeId);
 
         if (Settings.isTrial && currentChallengeId != null) {
-            BaseMod.logger.info("Conditions met for challenge initialization");
+        //    BaseMod.logger.info("Conditions met for challenge initialization");
             initializeChallengeDeck();
             applyStartOfRunEffect();
         } else {
-            BaseMod.logger.info("Conditions not met for challenge initialization");
+       //     BaseMod.logger.info("Conditions not met for challenge initialization");
         }
     }
 
@@ -524,7 +481,7 @@ public class CuratedChallenges implements
         ChallengeDefinition challenge = ChallengeRegistry.getChallenge(currentChallengeId);
         if (challenge != null) {
             challenge.applyStartOfRunEffect(AbstractDungeon.player);
-            BaseMod.logger.info("Applied start of run effect for challenge: " + currentChallengeId);
+          //  BaseMod.logger.info("Applied start of run effect for challenge: " + currentChallengeId);
         }
     }
 
@@ -533,7 +490,7 @@ public class CuratedChallenges implements
         if (challenge != null) {
             applyChallengeModifications();
             challenge.applyStartOfActEffect(player, actNumber);
-            BaseMod.logger.info("Applied start of act effect for challenge: " + currentChallengeId + ", Act: " + actNumber);
+         //   BaseMod.logger.info("Applied start of act effect for challenge: " + currentChallengeId + ", Act: " + actNumber);
         }
     }
 

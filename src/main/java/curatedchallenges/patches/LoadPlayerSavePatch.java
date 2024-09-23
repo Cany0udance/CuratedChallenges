@@ -36,7 +36,6 @@ public class LoadPlayerSavePatch {
             initializeCardPools.setAccessible(true);
             initializeCardPools.invoke(null);  // Invoke statically
         } catch (Exception e) {
-            logger.error("Failed to reinitialize card pools: " + e.getMessage());
         }
     }
 
@@ -46,7 +45,6 @@ public class LoadPlayerSavePatch {
             initializeRelicList.setAccessible(true);
             initializeRelicList.invoke(null);
         } catch (Exception e) {
-            logger.error("Failed to reinitialize relic list: " + e.getMessage());
         }
     }
 

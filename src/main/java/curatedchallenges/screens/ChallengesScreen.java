@@ -1,6 +1,7 @@
 package curatedchallenges.screens;
 
 import com.megacrit.cardcrawl.helpers.MathHelper;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBarListener;
 import curatedchallenges.patches.ChallengeModePatches;
@@ -12,7 +13,6 @@ import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.characters.*;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
@@ -23,7 +23,6 @@ import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.custom.CustomModeCharacterButton;
-import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
 import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 import com.megacrit.cardcrawl.trials.CustomTrial;
@@ -31,13 +30,14 @@ import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static curatedchallenges.CuratedChallenges.makeID;
 
 public class ChallengesScreen implements ScrollBarListener {
     private String currentSeed = "";
     private static final float CHARACTER_ICON_X = Settings.WIDTH * 0.5f;
     private static final float CHARACTER_ICON_Y = Settings.HEIGHT * 0.85f;
-    private static final float CHARACTER_BUTTON_SPACING = 175f * Settings.scale;
+    private static final float CHARACTER_BUTTON_SPACING = 150f * Settings.scale;
     private static final float CHALLENGE_LIST_Y_OFFSET = 20f * Settings.scale;
     public static Challenge currentChallenge = null;
     public CustomToggleButton ascension20Button;
@@ -66,6 +66,8 @@ public class ChallengesScreen implements ScrollBarListener {
     public AbstractPlayer.PlayerClass selectedCharacter;
     public boolean isScreenOpened;
     private ChallengesScreenRenderer renderer;
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ChallengeScreen"));
+
 
     public ChallengesScreen() {
         this.cancelButton = new MenuCancelButton();
@@ -82,8 +84,8 @@ public class ChallengesScreen implements ScrollBarListener {
         this.ascension20Button = new CustomToggleButton(
                 ASCENSION20_BUTTON_X,
                 ASCENSION20_BUTTON_Y,
-                "Ascension 20 Mode",
-                "Enable to start the run on Ascension 20",
+                uiStrings.TEXT[0],
+                uiStrings.TEXT[1],
                 false
         );
         this.fireEffects = new ArrayList<>();
@@ -94,7 +96,7 @@ public class ChallengesScreen implements ScrollBarListener {
     }
 
     private void calculateScrollBounds() {
-        this.scrollUpperBound = Math.max(0, this.challenges.size() * 20f * Settings.scale - Settings.HEIGHT * 0.7f);
+        this.scrollUpperBound = 300.0F * Settings.scale;
         this.scrollLowerBound = 0.0F;
     }
 
@@ -232,9 +234,19 @@ public class ChallengesScreen implements ScrollBarListener {
         updateScrolling();
         this.scrollBar.update();
 
+        updateCharacterButtons();
         updateChallenges();
         updateRelics();
         this.updateEmbarkButton();
+    }
+
+    private void updateCharacterButtons() {
+        float startX = CHARACTER_ICON_X - ((characterButtons.size() - 1) * CHARACTER_BUTTON_SPACING / 2f);
+        for (int i = 0; i < characterButtons.size(); i++) {
+            CustomModeCharacterButton button = characterButtons.get(i);
+            float baseY = CHARACTER_ICON_Y + scrollY; // Add scrollY to the base Y position
+            button.update(startX + (i * CHARACTER_BUTTON_SPACING), baseY);
+        }
     }
 
     private void updateScrolling() {
@@ -349,21 +361,6 @@ public class ChallengesScreen implements ScrollBarListener {
         currentChallenge = selectedChallenge;
         CuratedChallenges.startChallengeRun(selectedChallenge.id);
         CardCrawlGame.mode = CardCrawlGame.GameMode.CHAR_SELECT;
-    }
-
-    private AbstractPlayer.PlayerClass getPlayerClassFromString(String className) {
-        switch (className.toUpperCase()) {
-            case "IRONCLAD":
-                return AbstractPlayer.PlayerClass.IRONCLAD;
-            case "THE_SILENT":
-                return AbstractPlayer.PlayerClass.THE_SILENT;
-            case "DEFECT":
-                return AbstractPlayer.PlayerClass.DEFECT;
-            case "WATCHER":
-                return AbstractPlayer.PlayerClass.WATCHER;
-            default:
-                return AbstractPlayer.PlayerClass.IRONCLAD;
-        }
     }
 
     private void updateRelics() {

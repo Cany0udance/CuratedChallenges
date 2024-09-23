@@ -9,6 +9,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.CardLibrary;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.PandorasBox;
 import com.megacrit.cardcrawl.vfx.RainingGoldEffect;
@@ -22,8 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static basemod.BaseMod.logger;
+import static curatedchallenges.CuratedChallenges.makeID;
 
 public class Gamblecore implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("Gamblecore"));
+
     public static final String ID = "GAMBLECORE";
 
     @Override
@@ -33,7 +37,7 @@ public class Gamblecore implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Gamblecore";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -65,19 +69,19 @@ public class Gamblecore implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "LET'S GO GAMBLING!!!! NL At the start of each Act, reroll your cards into others of the same rarity and color. NL Rerolled cards keep their upgrades.";
+        return uiStrings.TEXT[1];
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 4.";
+        return uiStrings.TEXT[2];
     }
 
     @Override
     public List<WinCondition> getWinConditionLogic() {
         List<WinCondition> conditions = new ArrayList<>();
-        conditions.add(new CompleteActWinCondition(4));
+        conditions.add(new CompleteActWinCondition(3));
         return conditions;
     }
 

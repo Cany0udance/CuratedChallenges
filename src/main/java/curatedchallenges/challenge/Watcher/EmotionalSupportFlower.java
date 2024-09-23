@@ -1,11 +1,13 @@
 package curatedchallenges.challenge.Watcher;
 
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.events.exordium.GoopPuddle;
 import com.megacrit.cardcrawl.events.exordium.ScrapOoze;
 import com.megacrit.cardcrawl.events.exordium.ShiningLight;
 import com.megacrit.cardcrawl.events.shrines.Nloth;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.potions.StancePotion;
 import curatedchallenges.winconditions.CompleteActWinCondition;
@@ -20,7 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class EmotionalSupportFlower implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("EmotionalSupportFlower"));
 
     public static final String ID = "EMOTIONAL_SUPPORT_FLOWER";
 
@@ -31,7 +36,7 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Emotional Support Flower";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -66,12 +71,12 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "ALL usual methods of Stance-entering have been removed. NL When Happy Flower is at 1 or 2, enter Calm. NL When Happy Flower is at 0, enter Wrath. NL Card rewards have 1 less card to choose from.";
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

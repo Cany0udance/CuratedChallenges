@@ -22,22 +22,17 @@ public class GenerateRoomTypesPatch {
     public static SpireReturn<Void> Prefix(ArrayList<AbstractRoom> roomList, int availableRoomCount) {
         if (Avarice.ID.equals(CuratedChallenges.currentChallengeId)) {
             try {
-                logger.info("Generating Room Types for Avarice Challenge! There are " + availableRoomCount + " rooms:");
 
                 float restRoomChance = getProtectedFloat(AbstractDungeon.class, "restRoomChance");
                 int restCount = Math.round(availableRoomCount * restRoomChance);
-                logger.info(" REST (" + toPercentage(restRoomChance) + "): " + restCount);
 
                 float eliteRoomChance = getProtectedFloat(AbstractDungeon.class, "eliteRoomChance");
                 int eliteCount = calculateEliteCount(availableRoomCount, eliteRoomChance);
-                logger.info(" ELITE (" + toPercentage(eliteRoomChance) + "): " + eliteCount);
 
                 float eventRoomChance = getProtectedFloat(AbstractDungeon.class, "eventRoomChance");
                 int eventCount = Math.round(availableRoomCount * eventRoomChance);
-                logger.info(" EVNT (" + toPercentage(eventRoomChance) + "): " + eventCount);
 
                 int monsterCount = availableRoomCount - restCount - eliteCount - eventCount - 1; // -1 for guaranteed shop
-                logger.info(" MSTR (" + toPercentage(1.0F - restRoomChance - eliteRoomChance - eventRoomChance) + "): " + monsterCount);
 
                 // Add rooms to the list
                 for (int i = 0; i < restCount; i++) {
@@ -56,7 +51,6 @@ public class GenerateRoomTypesPatch {
 
                 return SpireReturn.Return(null);
             } catch (Exception e) {
-                logger.error("Error in Avarice Challenge room generation", e);
                 return SpireReturn.Continue();
             }
         }
@@ -85,7 +79,6 @@ public class GenerateRoomTypesPatch {
             method.setAccessible(true);
             return (String) method.invoke(null, f);
         } catch (Exception e) {
-            logger.error("Error calling toPercentage", e);
             return String.format("%.2f%%", f * 100);
         }
     }

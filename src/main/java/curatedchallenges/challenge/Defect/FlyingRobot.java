@@ -3,9 +3,11 @@ package curatedchallenges.challenge.Defect;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.blue.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.PowerTip;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.orbs.*;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.CrackedCore;
@@ -23,8 +25,11 @@ import java.util.List;
 import java.util.Random;
 
 import static basemod.BaseMod.logger;
+import static curatedchallenges.CuratedChallenges.makeID;
 
 public class FlyingRobot implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("FlyingRobot"));
+
     public static final String ID = "FLYING_ROBOT";
 
     @Override
@@ -34,7 +39,7 @@ public class FlyingRobot implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Flying Robot";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -74,13 +79,12 @@ public class FlyingRobot implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Map generation will only have two unconnected paths. NL At the start of each Act, refresh your Wing Boots. NL Wing Boots only holds 2 charges rather than 3.";
-
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

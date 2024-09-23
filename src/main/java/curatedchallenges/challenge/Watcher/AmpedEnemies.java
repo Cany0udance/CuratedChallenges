@@ -5,8 +5,10 @@ import com.megacrit.cardcrawl.actions.unique.IncreaseMaxHpAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.purple.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.potions.*;
 import com.megacrit.cardcrawl.powers.MetallicizePower;
@@ -22,7 +24,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class AmpedEnemies implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("AmpedEnemies"));
 
     public static final String ID = "AMPED_ENEMIES";
 
@@ -33,7 +38,7 @@ public class AmpedEnemies implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Amped Enemies";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -67,12 +72,12 @@ public class AmpedEnemies implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Start the run with a Smoke Bomb. NL At the start of combat, apply an Emerald Elite buff to ALL enemies.";
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

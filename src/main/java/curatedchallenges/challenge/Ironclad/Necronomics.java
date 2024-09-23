@@ -6,9 +6,11 @@ import com.megacrit.cardcrawl.cards.red.Bash;
 import com.megacrit.cardcrawl.cards.red.Defend_Red;
 import com.megacrit.cardcrawl.cards.red.Strike_Red;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.events.shrines.FountainOfCurseRemoval;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
@@ -19,7 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class Necronomics implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("Necronomics"));
+
     public static final String ID = "NECRONOMICS";
 
     @Override
@@ -29,7 +35,7 @@ public class Necronomics implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Necronomics";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -64,13 +70,13 @@ public class Necronomics implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Whenever you play a card, increase its cost by 1 for the rest of combat.";
+        return uiStrings.TEXT[1];
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 4.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

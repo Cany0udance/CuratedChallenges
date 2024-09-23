@@ -6,6 +6,7 @@ import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuPanelButton;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuPanelScreen;
@@ -13,6 +14,8 @@ import javassist.CtBehavior;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
+
+import static curatedchallenges.CuratedChallenges.makeID;
 
 public class ChallengeModePatches {
     private static final Texture CHALLENGE_MODE_BUTTON_TEXTURE = new Texture("curatedchallenges/images/ChallengesScreenImage.png");
@@ -79,16 +82,18 @@ public class ChallengeModePatches {
             method = "setLabel"
     )
     public static class SetChallengeModeLabel {
+        private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ChallengeScreens"));
+
         @SpirePostfixPatch
         public static void Postfix(MainMenuPanelButton __instance) {
             MainMenuPanelButton.PanelClickResult result = (MainMenuPanelButton.PanelClickResult) ReflectionHacks.getPrivate(__instance, MainMenuPanelButton.class, "result");
             if (result == Enums.PLAY_CHALLENGE) {
-                ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "header", "Challenges");
-                ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "description", "Play a run with special rules!");
+                ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "header", uiStrings.TEXT[0]);
+                ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "description", uiStrings.TEXT[1]);
                 ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "portraitImg", CHALLENGE_MODE_BUTTON_TEXTURE);
             } else if (result == Enums.PLAY_CURATED_CHALLENGE) {
-                ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "header", "Curated Challenges");
-                ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "description", "Play with special curated challenges!");
+                ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "header", uiStrings.TEXT[2]);
+                ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "description", uiStrings.TEXT[3]);
                 ReflectionHacks.setPrivate(__instance, MainMenuPanelButton.class, "portraitImg", CHALLENGE_MODE_BUTTON_TEXTURE);
             }
         }

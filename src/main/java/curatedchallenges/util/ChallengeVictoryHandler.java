@@ -4,6 +4,7 @@ import basemod.BaseMod;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
@@ -13,7 +14,11 @@ import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class ChallengeVictoryHandler {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("VictoryScreenText"));
+
     public static void checkVictoryConditions(String challengeId, boolean isInBossTreasureRoom, boolean isInVictoryRoom, boolean isInTrueVictoryRoom) {
         ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
         if (challenge != null) {
@@ -88,9 +93,7 @@ public class ChallengeVictoryHandler {
         AbstractDungeon.victoryScreen = new VictoryScreen(null);
         AbstractDungeon.screen = AbstractDungeon.CurrentScreen.VICTORY;
 
-        AbstractDungeon.dynamicBanner.appear("Challenge Complete!");
-
-        BaseMod.logger.info("Challenge victory screen opened with custom banner text.");
+        AbstractDungeon.dynamicBanner.appear(uiStrings.TEXT[0]);
     }
 
     public static boolean checkDeckForCard(String cardId) {

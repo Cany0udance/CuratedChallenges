@@ -9,8 +9,10 @@ import com.megacrit.cardcrawl.cards.colorless.PanicButton;
 import com.megacrit.cardcrawl.cards.green.*;
 import com.megacrit.cardcrawl.cards.purple.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.potions.DexterityPotion;
 import com.megacrit.cardcrawl.potions.SpeedPotion;
@@ -28,7 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class TheBestDefense implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("TheBestDefense"));
+
     public static final String ID = "THE_BEST_DEFENSE";
 
     @Override
@@ -38,8 +44,7 @@ public class TheBestDefense implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "The Best Defense...";
-    }
+        return uiStrings.TEXT[0];    }
 
     @Override
     public AbstractPlayer.PlayerClass getCharacterClass() {
@@ -74,13 +79,12 @@ public class TheBestDefense implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "ALL cards that directly grant Block are removed from the card pool. NL Card rewards have 1 less card to choose from.";
-
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

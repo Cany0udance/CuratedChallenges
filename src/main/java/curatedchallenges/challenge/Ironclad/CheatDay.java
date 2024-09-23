@@ -7,8 +7,10 @@ import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.curses.Parasite;
 import com.megacrit.cardcrawl.cards.red.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.potions.Elixir;
 import com.megacrit.cardcrawl.potions.FearPotion;
@@ -30,7 +32,11 @@ import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
 import java.util.ArrayList;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class CheatDay implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("CheatDay"));
+
     public static final String ID = "CHEAT_DAY";
 
     @Override
@@ -40,7 +46,7 @@ public class CheatDay implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Cheat Day";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -79,13 +85,12 @@ public class CheatDay implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Start with half max HP. NL At the start of combat, gain the effects of the Fasting power.";
-
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3 OR NL have at least 200 Max HP.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

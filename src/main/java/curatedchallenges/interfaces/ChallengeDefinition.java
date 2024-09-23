@@ -2,6 +2,7 @@ package curatedchallenges.interfaces;
 
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
@@ -9,6 +10,8 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static curatedchallenges.CuratedChallenges.makeID;
 
 public interface ChallengeDefinition {
     String getId();
@@ -64,7 +67,7 @@ public interface ChallengeDefinition {
 
     default String getTopPanelSummary() {
         StringBuilder summary = new StringBuilder();
-        summary.append("#ySpecial #yRules:").append(" NL NL ");
+        summary.append(CardCrawlGame.languagePack.getUIString(makeID("TopPanel")).TEXT[0]).append(" NL NL ");
 
         String[] specialRules = getSpecialRules().split("NL");
         for (int i = 0; i < specialRules.length; i++) {
@@ -74,7 +77,7 @@ public interface ChallengeDefinition {
             }
         }
 
-        summary.append(" NL NL #yWin #yConditions:").append(" NL NL ");
+        summary.append(CardCrawlGame.languagePack.getUIString(makeID("TopPanel")).TEXT[1]).append(" NL NL ");
 
         String[] winConditions = getWinConditions().split("NL");
         for (int i = 0; i < winConditions.length; i++) {

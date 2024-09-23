@@ -3,10 +3,12 @@ package curatedchallenges.challenge.Ironclad;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.red.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.PowerTip;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
@@ -19,8 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static basemod.BaseMod.logger;
+import static curatedchallenges.CuratedChallenges.makeID;
 
 public class CursedCombo implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("CursedCombo"));
     public static final String ID = "CURSED_COMBO";
 
     @Override
@@ -30,7 +34,7 @@ public class CursedCombo implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Cursed Combo";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -71,13 +75,13 @@ public class CursedCombo implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "At the start of Act 2, obtain a Runic Pyramid.";
+        return uiStrings.TEXT[1];
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

@@ -3,8 +3,10 @@ package curatedchallenges.challenge.Defect;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.blue.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.orbs.*;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.GoldPlatedCables;
@@ -17,9 +19,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class AuxiliaryPower implements ChallengeDefinition {
-    public static final String ID = "AUXILIARY_POWER";
+import static curatedchallenges.CuratedChallenges.makeID;
 
+public class AuxiliaryPower implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("AuxiliaryPower"));
+    public static final String ID = "AUXILIARY_POWER";
     @Override
     public String getId() {
         return ID;
@@ -27,7 +31,7 @@ public class AuxiliaryPower implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Auxiliary Power";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -66,13 +70,13 @@ public class AuxiliaryPower implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Draw 2 fewer cards per turn. NL Start with an additional orb slot. NL At the start of combat, channel one of each orb in random order.";
+        return uiStrings.TEXT[1];
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 4.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

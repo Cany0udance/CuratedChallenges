@@ -5,17 +5,16 @@ import com.megacrit.cardcrawl.actions.animations.VFXAction;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.colorless.HandOfGreed;
-import com.megacrit.cardcrawl.cards.green.Defend_Green;
-import com.megacrit.cardcrawl.cards.green.Neutralize;
-import com.megacrit.cardcrawl.cards.green.Strike_Green;
-import com.megacrit.cardcrawl.cards.green.Survivor;
+import com.megacrit.cardcrawl.cards.green.*;
 import com.megacrit.cardcrawl.cards.red.Bash;
 import com.megacrit.cardcrawl.cards.red.Defend_Red;
 import com.megacrit.cardcrawl.cards.red.Feed;
 import com.megacrit.cardcrawl.cards.red.Strike_Red;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.powers.DexterityPower;
 import com.megacrit.cardcrawl.powers.StrengthPower;
 import com.megacrit.cardcrawl.powers.watcher.EnergyDownPower;
@@ -30,7 +29,11 @@ import curatedchallenges.winconditions.MaxHPWinCondition;
 import java.util.ArrayList;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class Avarice implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("Avarice"));
+
     public static final String ID = "AVARICE";
 
     @Override
@@ -40,7 +43,7 @@ public class Avarice implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Avarice";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -56,13 +59,15 @@ public class Avarice implements ChallengeDefinition {
             deck.add(new Strike_Green());
         }
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             deck.add(new Defend_Green());
         }
 
         deck.add(new Neutralize());
 
         deck.add(new Survivor());
+
+        deck.add(new DodgeAndRoll());
 
         deck.add(new HandOfGreed());
 
@@ -79,13 +84,12 @@ public class Avarice implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Shops will only appear once per Act, where the chest normally spawns. NL The first time you spend Gold at a shop, obtain an Ectoplasm.";
-
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3 OR NL Have at least 1,500 Gold.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

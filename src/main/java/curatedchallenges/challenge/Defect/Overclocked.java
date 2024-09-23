@@ -4,9 +4,11 @@ import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.blue.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.PowerTip;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.powers.CombustPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.CrackedCore;
@@ -22,8 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static basemod.BaseMod.logger;
+import static curatedchallenges.CuratedChallenges.makeID;
 
 public class Overclocked implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("Overclocked"));
+
     public static final String ID = "OVERCLOCKED";
 
     @Override
@@ -33,7 +38,7 @@ public class Overclocked implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Overclocked";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -73,13 +78,13 @@ public class Overclocked implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "At the start of your turn, gain the effects of the Combust power.";
+        return uiStrings.TEXT[1];
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

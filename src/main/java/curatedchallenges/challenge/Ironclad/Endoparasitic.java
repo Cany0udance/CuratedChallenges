@@ -2,11 +2,13 @@ package curatedchallenges.challenge.Ironclad;
 
 import com.megacrit.cardcrawl.cards.curses.Parasite;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.events.exordium.GoopPuddle;
 import com.megacrit.cardcrawl.events.exordium.ScrapOoze;
 import com.megacrit.cardcrawl.events.exordium.ShiningLight;
 import com.megacrit.cardcrawl.events.shrines.FountainOfCurseRemoval;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import curatedchallenges.winconditions.CompleteActWinCondition;
 import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -23,7 +25,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class Endoparasitic implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("Endoparasitic"));
+
     public static final String ID = "ENDOPARASITIC";
 
     @Override
@@ -33,7 +39,7 @@ public class Endoparasitic implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Endoparasitic";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -71,13 +77,13 @@ public class Endoparasitic implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "None";
+        return uiStrings.TEXT[1];
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3 OR NL Remove ALL Parasites from your deck.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

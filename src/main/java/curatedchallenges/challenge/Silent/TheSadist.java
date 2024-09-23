@@ -6,8 +6,10 @@ import com.megacrit.cardcrawl.cards.blue.Melter;
 import com.megacrit.cardcrawl.cards.colorless.HandOfGreed;
 import com.megacrit.cardcrawl.cards.green.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.powers.CombustPower;
 import com.megacrit.cardcrawl.powers.EnvenomPower;
 import com.megacrit.cardcrawl.powers.SadisticPower;
@@ -20,7 +22,11 @@ import curatedchallenges.winconditions.CompleteActWinCondition;
 import java.util.ArrayList;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class TheSadist implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("TheSadist"));
+
     public static final String ID = "THE_SADIST";
 
     @Override
@@ -30,7 +36,7 @@ public class TheSadist implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "The Sadist";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -72,13 +78,12 @@ public class TheSadist implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Before the start of combat, lose 3 Strength, gain 1 Envenom, and gain 3 Sadistic.";
-
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 4.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

@@ -1,6 +1,17 @@
 package curatedchallenges.screens;
 
+import basemod.BaseMod;
 import com.badlogic.gdx.graphics.Color;
+import com.megacrit.cardcrawl.cards.curses.CurseOfTheBell;
+import com.megacrit.cardcrawl.cards.purple.Fasting;
+import com.megacrit.cardcrawl.cards.red.Combust;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.helpers.CardLibrary;
+import com.megacrit.cardcrawl.helpers.PowerTip;
+import com.megacrit.cardcrawl.helpers.input.InputHelper;
+import com.megacrit.cardcrawl.localization.PowerStrings;
+import com.megacrit.cardcrawl.localization.UIStrings;
+import com.megacrit.cardcrawl.powers.*;
 import com.megacrit.cardcrawl.screens.custom.CustomModeCharacterButton;
 import curatedchallenges.buttons.CustomToggleButton;
 import curatedchallenges.effects.MenuFireEffect;
@@ -15,10 +26,11 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static curatedchallenges.CuratedChallenges.makeID;
 
 public class ChallengesScreenRenderer {
     private static final float DESCRIPTION_X = Settings.WIDTH * 0.6f;
@@ -27,22 +39,38 @@ public class ChallengesScreenRenderer {
     private static final float LINE_SPACING = 30f * Settings.scale;
     private static final float REDUCED_LINE_SPACING = 20f * Settings.scale; // New constant for reduced spacing
     private static final float SECTION_SPACING = 20f * Settings.scale;
-    private static final float TIP_OFFSET_X = 20f;
-    private static final float TIP_OFFSET_Y = 20f;
-    private static final int CHAR_LIMIT_PER_LINE = 50; // Adjust this value as needed
-    private static final String BULLET_SYMBOL = "-";
-    private static final float BULLET_SCALE = 1.2f;
-    private static final String[] HEADERS = {"Starting Deck", "Starting Relics", "Special Rules", "Win Conditions"};
+    private static final float TIP_OFFSET_X = -350f * Settings.scale;
+    private static final float TIP_OFFSET_Y = 50f * Settings.scale;
+    private static final int CHAR_LIMIT_PER_LINE = 50;
+    private static final float CARD_PREVIEW_OFFSET_X = -150f * Settings.scale;
+    private static final float CARD_PREVIEW_OFFSET_Y = 100f * Settings.scale;
+    private AbstractCard cardToPreview;
+    private float previewX;
+    private float previewY;
+    private PowerTip tipToRender;
+    private float tipX;
+    private float tipY;
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ChallengeScreen"));
+    private static final Map<String, PowerTip> keywordTips = new HashMap<>();
+    private static final Map<String, String> powerDelimiters = new HashMap<>();
+    private static final Map<String, AbstractCard> cardPreviews = new HashMap<>();
+    private static final String DELIMITER_SEPARATOR = "\\|"; // Use this to separate multiple delimiters
+    private static final String[] HEADERS = {uiStrings.TEXT[2], uiStrings.TEXT[3], uiStrings.TEXT[4], uiStrings.TEXT[5]};
+
 
     public void render(SpriteBatch sb, ChallengesScreen screen, float scrollY) {
+        cardToPreview = null;
+        tipToRender = null;
         screen.cancelButton.render(sb);
         renderCharacterButtons(sb, screen, scrollY);
+
 
         if (screen.selectedCharacter != null) {
             screen.challenges.stream()
                     .filter(challenge -> challenge.characterClass.equals(screen.selectedCharacter))
                     .forEach(challenge -> challenge.render(sb, scrollY));
         }
+
 
         Challenge selectedChallenge = screen.getSelectedChallenge();
         if (selectedChallenge != null) {
@@ -51,20 +79,26 @@ public class ChallengesScreenRenderer {
             renderAscension20Button(sb, screen, scrollY);
             screen.embarkButton.render(sb);
 
+
             for (MenuFireEffect effect : screen.fireEffects) {
                 effect.render(sb);
             }
         }
+        if (cardToPreview != null) {
+            renderCardPreview(sb);
+        }
+        if (tipToRender != null) {
+            renderKeywordTooltip(sb);
+        }
     }
+
 
     private void renderCharacterButtons(SpriteBatch sb, ChallengesScreen screen, float scrollY) {
         for (CustomModeCharacterButton button : screen.characterButtons) {
-            float adjustedY = button.hb.cY + scrollY;
-            button.move(button.hb.cX, adjustedY);
             button.render(sb);
-            button.move(button.hb.cX, button.hb.cY - scrollY); // Reset the position after rendering
         }
     }
+
 
     private void renderAscension20Button(SpriteBatch sb, ChallengesScreen screen, float scrollY) {
         try {
@@ -81,6 +115,7 @@ public class ChallengesScreenRenderer {
         }
     }
 
+
     private void renderRelicTooltips(SpriteBatch sb, Challenge challenge) {
         challenge.startingRelics.stream()
                 .filter(relic -> relic.hb.hovered)
@@ -91,23 +126,27 @@ public class ChallengesScreenRenderer {
                 });
     }
 
+
     private void renderChallengeDescription(SpriteBatch sb, Challenge challenge, float scrollY) {
         float currentY = DESCRIPTION_START_Y;
+
 
         for (int i = 0; i < HEADERS.length; i++) {
             String header = HEADERS[i];
             FontHelper.renderFontLeftTopAligned(sb, FontHelper.panelNameFont, header, DESCRIPTION_X, currentY + scrollY, Settings.GOLD_COLOR);
             currentY -= FontHelper.getHeight(FontHelper.panelNameFont) + LINE_SPACING;
 
-            if (header.equals("Starting Relics")) {
+
+            if (header.equals(uiStrings.TEXT[3])) {
                 currentY = renderRelics(sb, challenge, currentY, scrollY);
-            } else if (header.equals("Starting Deck")) {
+            } else if (header.equals(uiStrings.TEXT[2])) {
                 currentY = renderTinyCards(sb, challenge, currentY, scrollY);
             } else {
                 String description = getDescriptionForHeader(challenge, header);
-                boolean useReducedSpacing = header.equals("Special Rules") || header.equals("Win Conditions");
+                boolean useReducedSpacing = header.equals(uiStrings.TEXT[4]) || header.equals(uiStrings.TEXT[5]);
                 currentY = renderWrappedText(sb, description, currentY, useReducedSpacing, scrollY);
             }
+
 
             if (i < HEADERS.length - 1) {
                 currentY -= SECTION_SPACING;
@@ -115,11 +154,13 @@ public class ChallengesScreenRenderer {
         }
     }
 
+
     private float renderRelics(SpriteBatch sb, Challenge challenge, float startY, float scrollY) {
         float relicX = DESCRIPTION_X;
         float relicY = startY;
         float maxRelicWidth = 64f * Settings.scale;
         float relicSpacing = 5f * Settings.scale;
+
 
         for (AbstractRelic relic : challenge.startingRelics) {
             relic.currentX = relicX + maxRelicWidth / 2f;
@@ -128,6 +169,7 @@ public class ChallengesScreenRenderer {
             relic.hb.move(relic.currentX, relic.currentY);
             relic.hb.render(sb);
 
+
             relicX += maxRelicWidth + relicSpacing;
             if (relicX > DESCRIPTION_X + DESCRIPTION_WIDTH - maxRelicWidth) {
                 relicX = DESCRIPTION_X;
@@ -135,17 +177,21 @@ public class ChallengesScreenRenderer {
             }
         }
 
+
         return relicY - maxRelicWidth - (20f * Settings.scale);
     }
+
 
     private float renderTinyCards(SpriteBatch sb, Challenge challenge, float startY, float scrollY) {
         float cardX = DESCRIPTION_X;
         float cardY = startY;
         float maxWidth = challenge.tinyCards.stream().map(card -> card.hb.width).max(Float::compare).orElse(0f);
 
+
         for (TinyCard tinyCard : challenge.tinyCards) {
             tinyCard.hb.move(cardX + tinyCard.hb.width / 2f, cardY - tinyCard.hb.height / 2f + scrollY);
             tinyCard.render(sb);
+
 
             cardY -= tinyCard.hb.height + 5f * Settings.scale;
             if (cardY < startY - DESCRIPTION_WIDTH + maxWidth) {
@@ -154,24 +200,30 @@ public class ChallengesScreenRenderer {
             }
         }
 
+
         return Math.min(startY, cardY) - (20f * Settings.scale);
     }
+
 
     private float renderWrappedText(SpriteBatch sb, String text, float startY, boolean useReducedSpacing, float scrollY) {
         String[] lines = text.split("NL");
         float currentY = startY;
         float lineSpacing = useReducedSpacing ? REDUCED_LINE_SPACING : LINE_SPACING;
 
+
         for (String line : lines) {
             currentY = renderBulletedLine(sb, line.trim(), DESCRIPTION_X, currentY, lineSpacing, true, scrollY);
         }
 
+
         return currentY;
     }
+
 
     private float renderBulletedLine(SpriteBatch sb, String text, float x, float y, float lineSpacing, boolean addBullet, float scrollY) {
         List<String> wrappedLines = wrapText(text, CHAR_LIMIT_PER_LINE);
         float currentY = y;
+
 
         for (int i = 0; i < wrappedLines.size(); i++) {
             String line = wrappedLines.get(i);
@@ -180,13 +232,16 @@ public class ChallengesScreenRenderer {
             currentY -= FontHelper.getHeight(FontHelper.cardDescFont_N) + lineSpacing;
         }
 
+
         return currentY;
     }
+
 
     private List<String> wrapText(String text, int charLimit) {
         List<String> wrappedLines = new ArrayList<>();
         StringBuilder currentLine = new StringBuilder();
         String[] words = text.split("\\s+");
+
 
         for (String word : words) {
             if (currentLine.length() + word.length() > charLimit) {
@@ -196,11 +251,23 @@ public class ChallengesScreenRenderer {
             currentLine.append(word).append(" ");
         }
 
+
         if (currentLine.length() > 0) {
             wrappedLines.add(currentLine.toString().trim());
         }
 
+
         return wrappedLines;
+    }
+
+
+    private static void addCardPreview(String cardID) {
+        AbstractCard card = CardLibrary.getCard(cardID);
+        if (card != null) {
+            String localizedName = card.name;
+            cardPreviews.put(localizedName.toLowerCase(), card.makeStatEquivalentCopy());
+            cardPreviews.put(cardID.toLowerCase(), card.makeStatEquivalentCopy());
+        }
     }
 
     private void renderColoredLine(SpriteBatch sb, String line, float x, float y, String prefix) {
@@ -215,10 +282,77 @@ public class ChallengesScreenRenderer {
                 wordColor = getColorFromTag(word.substring(0, 2));
                 word = word.substring(2);
             }
+
+            String cleanWord = word.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+            float wordWidth = FontHelper.getSmartWidth(FontHelper.cardDescFont_N, word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
+
+            if (isMouseOverWord(currentX, y, wordWidth)) {
+                PowerTip tip = keywordTips.get(cleanWord);
+                if (tip != null) {
+                    setupKeywordTooltip(tip, InputHelper.mX, InputHelper.mY);
+                } else {
+                    AbstractCard cardPreview = cardPreviews.get(cleanWord);
+                    if (cardPreview != null) {
+                        setupCardPreview(cardPreview, InputHelper.mX, InputHelper.mY);
+                    }
+                }
+            }
+
             FontHelper.renderFont(sb, FontHelper.cardDescFont_N, word + " ", currentX, y, wordColor);
-            currentX += FontHelper.getSmartWidth(FontHelper.cardDescFont_N, word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
+            currentX += wordWidth;
         }
     }
+
+    private void setupCardPreview(AbstractCard card, float x, float y) {
+        cardToPreview = card;
+        previewX = x + CARD_PREVIEW_OFFSET_X;
+        previewY = y + CARD_PREVIEW_OFFSET_Y;
+
+        // Ensure the preview doesn't go off-screen
+        previewX = Math.max(previewX, card.hb.width * card.drawScale / 2);
+        previewX = Math.min(previewX, Settings.WIDTH - card.hb.width * card.drawScale / 2);
+        previewY = Math.max(previewY, card.hb.height * card.drawScale / 2);
+        previewY = Math.min(previewY, Settings.HEIGHT - card.hb.height * card.drawScale / 2);
+
+    }
+
+    private void renderCardPreview(SpriteBatch sb) {
+        if (cardToPreview != null) {
+            cardToPreview.current_x = previewX;
+            cardToPreview.current_y = previewY;
+            cardToPreview.drawScale = 0.7f; // Adjust this value to change the size of the preview
+            cardToPreview.render(sb);
+        }
+    }
+
+
+
+    private boolean isKeyword(String word) {
+        return keywordTips.containsKey(word);
+    }
+
+
+    private boolean isMouseOverWord(float x, float y, float width) {
+        return (InputHelper.mX >= x && InputHelper.mX <= x + width &&
+                InputHelper.mY >= y - FontHelper.getHeight(FontHelper.cardDescFont_N) &&
+                InputHelper.mY <= y);
+    }
+
+
+    private void setupKeywordTooltip(PowerTip tip, float x, float y) {
+        tipToRender = tip;
+        tipX = x + TIP_OFFSET_X;
+        tipY = y + TIP_OFFSET_Y;
+    }
+
+    private void renderKeywordTooltip(SpriteBatch sb) {
+        if (tipToRender != null) {
+            ArrayList<PowerTip> tips = new ArrayList<>();
+            tips.add(tipToRender);
+            TipHelper.queuePowerTips(tipX, tipY, tips);
+        }
+    }
+
 
     private Color getColorFromTag(String tag) {
         switch (tag) {
@@ -231,34 +365,89 @@ public class ChallengesScreenRenderer {
         }
     }
 
-    private static class ColoredWord {
-        String word;
-        Color color;
 
-        ColoredWord(String word, Color color) {
-            this.word = word;
-            this.color = color;
-        }
+    static {
+        initializePowerDelimiters();
+        initializeKeywordTips();
+        initializeCardPreviews();
     }
 
+
+    private static void initializeKeywordTips() {
+        // Add keywords and their corresponding PowerTips here
+        addKeywordTip(CuriosityPower.NAME, CuriosityPower.POWER_ID);
+        addKeywordTip(StrengthPower.NAME, StrengthPower.POWER_ID);
+        addKeywordTip(EnvenomPower.NAME, EnvenomPower.POWER_ID);
+        addKeywordTip(SadisticPower.NAME, SadisticPower.POWER_ID);
+     //   addKeywordTip(CombustPower.NAME, CombustPower.POWER_ID);
+        // Add more keywords as needed
+    }
+
+    private static void initializePowerDelimiters() {
+        // Set custom delimiters for powers that need them
+        powerDelimiters.put(CuriosityPower.POWER_ID, "1");
+        powerDelimiters.put(StrengthPower.POWER_ID, "3");
+        powerDelimiters.put(EnvenomPower.POWER_ID, "1");
+        powerDelimiters.put(SadisticPower.POWER_ID, "3");
+      //  powerDelimiters.put(CombustPower.POWER_ID, "1|5"); // Use '|' to separate multiple delimiters
+        // Add more custom delimiters as needed
+    }
+
+    private static void initializeCardPreviews() {
+        addCardPreview(Fasting.ID);
+        addCardPreview(Combust.ID);
+    }
+
+
+    private static void addKeywordTip(String keyword, String powerId) {
+        PowerStrings powerStrings = CardCrawlGame.languagePack.getPowerStrings(powerId);
+        String delimiterString = powerDelimiters.getOrDefault(powerId, "1");
+        String description;
+
+        if (powerId.equals(StrengthPower.POWER_ID)) {
+            // Special handling for Strength
+            description = joinDescriptionsForStrength(powerStrings.DESCRIPTIONS, delimiterString);
+        } else {
+            description = joinDescriptions(powerStrings.DESCRIPTIONS, delimiterString);
+        }
+
+        keywordTips.put(keyword.toLowerCase(), new PowerTip(powerStrings.NAME, description));
+    }
+
+    private static String joinDescriptionsForStrength(String[] descriptions, String delimiterString) {
+        // For Strength, we want to use the second and third descriptions
+        return descriptions[1] + delimiterString + descriptions[2];
+    }
+
+    private static String joinDescriptions(String[] descriptions, String delimiterString) {
+        String[] delimiters = delimiterString.split(DELIMITER_SEPARATOR);
+        StringBuilder result = new StringBuilder(descriptions[0]);
+        for (int i = 1; i < descriptions.length; i++) {
+            String delimiter = (i - 1 < delimiters.length) ? delimiters[i - 1] : delimiters[delimiters.length - 1];
+            result.append(delimiter).append(descriptions[i]);
+        }
+        return result.toString();
+    }
+
+
     private String getDescriptionForHeader(Challenge challenge, String header) {
-        switch (header) {
-            case "Starting Deck":
-                return getStartingDeckDescription(challenge.startingDeck);
-            case "Starting Relics":
-                return "";
-            case "Special Rules":
-                return challenge.specialRules;
-            case "Win Conditions":
-                return challenge.winConditions;
-            default:
-                return "";
+        if (header.equals(uiStrings.TEXT[2])) { // "Starting Deck"
+            return getStartingDeckDescription(challenge.startingDeck);
+        } else if (header.equals(uiStrings.TEXT[3])) { // "Starting Relics"
+            return "";
+        } else if (header.equals(uiStrings.TEXT[4])) { // "Special Rules"
+            return challenge.specialRules;
+        } else if (header.equals(uiStrings.TEXT[5])) { // "Win Conditions"
+            return challenge.winConditions;
+        } else {
+            return "";
         }
     }
 
     private String getStartingDeckDescription(ArrayList<AbstractCard> deck) {
         Map<String, Integer> cardCounts = new HashMap<>();
         deck.forEach(card -> cardCounts.merge(card.name, 1, Integer::sum));
+
 
         return cardCounts.entrySet().stream()
                 .map(entry -> (entry.getValue() > 1 ? entry.getValue() + "x " : "") + entry.getKey())

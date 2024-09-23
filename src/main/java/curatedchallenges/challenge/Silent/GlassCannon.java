@@ -4,7 +4,9 @@ import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.colorless.HandOfGreed;
 import com.megacrit.cardcrawl.cards.green.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
@@ -14,7 +16,11 @@ import curatedchallenges.winconditions.GoldThresholdWinCondition;
 import java.util.ArrayList;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class GlassCannon implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("GlassCannon"));
+
     public static final String ID = "GLASS_CANNON";
 
     @Override
@@ -24,7 +30,7 @@ public class GlassCannon implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Glass Cannon";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -71,13 +77,13 @@ public class GlassCannon implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Start the run with 1 max HP.";
+        return uiStrings.TEXT[1];
 
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

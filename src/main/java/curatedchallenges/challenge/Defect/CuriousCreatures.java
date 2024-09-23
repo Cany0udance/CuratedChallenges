@@ -3,10 +3,7 @@ package curatedchallenges.challenge.Defect;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.actions.unique.IncreaseMaxHpAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
-import com.megacrit.cardcrawl.cards.blue.Defend_Blue;
-import com.megacrit.cardcrawl.cards.blue.Dualcast;
-import com.megacrit.cardcrawl.cards.blue.Strike_Blue;
-import com.megacrit.cardcrawl.cards.blue.Zap;
+import com.megacrit.cardcrawl.cards.blue.*;
 import com.megacrit.cardcrawl.cards.colorless.HandOfGreed;
 import com.megacrit.cardcrawl.cards.green.Defend_Green;
 import com.megacrit.cardcrawl.cards.green.Neutralize;
@@ -17,9 +14,12 @@ import com.megacrit.cardcrawl.cards.purple.Eruption;
 import com.megacrit.cardcrawl.cards.purple.Strike_Purple;
 import com.megacrit.cardcrawl.cards.purple.Vigilance;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.beyond.AwakenedOne;
 import com.megacrit.cardcrawl.powers.CuriosityPower;
 import com.megacrit.cardcrawl.powers.MetallicizePower;
 import com.megacrit.cardcrawl.powers.RegenerateMonsterPower;
@@ -35,7 +35,10 @@ import curatedchallenges.winconditions.CompleteActWinCondition;
 import java.util.ArrayList;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class CuriousCreatures implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("CuriousCreatures"));
 
     public static final String ID = "CURIOUS_CREATURES";
 
@@ -46,7 +49,7 @@ public class CuriousCreatures implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Curious Creatures";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -62,12 +65,14 @@ public class CuriousCreatures implements ChallengeDefinition {
             deck.add(new Strike_Blue());
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             deck.add(new Defend_Blue());
         }
 
-        deck.add(new Zap());
-        deck.add(new Dualcast());
+        deck.add(new ForceField());
+
+        deck.add(new SelfRepair());
+        deck.add(new WhiteNoise());
 
         return deck;
     }
@@ -82,12 +87,12 @@ public class CuriousCreatures implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "At the start of combat, ALL enemies gain 2 Curiosity.";
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override
@@ -101,9 +106,12 @@ public class CuriousCreatures implements ChallengeDefinition {
     public void applyPreCombatLogic(AbstractPlayer p) {
         // Get all monsters in the room
         for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
-            // Apply 2 stacks of CuriosityPower to each monster
-            AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, m,
-                    new CuriosityPower(m, 2), 2));
+            // Check if the monster is not the Awakened One
+            if (!(m instanceof AwakenedOne)) {
+                // Apply 2 stacks of CuriosityPower to each monster except the Awakened One
+                AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, m,
+                        new CuriosityPower(m, 1), 1));
+            }
         }
     }
 

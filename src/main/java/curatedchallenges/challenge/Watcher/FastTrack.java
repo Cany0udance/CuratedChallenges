@@ -7,7 +7,9 @@ import com.megacrit.cardcrawl.cards.green.Strike_Green;
 import com.megacrit.cardcrawl.cards.green.Survivor;
 import com.megacrit.cardcrawl.cards.purple.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.potions.*;
 import com.megacrit.cardcrawl.relics.*;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -18,7 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static curatedchallenges.CuratedChallenges.makeID;
+
 public class FastTrack implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("FastTrack"));
 
     public static final String ID = "FAST_TRACK";
 
@@ -29,7 +34,7 @@ public class FastTrack implements ChallengeDefinition {
 
     @Override
     public String getName() {
-        return "Fast Track";
+        return uiStrings.TEXT[0];
     }
 
     @Override
@@ -74,12 +79,12 @@ public class FastTrack implements ChallengeDefinition {
 
     @Override
     public String getSpecialRules() {
-        return "Skip Act 1 entirely. NL Start with 250 Gold, Liquid Bronze, and a Fear Potion.";
+        return uiStrings.TEXT[1];
     }
 
     @Override
     public String getWinConditions() {
-        return "Complete Act 3.";
+        return uiStrings.TEXT[2];
     }
 
     @Override

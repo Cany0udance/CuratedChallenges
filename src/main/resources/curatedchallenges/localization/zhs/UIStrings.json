@@ -1,0 +1,172 @@
+{
+  "CuratedChallenges:ChallengesTab": {
+    "TEXT": [
+      "挑战",
+      "尝试这些富有挑战性的杀戮尖塔变体！"
+    ]
+  },
+  "CuratedChallenges:AuxiliaryPower": {
+    "TEXT": [
+      "辅助能源",
+      "每回合少抽 #b2 张牌。 NL 开始时获得一个额外的充能球栏位。 NL 战斗开始时，以随机顺序生成一个每种类型的充能球。",
+      "完成第4幕。"
+    ]
+  },
+  "CuratedChallenges:CuriousCreatures": {
+    "TEXT": [
+      "好奇生物",
+      "战斗开始前，所有敌人获得 #b1 层 #y好奇心 。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:FlyingRobot": {
+    "TEXT": [
+      "飞行机器人",
+      "地图生成时只会有两条不相连的路径。 NL 每幕开始时，刷新你的翅膀靴。 NL 翅膀靴只能储存 #b2 次使用次数，而不是 #b3 次。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:Gamblecore": {
+    "TEXT": [
+      "赌博核心",
+      "让我们来赌一把吧！！！！ NL 每幕开始时，将你的卡牌重新随机变为相同稀有度和颜色的其他卡牌。 NL 重新随机的卡牌保留其升级状态。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:Overclocked": {
+    "TEXT": [
+      "超频",
+      "在你的回合开始时，获得 #y燃烧 的效果。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:CheatDay": {
+    "TEXT": [
+      "作弊日",
+      "开始时最大生命值减半。 NL 战斗开始前，获得 #y节食 的效果。",
+      "完成第3幕 或 NL 拥有至少 #b200 点最大生命值。"
+    ]
+  },
+  "CuratedChallenges:CursedCombo": {
+    "TEXT": [
+      "诅咒组合",
+      "在第2幕开始时，获得一个 #y符文金字塔 。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:Endoparasitic": {
+    "TEXT": [
+      "内部寄生",
+      "无",
+      "完成第3幕 或 NL 从你的牌组中移除所有 #y寄生 。"
+    ]
+  },
+  "CuratedChallenges:Necronomics": {
+    "TEXT": [
+      "死灵经济学",
+      "每当你打出一张牌时，在本场战斗中将其费用增加 #b1 。",
+      "完成第4幕。"
+    ]
+  },
+  "CuratedChallenges:Avarice": {
+    "TEXT": [
+      "贪婪",
+      "每幕只会出现一次商店，位于通常出现宝箱的位置。 NL 第一次在商店花费 #y金币 时，获得一个 #y灵体 。",
+      "完成第3幕 或 NL 拥有至少 #b1,500 #y金币 。"
+    ]
+  },
+  "CuratedChallenges:GlassCannon": {
+    "TEXT": [
+      "玻璃大炮",
+      "开始时最大生命值为 #b1 。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:TheBestDefense": {
+    "TEXT": [
+      "最好的防御...",
+      "所有直接提供格挡的卡牌从卡池中移除。 NL 卡牌奖励少 #b1 张可选卡牌。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:TheSadist": {
+    "TEXT": [
+      "虐待狂",
+      "战斗开始前，失去 #b3 点 #y力量 ，获得 #b1 层 #y涂毒 ，并获得 #b3 层 #y施虐 。",
+      "完成第4幕。"
+    ]
+  },
+  "CuratedChallenges:AmpedEnemies": {
+    "TEXT": [
+      "强化敌人",
+      "开始时获得一个 #y烟雾弹 。 NL 战斗开始时，对所有敌人施加一个绿宝石精英增益。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:Duet": {
+    "TEXT": [
+      "二重奏",
+      "所有铁甲战士卡牌被添加到卡池中。 NL 战斗中，你不能连续打出两张相同颜色的卡牌。 NL 每回合多抽 #b1 张牌。 NL 洗牌时会尽可能交替抽取不同颜色的卡牌。",
+      "完成第4幕。"
+    ]
+  },
+  "CuratedChallenges:EmotionalSupportFlower": {
+    "TEXT": [
+      "情感支持之花",
+      "所有常规进入姿态的方法已被移除。 NL 当快乐之花计数为 #b1 或 #b2 时，进入平静。 NL 当快乐之花计数为 #b0 时，进入愤怒。 NL 卡牌奖励少 #b1 张可选卡牌。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:FastTrack": {
+    "TEXT": [
+      "快速通道",
+      "直接跳过第1幕。 NL 开始时获得 #b250 #y金币 、 #y液态青铜 和一瓶 #y恐惧药水 。",
+      "完成第3幕。"
+    ]
+  },
+  "CuratedChallenges:TopPanel": {
+    "TEXT": [
+      "#y特殊规则：",
+      " NL NL #y胜利条件："
+    ]
+  },
+  "CuratedChallenges:DuetSpeech": {
+    "TEXT": [
+      "我现在还不能打出另一张",
+      "卡！"
+    ]
+  },
+  "CuratedChallenges:ChallengeScreens": {
+    "TEXT": [
+      "挑战",
+      "使用特殊规则进行一次游戏！",
+      "精选挑战",
+      "体验独特的精选挑战！"
+    ]
+  },
+  "CuratedChallenges:DeathScreenText": {
+    "TEXT": [
+      "挑战失败！"
+    ]
+  },
+  "CuratedChallenges:NeowTalk": {
+    "TEXT": [
+      "~祝你...~ NL ~..好运...~"
+    ]
+  },
+  "CuratedChallenges:VictoryScreenText": {
+    "TEXT": [
+      "挑战完成！"
+    ]
+  },
+  "CuratedChallenges:ChallengeScreen": {
+    "TEXT": [
+      "20级升天模式",
+      "启用以20级升天开始游戏",
+      "起始牌组",
+      "起始遗物",
+      "特殊规则",
+      "胜利条件"
+    ]
+  }
+}

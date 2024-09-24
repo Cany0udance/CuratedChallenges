@@ -282,10 +282,10 @@ public class ChallengesScreen implements ScrollBarListener {
 
     @Override
     public void scrolledUsingBar(float newPercent) {
-        float newPosition = MathHelper.valueFromPercentBetween(this.scrollLowerBound, this.scrollUpperBound, newPercent);
-        this.scrollY = newPosition;
-        this.targetY = newPosition;
-        updateBarPosition();
+     //   float newPosition = MathHelper.valueFromPercentBetween(this.scrollLowerBound, this.scrollUpperBound, newPercent);
+     //   this.scrollY = newPosition;
+      //  this.targetY = newPosition;
+      //  updateBarPosition();
     }
 
     private void updateBarPosition() {

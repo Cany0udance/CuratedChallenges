@@ -395,12 +395,12 @@ public class CuratedChallenges implements
             removeRelicFromPools(relic.relicId);
         }
         // Remove relics
-        List<String> relicsToRemove = challenge.getRelicIdsToRemove();
+        List<String> relicsToRemove = challenge.getRelicsToRemove();
         for (String relicId : relicsToRemove) {
             removeRelicFromPools(relicId);
         }
         // Add relics
-        List<String> relicsToAdd = challenge.getRelicIdsToAdd();
+        List<String> relicsToAdd = challenge.getRelicsToAdd();
         addRelicsToPools(relicsToAdd);
     }
 
@@ -605,17 +605,17 @@ public class CuratedChallenges implements
 
         // Defect Challenges
 
-        ChallengeRegistry.registerChallenge(new AuxiliaryPower());
-        ChallengeRegistry.registerChallenge(new FlyingRobot());
-        ChallengeRegistry.registerChallenge(new CuriousCreatures());
-        ChallengeRegistry.registerChallenge(new Gamblecore());
         ChallengeRegistry.registerChallenge(new Overclocked());
+        ChallengeRegistry.registerChallenge(new FlyingRobot());
+        ChallengeRegistry.registerChallenge(new AuxiliaryPower());
+        ChallengeRegistry.registerChallenge(new Gamblecore());
+        ChallengeRegistry.registerChallenge(new CuriousCreatures());
 
         // Watcher Challenges
 
         ChallengeRegistry.registerChallenge(new EmotionalSupportFlower());
-        ChallengeRegistry.registerChallenge(new Duet());
         ChallengeRegistry.registerChallenge(new FastTrack());
+        ChallengeRegistry.registerChallenge(new Duet());
         ChallengeRegistry.registerChallenge(new AmpedEnemies());
     }
 

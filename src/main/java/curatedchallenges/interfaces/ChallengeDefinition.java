@@ -95,7 +95,7 @@ public interface ChallengeDefinition {
         return Collections.emptyList();
     }
 
-    default List<String> getRelicIdsToRemove() {
+    default List<String> getRelicsToRemove() {
         return Collections.emptyList();
     }
 
@@ -107,7 +107,7 @@ public interface ChallengeDefinition {
         return Collections.emptyList();
     }
 
-    default List<String> getRelicIdsToAdd() {
+    default List<String> getRelicsToAdd() {
         return Collections.emptyList();
     }
 

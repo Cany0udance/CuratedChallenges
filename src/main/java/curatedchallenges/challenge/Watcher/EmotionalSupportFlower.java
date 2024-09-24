@@ -109,7 +109,7 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
     }
 
     @Override
-    public List<String> getRelicIdsToRemove() {
+    public List<String> getRelicsToRemove() {
         return Arrays.asList(TeardropLocket.ID, Damaru.ID);
     }
 

@@ -55,11 +55,11 @@ public class Avarice implements ChallengeDefinition {
     public ArrayList<AbstractCard> getStartingDeck() {
         ArrayList<AbstractCard> deck = new ArrayList<>();
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             deck.add(new Strike_Green());
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             deck.add(new Defend_Green());
         }
 

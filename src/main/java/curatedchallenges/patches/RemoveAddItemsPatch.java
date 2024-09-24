@@ -99,13 +99,13 @@ public static class ModifyRelicsPatch {
             }
 
             // Remove relics
-            List<String> relicsToRemove = currentChallenge.getRelicIdsToRemove();
+            List<String> relicsToRemove = currentChallenge.getRelicsToRemove();
             for (String relicId : relicsToRemove) {
                 removeRelicFromPools(relicId);
             }
 
             // Add relics
-            List<String> relicsToAdd = currentChallenge.getRelicIdsToAdd();
+            List<String> relicsToAdd = currentChallenge.getRelicsToAdd();
             addRelicsToPools(relicsToAdd);
         }
     }

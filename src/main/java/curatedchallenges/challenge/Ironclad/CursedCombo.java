@@ -69,7 +69,7 @@ public class CursedCombo implements ChallengeDefinition {
     }
 
     @Override
-    public List<String> getRelicIdsToRemove() {
+    public List<String> getRelicsToRemove() {
         return Arrays.asList(RunicPyramid.ID);
     }
 

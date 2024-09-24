@@ -106,7 +106,7 @@ public class FastTrackChallengePatch {
     public static class MapGenerationPatch {
         @SpirePostfixPatch
         public static void Postfix() {
-            if (FastTrack.ID.equals(CuratedChallenges.currentChallengeId)) {
+            if (FastTrack.ID.equals(CuratedChallenges.currentChallengeId) && !CardCrawlGame.loadingSave) {
                 BaseMod.publishStartGame();
                 initializeChallengeDeck();
             }

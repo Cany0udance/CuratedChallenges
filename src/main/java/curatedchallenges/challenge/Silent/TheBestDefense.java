@@ -126,7 +126,7 @@ public class TheBestDefense implements ChallengeDefinition {
 
     @Override
     public Integer getCardRewardAdjustment() {
-        return 12;
+        return -1;
     }
 
 }

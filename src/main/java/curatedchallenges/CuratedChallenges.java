@@ -1,10 +1,14 @@
 package curatedchallenges;
 
 import basemod.BaseMod;
+import basemod.ModLabeledToggleButton;
+import basemod.ModPanel;
 import basemod.interfaces.*;
 import basemod.patches.com.megacrit.cardcrawl.ui.panels.TopPanel.TopPanelPatches;
 import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.cards.curses.AscendersBane;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.PotionHelper;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.monsters.city.Snecko;
@@ -76,17 +80,20 @@ public class CuratedChallenges implements
     public static final String SAVE_KEY = "CurrentChallengeId";
     private static final String CHALLENGE_RUN_KEY = "IsChallengeRun";
     public static String currentChallengeId = null;
+    private static SpireConfig config;
+    public static boolean defaultAscension20;
 
     public static final Logger logger = LogManager.getLogger(modID); //Used to output to the console.
-
-    //This is used to prefix the IDs of various objects like cards and relics,
-    //to avoid conflicts between different mods using the same name for things.
     public static String makeID(String id) {
         return modID + ":" + id;
     }
 
     //This will be called by ModTheSpire because of the @SpireInitializer annotation at the top of the class.
-    public static void initialize() {
+    public static void initialize() throws IOException {
+        Properties defaults = new Properties();
+        defaults.setProperty("defaultascension20", "false");
+        config = new SpireConfig(modID, "config", defaults);
+        defaultAscension20 = config.getBool("defaultascension20");
         new CuratedChallenges();
     }
 
@@ -97,15 +104,18 @@ public class CuratedChallenges implements
 
     @Override
     public void receivePostInitialize() {
-      //  initializeSaveData();
-        //This loads the image used as an icon in the in-game mods menu.
-        Texture badgeTexture = TextureLoader.getTexture(imagePath("badge.png"));
-        //Set up the mod information displayed in the in-game mods menu.
-        //The information used is taken from your pom.xml file.
+        //  initializeSaveData();
+        ModPanel settingsPanel = new ModPanel();
 
-        //If you want to set up a config panel, that will be done here.
-        //The Mod Badges page has a basic example of this, but setting up config is overall a bit complex.
-        BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors), info.Description, null);
+        String[] TEXT = CardCrawlGame.languagePack.getUIString(makeID("ConfigMenu")).TEXT;
+
+        settingsPanel.addUIElement(new ModLabeledToggleButton(TEXT[0], 350, 700, Settings.CREAM_COLOR, FontHelper.charDescFont, config.getBool("defaultascension20"), settingsPanel, label -> {}, button -> {
+            defaultAscension20 = button.enabled;
+            config.setBool("defaultascension20", button.enabled);
+            try {config.save();} catch (Exception e) {}
+        }));
+        Texture badgeTexture = TextureLoader.getTexture(imagePath("badge.png"));
+        BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors), info.Description, settingsPanel);
         BaseMod.addSaveField(ChallengeInfo.SAVE_KEY, new ChallengeInfo());
         initializeChallenges();
     }
@@ -123,12 +133,6 @@ public class CuratedChallenges implements
 
     @Override
     public void receiveEditStrings() {
-        /*
-            First, load the default localization.
-            Then, if the current language is different, attempt to load localization for that language.
-            This results in the default localization being used for anything that might be missing.
-            The same process is used to load keywords slightly below.
-        */
         loadLocalization(defaultLanguage); //no exception catching for default localization; you better have at least one that works.
         if (!defaultLanguage.equals(getLangString())) {
             try {
@@ -141,8 +145,6 @@ public class CuratedChallenges implements
     }
 
     private void loadLocalization(String lang) {
-        //While this does load every type of localization, most of these files are just outlines so that you can see how they're formatted.
-        //Feel free to comment out/delete any that you don't end up using.
         BaseMod.loadCustomStringsFile(UIStrings.class,
                 localizationPath(lang, "UIStrings.json"));
     }

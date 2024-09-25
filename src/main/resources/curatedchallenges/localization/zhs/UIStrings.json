@@ -168,5 +168,10 @@
       "特殊规则",
       "胜利条件"
     ]
+  },
+  "CuratedChallenges:ConfigMenu": {
+    "TEXT": [
+      "在精选挑战界面中默认启用晋升等级20"
+    ]
   }
 }

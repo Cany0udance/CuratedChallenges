@@ -168,5 +168,10 @@
       "Special Rules",
       "Win Conditions"
     ]
+  },
+  "CuratedChallenges:ConfigMenu": {
+    "TEXT": [
+      "Enable Ascension Level 20 by default in the Curated Challenges screen"
+    ]
   }
 }

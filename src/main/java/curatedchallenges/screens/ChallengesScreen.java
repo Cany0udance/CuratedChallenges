@@ -30,6 +30,7 @@ import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static curatedchallenges.CuratedChallenges.makeID;
 
@@ -86,7 +87,7 @@ public class ChallengesScreen implements ScrollBarListener {
                 ASCENSION20_BUTTON_Y,
                 uiStrings.TEXT[0],
                 uiStrings.TEXT[1],
-                false
+                CuratedChallenges.defaultAscension20
         );
         this.fireEffects = new ArrayList<>();
         this.fireEffectTimer = 0.0F;
@@ -102,14 +103,27 @@ public class ChallengesScreen implements ScrollBarListener {
 
     private void initializeCharacterButtons() {
         ArrayList<AbstractPlayer> characters = CardCrawlGame.characterManager.getAllCharacters();
-        float startX = CHARACTER_ICON_X - ((characters.size() - 1) * CHARACTER_BUTTON_SPACING / 2f);
-        for (int i = 0; i < characters.size(); i++) {
-            AbstractPlayer character = characters.get(i);
+        Set<AbstractPlayer.PlayerClass> charactersWithChallenges = getCharactersWithChallenges();
+
+        ArrayList<AbstractPlayer> validCharacters = characters.stream()
+                .filter(character -> charactersWithChallenges.contains(character.chosenClass))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        float startX = CHARACTER_ICON_X - ((validCharacters.size() - 1) * CHARACTER_BUTTON_SPACING / 2f);
+        for (int i = 0; i < validCharacters.size(); i++) {
+            AbstractPlayer character = validCharacters.get(i);
             CustomModeCharacterButton button = new CustomModeCharacterButton(character, UnlockTracker.isCharacterLocked(character.chosenClass.toString()));
             button.move(startX + (i * CHARACTER_BUTTON_SPACING), CHARACTER_ICON_Y);
             this.characterButtons.add(button);
         }
     }
+
+    private Set<AbstractPlayer.PlayerClass> getCharactersWithChallenges() {
+        return ChallengeRegistry.getAllChallenges().values().stream()
+                .map(ChallengeDefinition::getCharacterClass)
+                .collect(Collectors.toSet());
+    }
+
 
     private void initializeChallenges() {
         this.challenges.clear();
@@ -149,6 +163,7 @@ public class ChallengesScreen implements ScrollBarListener {
         CardCrawlGame.mainMenuScreen.darken();
         this.cancelButton.show(CardCrawlGame.languagePack.getUIString("DungeonMapScreen").TEXT[1]);
         this.isScreenOpened = true;
+        this.ascension20Button.enabled = CuratedChallenges.defaultAscension20;
     }
 
     public void close() {
@@ -226,7 +241,7 @@ public class ChallengesScreen implements ScrollBarListener {
                 this.fireEffects.clear();
             }
         } else {
-            this.ascension20Button.enabled = false;
+            this.ascension20Button.enabled = CuratedChallenges.defaultAscension20;
             this.fireEffects.clear();
         }
 

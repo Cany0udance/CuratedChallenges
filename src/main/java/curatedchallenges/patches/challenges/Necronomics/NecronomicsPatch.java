@@ -1,4 +1,4 @@
-package curatedchallenges.patches.challenges;
+package curatedchallenges.patches.challenges.Necronomics;
 
 import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.megacrit.cardcrawl.cards.AbstractCard;

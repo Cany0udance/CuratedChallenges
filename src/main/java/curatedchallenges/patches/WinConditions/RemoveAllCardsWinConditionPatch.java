@@ -1,13 +1,11 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.WinConditions;
 
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.CardGroup;
 import curatedchallenges.CuratedChallenges;
-import curatedchallenges.challenge.Ironclad.Endoparasitic;
 import curatedchallenges.util.ChallengeVictoryHandler;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
-import com.megacrit.cardcrawl.cards.curses.Parasite;
 
 
 @SpirePatch(
@@ -15,7 +13,7 @@ import com.megacrit.cardcrawl.cards.curses.Parasite;
         method = "removeCard",
         paramtypez = {AbstractCard.class}
 )
-public class EndoparasiticChallengePatch {
+public class RemoveAllCardsWinConditionPatch {
     @SpirePostfixPatch
     public static void Postfix(CardGroup __instance, AbstractCard c) {
         if (__instance.type == CardGroup.CardGroupType.MASTER_DECK && CuratedChallenges.currentChallengeId != null) {

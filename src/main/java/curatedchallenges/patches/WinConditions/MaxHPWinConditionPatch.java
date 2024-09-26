@@ -1,20 +1,21 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.WinConditions;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.AbstractCreature;
 import curatedchallenges.CuratedChallenges;
 import curatedchallenges.util.ChallengeVictoryHandler;
 
 @SpirePatch(
-        clz = AbstractPlayer.class,
-        method = "gainGold"
+        clz = AbstractCreature.class,
+        method = "increaseMaxHp"
 )
-public class GainGoldPatch {
+public class MaxHPWinConditionPatch {
     @SpirePostfixPatch
-    public static void Postfix(AbstractPlayer __instance, int amount) {
+    public static void Postfix(AbstractCreature __instance, int amount, boolean showEffect) {
         if (__instance instanceof AbstractPlayer && CuratedChallenges.currentChallengeId != null) {
-            ChallengeVictoryHandler.checkGoldThresholdWinCondition(CuratedChallenges.currentChallengeId);
+            ChallengeVictoryHandler.checkMaxHPWinCondition(CuratedChallenges.currentChallengeId);
         }
     }
 }

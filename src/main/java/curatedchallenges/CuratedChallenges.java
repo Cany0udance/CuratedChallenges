@@ -19,10 +19,7 @@ import curatedchallenges.challenge.Defect.AuxiliaryPower;
 import curatedchallenges.challenge.Defect.FlyingRobot;
 import curatedchallenges.challenge.Defect.Gamblecore;
 import curatedchallenges.challenge.Defect.Overclocked;
-import curatedchallenges.challenge.Ironclad.CheatDay;
-import curatedchallenges.challenge.Ironclad.CursedCombo;
-import curatedchallenges.challenge.Ironclad.Endoparasitic;
-import curatedchallenges.challenge.Ironclad.Necronomics;
+import curatedchallenges.challenge.Ironclad.*;
 import curatedchallenges.challenge.Silent.Avarice;
 import curatedchallenges.challenge.Defect.CuriousCreatures;
 import curatedchallenges.challenge.Silent.GlassCannon;
@@ -35,6 +32,7 @@ import curatedchallenges.challenge.Watcher.FastTrack;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
+import curatedchallenges.patches.VictoryScreenPatches;
 import curatedchallenges.util.*;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
@@ -466,17 +464,14 @@ public class CuratedChallenges implements
 
     @Override
     public void receivePostDungeonInitialize() {
-      //  BaseMod.logger.info("receivePostDungeonInitialize called");
-      //  BaseMod.logger.info("Settings.isTrial: " + Settings.isTrial);
       //  BaseMod.logger.info("currentChallengeId: " + currentChallengeId);
 
         if (Settings.isTrial && currentChallengeId != null) {
-        //    BaseMod.logger.info("Conditions met for challenge initialization");
             initializeChallengeDeck();
             applyStartOfRunEffect();
-        } else {
-       //     BaseMod.logger.info("Conditions not met for challenge initialization");
         }
+
+        VictoryScreenPatches.challengeBannerText = null;
     }
 
     private void applyStartOfRunEffect() {
@@ -593,6 +588,7 @@ public class CuratedChallenges implements
     private void initializeChallenges() {
         // Ironclad Challenges
 
+      //  ChallengeRegistry.registerChallenge(new MatchAndKeep());
         ChallengeRegistry.registerChallenge(new Endoparasitic());
         ChallengeRegistry.registerChallenge(new CursedCombo());
         ChallengeRegistry.registerChallenge(new Necronomics());

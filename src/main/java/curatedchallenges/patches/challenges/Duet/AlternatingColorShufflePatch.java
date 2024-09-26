@@ -3,19 +3,15 @@ package curatedchallenges.patches.challenges.Duet;
 import basemod.BaseMod;
 import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.megacrit.cardcrawl.actions.common.DrawCardAction;
-import com.megacrit.cardcrawl.actions.defect.ShuffleAllAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
-import com.megacrit.cardcrawl.actions.common.EmptyDeckShuffleAction;
-import com.megacrit.cardcrawl.actions.common.ShuffleAction;
 import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.random.Random;
 import curatedchallenges.CuratedChallenges;
 import curatedchallenges.challenge.Watcher.Duet;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class AlternatingColorShufflePatch {
@@ -35,6 +31,7 @@ public class AlternatingColorShufflePatch {
         }
     }
 
+
     @SpirePatch(
             clz = CardGroup.class,
             method = "shuffle",
@@ -50,6 +47,7 @@ public class AlternatingColorShufflePatch {
             return SpireReturn.Continue();
         }
     }
+
 
     @SpirePatch(
             clz = CardGroup.class,
@@ -67,16 +65,20 @@ public class AlternatingColorShufflePatch {
         }
     }
 
+
     private static void customInitializeDeck(CardGroup drawPile, CardGroup masterDeck) {
         drawPile.clear();
         CardGroup copy = new CardGroup(masterDeck, CardGroup.CardGroupType.DRAW_PILE);
 
+
         // Apply our custom shuffle
         multiColorAlternatingColorShuffle(copy);
+
 
         ArrayList<AbstractCard> placeOnTop = new ArrayList<>();
         ArrayList<AbstractCard> initialHand = new ArrayList<>();
         ArrayList<AbstractCard> innateCards = new ArrayList<>();
+
 
         for (AbstractCard c : copy.group) {
             if (c.isInnate) {
@@ -92,12 +94,15 @@ public class AlternatingColorShufflePatch {
             }
         }
 
+
         // Sort innate cards to alternate colors
         sortAlternatingColors(innateCards);
+
 
         // Combine innate cards with regular cards for initial hand
         int handSize = Math.min(AbstractDungeon.player.masterHandSize, drawPile.size() + innateCards.size());
         initialHand.addAll(innateCards);
+
 
         while (initialHand.size() < handSize) {
             AbstractCard card = drawPile.getTopCard();
@@ -110,15 +115,18 @@ public class AlternatingColorShufflePatch {
             }
         }
 
+
         // Place initial hand on top of the deck
         for (int i = initialHand.size() - 1; i >= 0; i--) {
             drawPile.addToTop(initialHand.get(i));
         }
 
+
         // Place bottled cards on top
         for (AbstractCard c : placeOnTop) {
             drawPile.addToTop(c);
         }
+
 
         // Handle extra draw if necessary
         int extraDraw = placeOnTop.size() + initialHand.size() - AbstractDungeon.player.masterHandSize;
@@ -127,21 +135,26 @@ public class AlternatingColorShufflePatch {
         }
     }
 
+
     private static void sortAlternatingColors(ArrayList<AbstractCard> cards) {
         if (cards.size() <= 1) return;
 
+
         ArrayList<AbstractCard> sorted = new ArrayList<>();
         Map<AbstractCard.CardColor, Queue<AbstractCard>> colorQueues = new HashMap<>();
+
 
         // Group cards by color
         for (AbstractCard card : cards) {
             colorQueues.computeIfAbsent(card.color, k -> new LinkedList<>()).add(card);
         }
 
+
         // Sort colors by queue size (descending)
         List<Map.Entry<AbstractCard.CardColor, Queue<AbstractCard>>> sortedQueues =
                 new ArrayList<>(colorQueues.entrySet());
         sortedQueues.sort((a, b) -> Integer.compare(b.getValue().size(), a.getValue().size()));
+
 
         // Alternate colors
         while (!sortedQueues.isEmpty()) {
@@ -157,9 +170,11 @@ public class AlternatingColorShufflePatch {
             }
         }
 
+
         cards.clear();
         cards.addAll(sorted);
     }
+
 
     private static boolean sameColor(AbstractCard card1, AbstractCard card2) {
         return card1.color == card2.color;
@@ -212,6 +227,9 @@ public class AlternatingColorShufflePatch {
                 }
             }
 
+            // Reverse the order of shuffledCards to ensure alternating colors at the beginning
+            Collections.reverse(shuffledCards);
+
             group.group.clear();
             group.group.addAll(shuffledCards);
 
@@ -234,24 +252,30 @@ public class AlternatingColorShufflePatch {
         }
     }
 
+
     private static long createEncounterSeed() {
         long seed = Settings.seed;
+
 
         if (AbstractDungeon.getCurrRoom() != null && AbstractDungeon.getMonsters() != null) {
             // Add the floor number to the seed
             seed += AbstractDungeon.floorNum;
 
+
             // Add the current gold amount to the seed
             seed += AbstractDungeon.player.gold;
 
+
             // Add the number of cards in the deck to the seed
             seed += AbstractDungeon.player.masterDeck.size();
+
 
             // Add monster info to the seed
             for (AbstractMonster monster : AbstractDungeon.getMonsters().monsters) {
                 seed += monster.id.hashCode();
                 seed += monster.currentHealth;
             }
+
 
             // Add a hash of the player's relics to the seed
             int relicHash = AbstractDungeon.player.relics.stream()
@@ -261,5 +285,6 @@ public class AlternatingColorShufflePatch {
         }
         return seed;
     }
+
 
 }

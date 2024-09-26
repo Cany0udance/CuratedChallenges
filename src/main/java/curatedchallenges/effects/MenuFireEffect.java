@@ -21,10 +21,10 @@ public class MenuFireEffect extends AbstractGameEffect {
 
     public MenuFireEffect() {
         this.setImg();
-        this.startingDuration = MathUtils.random(1.0F, 1.5F);
+        this.startingDuration = MathUtils.random(1.1F, 1.6F);
         this.duration = this.startingDuration;
         this.x = MathUtils.random(0.0F, Settings.WIDTH);
-        this.y = MathUtils.random(-100.0F, -20.0F) * Settings.scale;
+        this.y = MathUtils.random(-150.0F, -70.0F) * Settings.scale;
         this.vX = MathUtils.random(-70.0F, 70.0F) * Settings.scale;
         this.vY = MathUtils.random(100.0F, 300.0F) * Settings.scale;
         this.color = new Color(MathUtils.random(0.7F, 1.0F), MathUtils.random(0.3F, 0.5F), MathUtils.random(0.1F, 0.3F), 0.0F);

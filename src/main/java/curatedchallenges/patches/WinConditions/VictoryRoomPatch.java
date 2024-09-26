@@ -1,4 +1,4 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.WinConditions;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;

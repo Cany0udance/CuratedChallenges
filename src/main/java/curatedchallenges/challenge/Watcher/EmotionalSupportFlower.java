@@ -9,6 +9,7 @@ import com.megacrit.cardcrawl.events.exordium.ShiningLight;
 import com.megacrit.cardcrawl.events.shrines.Nloth;
 import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.potions.Ambrosia;
 import com.megacrit.cardcrawl.potions.StancePotion;
 import curatedchallenges.winconditions.CompleteActWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -90,6 +91,7 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
     @Override
     public List<Class<? extends AbstractCard>> getCardsToRemove() {
         return Arrays.asList(
+                Eruption.class,
                 Tantrum.class,
                 Indignation.class,
                 Devotion.class,
@@ -115,7 +117,7 @@ public class EmotionalSupportFlower implements ChallengeDefinition {
 
     @Override
     public List<Class<? extends AbstractPotion>> getPotionsToRemove() {
-        return Arrays.asList(StancePotion.class);
+        return Arrays.asList(StancePotion.class, Ambrosia.class);
     }
 
     @Override

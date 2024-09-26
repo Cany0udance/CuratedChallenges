@@ -1,4 +1,4 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.challenges.EmotionalSupportFlower;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.megacrit.cardcrawl.actions.watcher.ChangeStanceAction;

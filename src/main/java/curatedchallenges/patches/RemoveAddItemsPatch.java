@@ -2,8 +2,11 @@
 package curatedchallenges.patches;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.PotionHelper;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
@@ -12,8 +15,11 @@ import curatedchallenges.CuratedChallenges;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.util.ChallengeRegistry;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 
@@ -81,6 +87,68 @@ public static class ModifyCardsPatch {
                 e.printStackTrace();
             }
         }
+    }
+}
+
+@SpirePatch(
+        clz = GremlinMatchGame.class,
+        method = "placeCards"
+)
+public static class GremlinMatchGamePlaceCardsPatch { // This patch is necessary to replace starter cards in the Match & Keep event
+    @SpirePostfixPatch
+    public static void Postfix(GremlinMatchGame __instance) {
+        try {
+            Field cardsField = GremlinMatchGame.class.getDeclaredField("cards");
+            cardsField.setAccessible(true);
+            CardGroup cards = (CardGroup) cardsField.get(__instance);
+            replaceCards(cards);
+
+            // Reset cardFlipped to false
+            Field cardFlippedField = GremlinMatchGame.class.getDeclaredField("cardFlipped");
+            cardFlippedField.setAccessible(true);
+            cardFlippedField.set(__instance, false);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void replaceCards(CardGroup cards) {
+        ChallengeDefinition currentChallenge = ChallengeRegistry.getChallenge(CuratedChallenges.currentChallengeId);
+        Map<String, AbstractCard> replacementMap = new HashMap<>();
+
+        for (int i = 0; i < cards.group.size(); i++) {
+            AbstractCard card = cards.group.get(i);
+
+            if (shouldReplace(card, currentChallenge)) {
+                String cardKey = card.cardID;
+                if (!replacementMap.containsKey(cardKey)) {
+                    AbstractCard replacement = AbstractDungeon.returnTrulyRandomCard().makeCopy();
+                    replacementMap.put(cardKey, replacement);
+                }
+                AbstractCard newCard = replacementMap.get(cardKey).makeStatEquivalentCopy();
+                copyCardPosition(card, newCard);
+                newCard.isFlipped = true;  // Ensure the new card is face-down
+                cards.group.set(i, newCard);
+            } else {
+                card.isFlipped = true;  // Ensure all cards are face-down
+            }
+        }
+    }
+
+    private static boolean shouldReplace(AbstractCard card, ChallengeDefinition currentChallenge) {
+        return (currentChallenge != null && currentChallenge.getCardsToRemove().stream().anyMatch(cls -> cls.isInstance(card)));
+    }
+
+    private static void copyCardPosition(AbstractCard source, AbstractCard target) {
+        target.current_x = source.current_x;
+        target.current_y = source.current_y;
+        target.target_x = source.target_x;
+        target.target_y = source.target_y;
+        target.drawScale = source.drawScale;
+        target.targetDrawScale = source.targetDrawScale;
+        target.angle = source.angle;
+        target.targetAngle = source.targetAngle;
     }
 }
 

@@ -1,9 +1,8 @@
-package curatedchallenges.patches;
+package curatedchallenges.patches.challenges.FastTrack;
 
 import basemod.BaseMod;
 import basemod.ReflectionHacks;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.megacrit.cardcrawl.cards.AbstractCard;
@@ -14,7 +13,6 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.dungeons.TheCity;
 import com.megacrit.cardcrawl.helpers.SaveHelper;
-import com.megacrit.cardcrawl.helpers.TipHelper;
 import com.megacrit.cardcrawl.helpers.TipTracker;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.neow.NeowRoom;
@@ -22,12 +20,10 @@ import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.potions.PotionSlot;
 import com.megacrit.cardcrawl.random.Random;
 import com.megacrit.cardcrawl.relics.*;
-import com.megacrit.cardcrawl.rooms.EmptyRoom;
 import com.megacrit.cardcrawl.saveAndContinue.SaveFile;
 import com.megacrit.cardcrawl.scenes.TheCityScene;
 import com.megacrit.cardcrawl.screens.DungeonMapScreen;
 import com.megacrit.cardcrawl.screens.DungeonTransitionScreen;
-import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import curatedchallenges.CuratedChallenges;
 import curatedchallenges.challenge.Watcher.FastTrack;
 import curatedchallenges.elements.Challenge;
@@ -44,7 +40,7 @@ import java.util.ArrayList;
 
 import static com.megacrit.cardcrawl.dungeons.AbstractDungeon.ascensionLevel;
 
-public class FastTrackChallengePatch {
+public class FastTrackChallengePatches {
     @SpirePatch(
             clz = CardCrawlGame.class,
             method = "update"

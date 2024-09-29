@@ -124,6 +124,25 @@
       "完成第3幕。"
     ]
   },
+  "CuratedChallenges:Matchmaker": {
+    "TEXT": [
+      "红娘",
+      "卡牌奖励界面已被匹配和保留取代。NL 原本会出现在卡牌奖励中的卡牌被放入匹配和保留中，其余卡牌则是随机的#r诅咒。",
+      "完成第三章。"
+    ]
+  },
+  "CuratedChallenges:Freeloader": {
+    "TEXT": [
+      "搭便车者",
+      "未知房间出现得更频繁。NL 你会在未知房间中经常遇到恩洛斯。NL 你无法避免给予恩洛斯遗物，而恩洛斯会回赠你一个#y头环。",
+      "完成第三章 或 NL 同时拥有#b7个#y头环。"
+    ]
+  },
+  "CuratedChallenges:MatchmakerText": {
+    "TEXT": [
+      "玩匹配和保留！"
+    ]
+  },
   "CuratedChallenges:TopPanel": {
     "TEXT": [
       "#y特殊规则：",

@@ -106,7 +106,7 @@
   "CuratedChallenges:Duet": {
     "TEXT": [
       "Duet",
-      "ALL Ironclad cards are added to the card pool. NL During combat, you cannot play two consecutive cards of the same color. NL Draw #b1 additional card per turn. NL Shuffling is changed to draw alternating card colors when possible.",
+      "ALL Ironclad cards are added to the card pool. NL During combat, you cannot play consecutive cards of the same color. NL Draw #b1 additional card per turn. NL Shuffling is changed to draw alternating card colors when possible.",
       "Complete Act 4."
     ]
   },
@@ -122,6 +122,25 @@
       "Fast Track",
       "Skip Act 1 entirely. NL Start with #b250 #yGold, #yLiquid #yBronze, and a #yFear #yPotion.",
       "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:Matchmaker": {
+    "TEXT": [
+      "Matchmaker",
+      "Card reward screens have been replaced by Match and Keep. NL The cards that would be in each card reward are put into Match and Keep, and the other remaining cards are random #rCurses.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:Freeloader": {
+    "TEXT": [
+      "Freeloader",
+      "Unknown rooms appear more often. NL N'loth will frequently be encountered in unknown rooms. NL You cannot avoid giving relics to N'loth, and N'loth will you a #yCirclet in return.",
+      "Complete Act 3 OR NL Have #b7 #yCirclets at once."
+    ]
+  },
+  "CuratedChallenges:MatchmakerText": {
+    "TEXT": [
+      "Play Match and Keep!"
     ]
   },
   "CuratedChallenges:TopPanel": {

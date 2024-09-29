@@ -4,27 +4,22 @@ import basemod.BaseMod;
 import basemod.ModLabeledToggleButton;
 import basemod.ModPanel;
 import basemod.interfaces.*;
-import basemod.patches.com.megacrit.cardcrawl.ui.panels.TopPanel.TopPanelPatches;
-import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.cards.curses.AscendersBane;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.PotionHelper;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
-import com.megacrit.cardcrawl.monsters.city.Snecko;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.potions.PotionSlot;
 import com.megacrit.cardcrawl.relics.*;
+import com.megacrit.cardcrawl.screens.CardRewardScreen;
 import curatedchallenges.challenge.Defect.AuxiliaryPower;
 import curatedchallenges.challenge.Defect.FlyingRobot;
 import curatedchallenges.challenge.Defect.Gamblecore;
 import curatedchallenges.challenge.Defect.Overclocked;
 import curatedchallenges.challenge.Ironclad.*;
-import curatedchallenges.challenge.Silent.Avarice;
+import curatedchallenges.challenge.Silent.*;
 import curatedchallenges.challenge.Defect.CuriousCreatures;
-import curatedchallenges.challenge.Silent.GlassCannon;
-import curatedchallenges.challenge.Silent.TheBestDefense;
-import curatedchallenges.challenge.Silent.TheSadist;
 import curatedchallenges.challenge.Watcher.AmpedEnemies;
 import curatedchallenges.challenge.Watcher.Duet;
 import curatedchallenges.challenge.Watcher.EmotionalSupportFlower;
@@ -35,7 +30,6 @@ import curatedchallenges.interfaces.WinCondition;
 import curatedchallenges.patches.VictoryScreenPatches;
 import curatedchallenges.util.*;
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -45,7 +39,6 @@ import com.evacipated.cardcrawl.modthespire.ModInfo;
 import com.evacipated.cardcrawl.modthespire.Patcher;
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
-import com.google.gson.Gson;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.Settings;
@@ -58,7 +51,7 @@ import org.apache.logging.log4j.Logger;
 import org.scannotation.AnnotationDB;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -310,14 +303,40 @@ public class CuratedChallenges implements
     @Override
     public void receiveStartGame() {
         loadChallengeData();
-      //  BaseMod.logger.info("Game started. isTrial: " + Settings.isTrial + ", currentChallengeId: " + currentChallengeId);
         if (Settings.isTrial && currentChallengeId != null) {
-       //     BaseMod.logger.info("Starting challenge run. Current Challenge ID: " + currentChallengeId);
-            // Apply challenge modifications after a short delay to ensure all game systems are initialized
             applyChallengeModifications();
         } else {
-       //     BaseMod.logger.info("Starting regular run. Clearing any lingering challenge data.");
             clearChallengeData();
+        }
+        resetMatchAndKeepState();
+    }
+
+    private void resetMatchAndKeepState() {
+        try {
+            // Find the MatchAndKeepCardRewardScreen class
+            Class<?> matchAndKeepClass = Class.forName("curatedchallenges.screens.MatchAndKeepCardRewardScreen");
+
+            // Find all instances of MatchAndKeepCardRewardScreen in AbstractDungeon
+            Field[] fields = AbstractDungeon.class.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                Object obj = field.get(null);
+                if (matchAndKeepClass.isInstance(obj)) {
+                    // Call the dispose method
+                    matchAndKeepClass.getMethod("dispose").invoke(obj);
+
+                    // Set the field to null
+                    field.set(null, null);
+                }
+            }
+
+            // Reset the CardRewardScreen in AbstractDungeon
+            CardRewardScreen originalScreen = new CardRewardScreen();
+            Field cardRewardScreenField = AbstractDungeon.class.getDeclaredField("cardRewardScreen");
+            cardRewardScreenField.setAccessible(true);
+            cardRewardScreenField.set(null, originalScreen);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -558,6 +577,9 @@ public class CuratedChallenges implements
                 if (relic instanceof Necronomicon) {
                     ((Necronomicon) relic).onEquip();
                 }
+                if (relic instanceof CallingBell) {
+                    ((CallingBell) relic).onEquip();
+                }
             }
         }
     }
@@ -588,8 +610,8 @@ public class CuratedChallenges implements
     private void initializeChallenges() {
         // Ironclad Challenges
 
-      //  ChallengeRegistry.registerChallenge(new MatchAndKeep());
         ChallengeRegistry.registerChallenge(new Endoparasitic());
+        ChallengeRegistry.registerChallenge(new Matchmaker());
         ChallengeRegistry.registerChallenge(new CursedCombo());
         ChallengeRegistry.registerChallenge(new Necronomics());
         ChallengeRegistry.registerChallenge(new CheatDay());
@@ -598,6 +620,7 @@ public class CuratedChallenges implements
 
         ChallengeRegistry.registerChallenge(new TheSadist());
         ChallengeRegistry.registerChallenge(new Avarice());
+        ChallengeRegistry.registerChallenge(new Freeloader());
         ChallengeRegistry.registerChallenge(new TheBestDefense());
         ChallengeRegistry.registerChallenge(new GlassCannon());
 

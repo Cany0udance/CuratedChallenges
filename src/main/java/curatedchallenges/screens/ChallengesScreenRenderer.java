@@ -6,12 +6,15 @@ import com.megacrit.cardcrawl.cards.curses.CurseOfTheBell;
 import com.megacrit.cardcrawl.cards.purple.Fasting;
 import com.megacrit.cardcrawl.cards.red.Combust;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
-import com.megacrit.cardcrawl.helpers.CardLibrary;
-import com.megacrit.cardcrawl.helpers.PowerTip;
+import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.localization.PowerStrings;
 import com.megacrit.cardcrawl.localization.UIStrings;
+import com.megacrit.cardcrawl.potions.*;
 import com.megacrit.cardcrawl.powers.*;
+import com.megacrit.cardcrawl.relics.Circlet;
+import com.megacrit.cardcrawl.relics.Ectoplasm;
+import com.megacrit.cardcrawl.relics.RunicPyramid;
 import com.megacrit.cardcrawl.screens.custom.CustomModeCharacterButton;
 import curatedchallenges.buttons.CustomToggleButton;
 import curatedchallenges.effects.MenuFireEffect;
@@ -20,8 +23,6 @@ import curatedchallenges.screens.ChallengesScreen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.core.Settings;
-import com.megacrit.cardcrawl.helpers.FontHelper;
-import com.megacrit.cardcrawl.helpers.TipHelper;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 
@@ -52,6 +53,11 @@ public class ChallengesScreenRenderer {
     private float tipY;
     private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ChallengeScreen"));
     private static final Map<String, PowerTip> keywordTips = new HashMap<>();
+    private static final Map<String, PowerTip> relicTips = new HashMap<>();
+    private static final Map<String, PowerTip> potionTips = new HashMap<>();
+    private static final Map<String, String> wordToFullName = new HashMap<>();
+    private static final int MAX_WORDS_IN_NAME = 5; // Adjust this if needed
+    private static final Map<String, String> fullNameToTip = new HashMap<>();
     private static final Map<String, String> powerDelimiters = new HashMap<>();
     private static final Map<String, AbstractCard> cardPreviews = new HashMap<>();
     private static final String DELIMITER_SEPARATOR = "\\|"; // Use this to separate multiple delimiters
@@ -264,10 +270,34 @@ public class ChallengesScreenRenderer {
     private static void addCardPreview(String cardID) {
         AbstractCard card = CardLibrary.getCard(cardID);
         if (card != null) {
-            String localizedName = card.name;
-            cardPreviews.put(localizedName.toLowerCase(), card.makeStatEquivalentCopy());
-            cardPreviews.put(cardID.toLowerCase(), card.makeStatEquivalentCopy());
+            addTipToMap(cardPreviews, card.name, card.makeStatEquivalentCopy());
         }
+    }
+
+
+    private String stripColorIndicator(String word) {
+        return word.startsWith("#") && word.length() > 2 ? word.substring(2) : word;
+    }
+
+    private static <T> void addTipToMap(Map<String, T> map, String name, T tip) {
+        String cleanName = name.toLowerCase().replaceAll("[^a-z0-9 ]", "");
+        map.put(cleanName, tip);
+        fullNameToTip.put(cleanName, cleanName);
+    }
+
+    private String findMatchInContext(String[] words, int startIndex) {
+        StringBuilder context = new StringBuilder();
+        for (int i = startIndex; i < Math.min(words.length, startIndex + MAX_WORDS_IN_NAME); i++) {
+            if (i > startIndex) context.append(" ");
+            context.append(stripColorIndicator(words[i]));
+
+            String cleanContext = context.toString().toLowerCase().replaceAll("[^a-z0-9 ]", "");
+            String match = fullNameToTip.get(cleanContext);
+            if (match != null) {
+                return match;
+            }
+        }
+        return null;
     }
 
     private void renderColoredLine(SpriteBatch sb, String line, float x, float y, String prefix) {
@@ -276,30 +306,94 @@ public class ChallengesScreenRenderer {
         currentX += FontHelper.getSmartWidth(FontHelper.cardDescFont_N, prefix, DESCRIPTION_WIDTH, LINE_SPACING);
 
         String[] words = line.split("\\s+");
-        for (String word : words) {
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
             Color wordColor = Settings.CREAM_COLOR;
             if (word.startsWith("#")) {
                 wordColor = getColorFromTag(word.substring(0, 2));
                 word = word.substring(2);
             }
 
-            String cleanWord = word.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
             float wordWidth = FontHelper.getSmartWidth(FontHelper.cardDescFont_N, word + " ", DESCRIPTION_WIDTH, LINE_SPACING);
 
-            if (isMouseOverWord(currentX, y, wordWidth)) {
-                PowerTip tip = keywordTips.get(cleanWord);
-                if (tip != null) {
-                    setupKeywordTooltip(tip, InputHelper.mX, InputHelper.mY);
-                } else {
-                    AbstractCard cardPreview = cardPreviews.get(cleanWord);
-                    if (cardPreview != null) {
-                        setupCardPreview(cardPreview, InputHelper.mX, InputHelper.mY);
+            String matchedName = findMatchInContext(words, i);
+            if (matchedName != null) {
+                int matchedWordsCount = matchedName.split("\\s+").length;
+                boolean isHovered = false;
+
+                // Check if any word in the phrase is hovered
+                for (int j = 0; j < matchedWordsCount; j++) {
+                    if (isMouseOverWord(currentX + FontHelper.getSmartWidth(FontHelper.cardDescFont_N,
+                                    String.join(" ", Arrays.copyOfRange(words, i, i + j)) + " ",
+                                    DESCRIPTION_WIDTH, LINE_SPACING),
+                            y,
+                            FontHelper.getSmartWidth(FontHelper.cardDescFont_N, words[i + j] + " ", DESCRIPTION_WIDTH, LINE_SPACING))) {
+                        isHovered = true;
+                        break;
                     }
+                }
+
+                if (isHovered) {
+                    setupTooltipOrPreview(matchedName, InputHelper.mX, InputHelper.mY);
                 }
             }
 
             FontHelper.renderFont(sb, FontHelper.cardDescFont_N, word + " ", currentX, y, wordColor);
             currentX += wordWidth;
+        }
+    }
+
+
+    private String findLongestMatch(String[] words, int startIndex) {
+        StringBuilder nameBuilder = new StringBuilder();
+        String longestMatch = null;
+        int longestMatchLength = 0;
+
+        for (int i = 0; i < 5 && startIndex + i < words.length; i++) {
+            if (i > 0) nameBuilder.append(" ");
+            nameBuilder.append(stripColorIndicator(words[startIndex + i]));
+            String potentialMatch = nameBuilder.toString().toLowerCase().replaceAll("[^a-z0-9 ]", "");
+
+            // Check for full match
+            if (keywordTips.containsKey(potentialMatch) || relicTips.containsKey(potentialMatch) ||
+                    potionTips.containsKey(potentialMatch) || cardPreviews.containsKey(potentialMatch)) {
+                if (potentialMatch.length() > longestMatchLength) {
+                    longestMatch = potentialMatch;
+                    longestMatchLength = potentialMatch.length();
+                }
+            }
+
+            // Check for partial match only if we haven't found a longer full match
+            if (longestMatch == null) {
+                String fullName = wordToFullName.get(potentialMatch);
+                if (fullName != null && fullName.length() > longestMatchLength) {
+                    longestMatch = fullName;
+                    longestMatchLength = fullName.length();
+                }
+            }
+        }
+        return longestMatch;
+    }
+
+    private void setupTooltipOrPreview(String name, float x, float y) {
+        PowerTip tip = keywordTips.get(name);
+        if (tip != null) {
+            setupKeywordTooltip(tip, x, y);
+        } else {
+            tip = relicTips.get(name);
+            if (tip != null) {
+                setupKeywordTooltip(tip, x, y);
+            } else {
+                tip = potionTips.get(name);
+                if (tip != null) {
+                    setupKeywordTooltip(tip, x, y);
+                } else {
+                    AbstractCard cardPreview = cardPreviews.get(name);
+                    if (cardPreview != null) {
+                        setupCardPreview(cardPreview, x, y);
+                    }
+                }
+            }
         }
     }
 
@@ -370,7 +464,10 @@ public class ChallengesScreenRenderer {
         initializePowerDelimiters();
         initializeKeywordTips();
         initializeCardPreviews();
+        initializeRelicTips();
+        initializePotionTips();
     }
+
 
 
     private static void initializeKeywordTips() {
@@ -399,19 +496,48 @@ public class ChallengesScreenRenderer {
     }
 
 
+    private static void initializeRelicTips() {
+        addRelicTip(Circlet.ID);
+        addRelicTip(Ectoplasm.ID);
+        addRelicTip(RunicPyramid.ID);
+        // Add more relics as needed
+    }
+
+    private static void initializePotionTips() {
+        addPotionTip(FirePotion.POTION_ID);
+        addPotionTip(FearPotion.POTION_ID);
+        addPotionTip(BlockPotion.POTION_ID);
+        addPotionTip(LiquidBronze.POTION_ID);
+        addPotionTip(SmokeBomb.POTION_ID);
+        // Add more potions as needed
+    }
+
+    private static void addRelicTip(String relicId) {
+        AbstractRelic relic = RelicLibrary.getRelic(relicId);
+        if (relic != null) {
+            addTipToMap(relicTips, relic.name, new PowerTip(relic.name, relic.description));
+        }
+    }
+
+    private static void addPotionTip(String potionId) {
+        AbstractPotion potion = PotionHelper.getPotion(potionId);
+        if (potion != null) {
+            addTipToMap(potionTips, potion.name, new PowerTip(potion.name, potion.description));
+        }
+    }
+
     private static void addKeywordTip(String keyword, String powerId) {
         PowerStrings powerStrings = CardCrawlGame.languagePack.getPowerStrings(powerId);
         String delimiterString = powerDelimiters.getOrDefault(powerId, "1");
         String description;
 
         if (powerId.equals(StrengthPower.POWER_ID)) {
-            // Special handling for Strength
             description = joinDescriptionsForStrength(powerStrings.DESCRIPTIONS, delimiterString);
         } else {
             description = joinDescriptions(powerStrings.DESCRIPTIONS, delimiterString);
         }
 
-        keywordTips.put(keyword.toLowerCase(), new PowerTip(powerStrings.NAME, description));
+        addTipToMap(keywordTips, keyword, new PowerTip(powerStrings.NAME, description));
     }
 
     private static String joinDescriptionsForStrength(String[] descriptions, String delimiterString) {

@@ -6,6 +6,7 @@ import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.localization.UIStrings;
+import com.megacrit.cardcrawl.relics.BurningBlood;
 import curatedchallenges.winconditions.CompleteActWinCondition;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import com.megacrit.cardcrawl.cards.AbstractCard;
@@ -72,6 +73,7 @@ public class Duet implements ChallengeDefinition {
     public ArrayList<AbstractRelic> getStartingRelics() {
         ArrayList<AbstractRelic> relics = new ArrayList<>();
         relics.add(RelicLibrary.getRelic(PureWater.ID).makeCopy());
+       // relics.add(RelicLibrary.getRelic(BurningBlood.ID).makeCopy());
         return relics;
     }
 

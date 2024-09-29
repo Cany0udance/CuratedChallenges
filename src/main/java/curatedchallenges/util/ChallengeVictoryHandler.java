@@ -6,8 +6,10 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
+import curatedchallenges.winconditions.CircletCountWinCondition;
 import curatedchallenges.winconditions.GoldThresholdWinCondition;
 import curatedchallenges.winconditions.MaxHPWinCondition;
 import curatedchallenges.winconditions.RemoveAllCardsWinCondition;
@@ -68,6 +70,43 @@ public class ChallengeVictoryHandler {
                     return;
                 }
             }
+        }
+    }
+
+    public static void checkCircletCountWinCondition(String challengeId) {
+        BaseMod.logger.info("ChallengeVictoryHandler: Checking Circlet count win condition for challenge: " + challengeId);
+
+        ChallengeDefinition challenge = ChallengeRegistry.getChallenge(challengeId);
+        if (challenge != null) {
+            BaseMod.logger.info("ChallengeVictoryHandler: Challenge found");
+
+            for (WinCondition condition : challenge.getWinConditionLogic()) {
+                BaseMod.logger.info("ChallengeVictoryHandler: Checking condition: " + condition.getClass().getSimpleName());
+
+                if (condition instanceof CircletCountWinCondition) {
+                    BaseMod.logger.info("ChallengeVictoryHandler: CircletCountWinCondition found");
+
+                    CircletCountWinCondition circletCondition = (CircletCountWinCondition) condition;
+                    BaseMod.logger.info("ChallengeVictoryHandler: Required Circlet count: " + circletCondition.getRequiredCount());
+
+                    AbstractRelic circlet = AbstractDungeon.player.getRelic("Circlet");
+                    if (circlet != null) {
+                        BaseMod.logger.info("ChallengeVictoryHandler: Current Circlet count: " + circlet.counter);
+                    } else {
+                        BaseMod.logger.info("ChallengeVictoryHandler: Player does not have a Circlet relic");
+                    }
+
+                    if (condition.isMet()) {
+                        BaseMod.logger.info("ChallengeVictoryHandler: Win condition met! Handling victory.");
+                        handleVictory(challengeId);
+                        return;
+                    } else {
+                        BaseMod.logger.info("ChallengeVictoryHandler: Win condition not met yet.");
+                    }
+                }
+            }
+        } else {
+            BaseMod.logger.info("ChallengeVictoryHandler: Challenge not found for ID: " + challengeId);
         }
     }
 

@@ -86,7 +86,7 @@ public class Matchmaker implements ChallengeDefinition {
 
     @Override
     public List<String> getRelicsToRemove() {
-        return Arrays.asList(SingingBowl.ID);
+        return Arrays.asList(SingingBowl.ID, DreamCatcher.ID);
     }
 
 }

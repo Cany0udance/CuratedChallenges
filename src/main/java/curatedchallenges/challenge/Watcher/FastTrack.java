@@ -103,7 +103,7 @@ public class FastTrack implements ChallengeDefinition {
     @Override
     public List<WinCondition> getWinConditionLogic() {
         List<WinCondition> conditions = new ArrayList<>();
-        conditions.add(new CompleteActWinCondition(3));
+        conditions.add(new CompleteActWinCondition(2));
         return conditions;
     }
 

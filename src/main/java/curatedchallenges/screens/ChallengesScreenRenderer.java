@@ -476,8 +476,27 @@ public class ChallengesScreenRenderer {
         addKeywordTip(StrengthPower.NAME, StrengthPower.POWER_ID);
         addKeywordTip(EnvenomPower.NAME, EnvenomPower.POWER_ID);
         addKeywordTip(SadisticPower.NAME, SadisticPower.POWER_ID);
-     //   addKeywordTip(CombustPower.NAME, CombustPower.POWER_ID);
+        addKeywordTip(getPowerName(EntanglePower.class), EntanglePower.POWER_ID);
         // Add more keywords as needed
+    }
+
+    private static String getPowerName(Class<? extends AbstractPower> powerClass) {
+        try {
+            Field nameField = powerClass.getField("NAME");
+            return (String) nameField.get(null);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // If NAME field doesn't exist, try to get it from powerStrings
+            try {
+                Field powerStringsField = powerClass.getDeclaredField("powerStrings");
+                powerStringsField.setAccessible(true);
+                PowerStrings powerStrings = (PowerStrings) powerStringsField.get(null);
+                return powerStrings.NAME;
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+                ex.printStackTrace();
+                // Fallback to using the class name if all else fails
+                return powerClass.getSimpleName().replace("Power", "");
+            }
+        }
     }
 
     private static void initializePowerDelimiters() {

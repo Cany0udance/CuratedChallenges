@@ -1,6 +1,10 @@
 package curatedchallenges.winconditions;
 
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.rooms.TreasureRoomBoss;
+import curatedchallenges.CuratedChallenges;
+import curatedchallenges.challenge.Silent.Freeloader;
+import curatedchallenges.challenge.Watcher.FastTrack;
 import curatedchallenges.interfaces.WinCondition;
 
 public class CompleteActWinCondition implements WinCondition {
@@ -12,6 +16,9 @@ public class CompleteActWinCondition implements WinCondition {
 
     @Override
     public boolean isMet() {
+        if (AbstractDungeon.getCurrRoom() instanceof TreasureRoomBoss && FastTrack.ID.equals(CuratedChallenges.currentChallengeId)) {
+            return AbstractDungeon.actNum + 1 == targetAct;
+        }
         return AbstractDungeon.actNum == targetAct;
     }
 

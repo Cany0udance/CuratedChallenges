@@ -53,6 +53,7 @@ public interface ChallengeDefinition {
     // New method for start of turn logic
     default void applyStartOfTurnEffect(AbstractPlayer p) {
         // Default implementation does nothing
+        // Note that this method is applied post-draw
     }
 
     // New method for post battle logic

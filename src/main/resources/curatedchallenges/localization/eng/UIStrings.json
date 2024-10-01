@@ -121,7 +121,7 @@
     "TEXT": [
       "Fast Track",
       "Skip Act 1 entirely. NL Start with #b250 #yGold, #yLiquid #yBronze, and a #yFear #yPotion.",
-      "Complete Act 3."
+      "Complete Act 2."
     ]
   },
   "CuratedChallenges:Matchmaker": {
@@ -136,6 +136,13 @@
       "Freeloader",
       "Unknown rooms appear more often. NL N'loth will frequently be encountered in unknown rooms. NL You cannot avoid giving relics to N'loth, and N'loth will you a #yCirclet in return.",
       "Complete Act 3 OR NL Have #b7 #yCirclets at once."
+    ]
+  },
+  "CuratedChallenges:Zenith": {
+    "TEXT": [
+      "Zenith",
+      "On odd turns, become #yEntangled. NL On even turns, deal double damage.",
+      "Complete Act 3."
     ]
   },
   "CuratedChallenges:MatchmakerText": {

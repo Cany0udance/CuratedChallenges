@@ -20,10 +20,7 @@ import curatedchallenges.challenge.Defect.Overclocked;
 import curatedchallenges.challenge.Ironclad.*;
 import curatedchallenges.challenge.Silent.*;
 import curatedchallenges.challenge.Defect.CuriousCreatures;
-import curatedchallenges.challenge.Watcher.AmpedEnemies;
-import curatedchallenges.challenge.Watcher.Duet;
-import curatedchallenges.challenge.Watcher.EmotionalSupportFlower;
-import curatedchallenges.challenge.Watcher.FastTrack;
+import curatedchallenges.challenge.Watcher.*;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
@@ -63,7 +60,8 @@ public class CuratedChallenges implements
         OnStartBattleSubscriber,
         PostBattleSubscriber,
         StartGameSubscriber,
-        PostDungeonInitializeSubscriber {
+        PostDungeonInitializeSubscriber,
+        OnPlayerTurnStartPostDrawSubscriber{
     public static ModInfo info;
     public static String modID; //Edit your pom.xml to change this
     static { loadModInfo(); }
@@ -206,15 +204,19 @@ public class CuratedChallenges implements
         }
     }
 
-
     @Override
-    public void receiveOnPlayerTurnStart() {
+    public void receiveOnPlayerTurnStartPostDraw() {
         if (currentChallengeId != null) {
             ChallengeDefinition challenge = ChallengeRegistry.getChallenge(currentChallengeId);
             if (challenge != null) {
                 challenge.applyStartOfTurnEffect(AbstractDungeon.player);
             }
         }
+    }
+
+    @Override
+    public void receiveOnPlayerTurnStart() {
+
     }
 
 
@@ -634,6 +636,7 @@ public class CuratedChallenges implements
 
         // Watcher Challenges
 
+        ChallengeRegistry.registerChallenge(new Zenith());
         ChallengeRegistry.registerChallenge(new EmotionalSupportFlower());
         ChallengeRegistry.registerChallenge(new FastTrack());
         ChallengeRegistry.registerChallenge(new Duet());

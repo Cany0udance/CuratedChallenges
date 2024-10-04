@@ -83,7 +83,7 @@ public class Freeloader implements ChallengeDefinition {
     public List<WinCondition> getWinConditionLogic() {
         List<WinCondition> conditions = new ArrayList<>();
         conditions.add(new CompleteActWinCondition(3));
-        conditions.add(new CircletCountWinCondition(7));
+        conditions.add(new CircletCountWinCondition(8));
         return conditions;
     }
 

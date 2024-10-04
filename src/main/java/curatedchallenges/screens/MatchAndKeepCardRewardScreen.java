@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.core.Settings;
@@ -19,6 +20,7 @@ import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.CardRewardScreen;
 import com.megacrit.cardcrawl.vfx.cardManip.ShowCardAndObtainEffect;
+import com.megacrit.cardcrawl.vfx.scene.EventBgParticle;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,6 +33,8 @@ public class MatchAndKeepCardRewardScreen extends CardRewardScreen {
     private boolean isMatchGameActive = true;
     private AbstractCard chosenCard;
     private AbstractCard hoveredCard;
+    private AbstractCard lastChosenCard;
+    private AbstractCard lastHoveredCard;
     private boolean cardFlipped = false;
     private float waitTimer = 0.0F;
     private boolean cardsMatched = false;
@@ -185,10 +189,19 @@ public class MatchAndKeepCardRewardScreen extends CardRewardScreen {
                 } else {
                     this.waitTimer = 0.0F;
                     if (this.chosenCard != null && this.hoveredCard != null) {
-                        this.chosenCard.isFlipped = true;
-                        this.hoveredCard.isFlipped = true;
-                        this.chosenCard.targetDrawScale = 0.5F;
-                        this.hoveredCard.targetDrawScale = 0.5F;
+                        if (this.attemptCount > 1) {
+                            this.chosenCard.isFlipped = true;
+                            this.hoveredCard.isFlipped = true;
+                            this.chosenCard.targetDrawScale = 0.5F;
+                            this.hoveredCard.targetDrawScale = 0.5F;
+                        } else {
+                            // Keep the cards at their larger scale for the last attempt
+                            this.chosenCard.targetDrawScale = 1.0F;
+                            this.hoveredCard.targetDrawScale = 1.0F;
+                            // Store the last two cards separately
+                            this.lastChosenCard = this.chosenCard;
+                            this.lastHoveredCard = this.hoveredCard;
+                        }
                         this.chosenCard = null;
                         this.hoveredCard = null;
                     }
@@ -205,7 +218,6 @@ public class MatchAndKeepCardRewardScreen extends CardRewardScreen {
                 this.returnToCombatReward = true;
             }
         }
-
         cards.update();
     }
 
@@ -268,7 +280,19 @@ public class MatchAndKeepCardRewardScreen extends CardRewardScreen {
 
         // Render the cards
         CardGroup cards = (CardGroup) ReflectionHacks.getPrivate(this.matchGame, GremlinMatchGame.class, "cards");
-        cards.render(sb);
+        for (AbstractCard c : cards.group) {
+            if (c != this.lastChosenCard && c != this.lastHoveredCard) {
+                c.render(sb);
+            }
+        }
+
+        // Render the last two cards on top
+        if (this.lastChosenCard != null) {
+            this.lastChosenCard.render(sb);
+        }
+        if (this.lastHoveredCard != null) {
+            this.lastHoveredCard.render(sb);
+        }
 
         if (this.chosenCard != null) {
             this.chosenCard.render(sb);
@@ -326,6 +350,8 @@ public class MatchAndKeepCardRewardScreen extends CardRewardScreen {
         this.matchGame = null;
         this.chosenCard = null;
         this.hoveredCard = null;
+        this.lastChosenCard = null;
+        this.lastHoveredCard = null;
         this.originalRewards = null;
         this.claimedRewardIndices = null;
         if (backgroundTexture != null) {

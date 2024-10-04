@@ -33,7 +33,6 @@ public class TrueVictoryRoomPatch {
         public static void Postfix(TrueVictoryRoom __instance) {
             if (isInChallenge.get(__instance)) {
                 AbstractDungeon.isScreenUp = false;
-                AbstractDungeon.overlayMenu.proceedButton.show();
                 GameCursor.hidden = false;
                 AbstractDungeon.screen = AbstractDungeon.CurrentScreen.NONE;
                 ChallengeVictoryHandler.checkVictoryConditions(CuratedChallenges.currentChallengeId, false, false, true);

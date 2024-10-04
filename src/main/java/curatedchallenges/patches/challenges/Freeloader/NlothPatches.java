@@ -11,6 +11,9 @@ import curatedchallenges.CuratedChallenges;
 import curatedchallenges.challenge.Silent.Freeloader;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class NlothPatches {
     @SpirePatch(
@@ -28,25 +31,46 @@ public class NlothPatches {
                     Field giftField = Nloth.class.getDeclaredField("gift");
                     giftField.setAccessible(true);
                     giftField.set(__instance, new Circlet());
+
                     // Get choice1 and choice2
                     Field choice1Field = Nloth.class.getDeclaredField("choice1");
                     Field choice2Field = Nloth.class.getDeclaredField("choice2");
                     choice1Field.setAccessible(true);
                     choice2Field.setAccessible(true);
-                    AbstractRelic choice1 = (AbstractRelic) choice1Field.get(__instance);
-                    AbstractRelic choice2 = (AbstractRelic) choice2Field.get(__instance);
 
-                    // Check if player has Circlet and replace choices if necessary
-                    if (AbstractDungeon.player.hasRelic(Circlet.ID)) {
-                        if (choice1.relicId.equals(Circlet.ID)) {
-                            choice1 = getRandomNonCircletRelic();
-                            choice1Field.set(__instance, choice1);
-                        }
-                        if (choice2.relicId.equals(Circlet.ID)) {
-                            choice2 = getRandomNonCircletRelic();
-                            choice2Field.set(__instance, choice2);
+                    // Get two different random relics
+                    List<AbstractRelic> playerRelics = new ArrayList<>(AbstractDungeon.player.relics);
+                    Collections.shuffle(playerRelics, new java.util.Random(AbstractDungeon.miscRng.randomLong()));
+
+                    AbstractRelic choice1 = null;
+                    AbstractRelic choice2 = null;
+
+                    for (AbstractRelic relic : playerRelics) {
+                        if (!relic.relicId.equals(Circlet.ID)) {
+                            if (choice1 == null) {
+                                choice1 = relic;
+                            } else if (choice2 == null) {
+                                choice2 = relic;
+                                break;
+                            }
                         }
                     }
+
+                    // If we couldn't find two different non-Circlet relics, fall back to allowing Circlet
+                    if (choice2 == null) {
+                        for (AbstractRelic relic : playerRelics) {
+                            if (relic != choice1) {
+                                choice2 = relic;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Set the choices
+                    choice1Field.set(__instance, choice1);
+                    choice2Field.set(__instance, choice2);
+
+                    // Update dialog options
                     __instance.imageEventText.updateDialogOption(0, Nloth.OPTIONS[0] + choice1.name + Nloth.OPTIONS[1]);
                     __instance.imageEventText.updateDialogOption(1, Nloth.OPTIONS[0] + choice2.name + Nloth.OPTIONS[1]);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -54,15 +78,8 @@ public class NlothPatches {
                 }
             }
         }
-
-        private static AbstractRelic getRandomNonCircletRelic() {
-            AbstractRelic relic;
-            do {
-                relic = AbstractDungeon.player.relics.get(AbstractDungeon.relicRng.random(AbstractDungeon.player.relics.size() - 1));
-            } while (relic.relicId.equals(Circlet.ID));
-            return relic;
-        }
     }
+
 
     @SpirePatch(
             clz = Nloth.class,

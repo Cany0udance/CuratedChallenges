@@ -38,7 +38,10 @@ public class ChallengesScreen implements ScrollBarListener {
     private String currentSeed = "";
     private static final float CHARACTER_ICON_X = Settings.WIDTH * 0.5f;
     private static final float CHARACTER_ICON_Y = Settings.HEIGHT * 0.85f;
-    private static final float CHARACTER_BUTTON_SPACING = 150f * Settings.scale;
+
+    private static final float BASE_CHARACTER_BUTTON_SPACING = 150f * Settings.scale;
+    private static final float SPACING_REDUCTION_PER_EXTRA_CHARACTER = 15f * Settings.scale;
+    private static final int MAX_CHARACTERS_BEFORE_SQUISH = 8;
     private static final float CHALLENGE_LIST_Y_OFFSET = 20f * Settings.scale;
     public static Challenge currentChallenge = null;
     public CustomToggleButton ascension20Button;
@@ -109,12 +112,24 @@ public class ChallengesScreen implements ScrollBarListener {
                 .filter(character -> charactersWithChallenges.contains(character.chosenClass))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        float startX = CHARACTER_ICON_X - ((validCharacters.size() - 1) * CHARACTER_BUTTON_SPACING / 2f);
+        float dynamicSpacing = calculateDynamicSpacing(validCharacters.size());
+        float startX = CHARACTER_ICON_X - ((validCharacters.size() - 1) * dynamicSpacing / 2f);
+
         for (int i = 0; i < validCharacters.size(); i++) {
             AbstractPlayer character = validCharacters.get(i);
             CustomModeCharacterButton button = new CustomModeCharacterButton(character, UnlockTracker.isCharacterLocked(character.chosenClass.toString()));
-            button.move(startX + (i * CHARACTER_BUTTON_SPACING), CHARACTER_ICON_Y);
+            button.move(startX + (i * dynamicSpacing), CHARACTER_ICON_Y);
             this.characterButtons.add(button);
+        }
+    }
+
+    private float calculateDynamicSpacing(int characterCount) {
+        if (characterCount <= MAX_CHARACTERS_BEFORE_SQUISH) {
+            return BASE_CHARACTER_BUTTON_SPACING;
+        } else {
+            int extraCharacters = characterCount - MAX_CHARACTERS_BEFORE_SQUISH;
+            float reductionAmount = extraCharacters * SPACING_REDUCTION_PER_EXTRA_CHARACTER;
+            return Math.max(BASE_CHARACTER_BUTTON_SPACING - reductionAmount, 90f * Settings.scale); // Ensure a minimum spacing
         }
     }
 
@@ -255,12 +270,14 @@ public class ChallengesScreen implements ScrollBarListener {
         this.updateEmbarkButton();
     }
 
+
     private void updateCharacterButtons() {
-        float startX = CHARACTER_ICON_X - ((characterButtons.size() - 1) * CHARACTER_BUTTON_SPACING / 2f);
+        float dynamicSpacing = calculateDynamicSpacing(characterButtons.size());
+        float startX = CHARACTER_ICON_X - ((characterButtons.size() - 1) * dynamicSpacing / 2f);
         for (int i = 0; i < characterButtons.size(); i++) {
             CustomModeCharacterButton button = characterButtons.get(i);
             float baseY = CHARACTER_ICON_Y + scrollY; // Add scrollY to the base Y position
-            button.update(startX + (i * CHARACTER_BUTTON_SPACING), baseY);
+            button.update(startX + (i * dynamicSpacing), baseY);
         }
     }
 

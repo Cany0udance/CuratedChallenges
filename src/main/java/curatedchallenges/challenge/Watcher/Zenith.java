@@ -1,7 +1,7 @@
 package curatedchallenges.challenge.Watcher;
 
-import basemod.BaseMod;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
+import com.megacrit.cardcrawl.actions.common.MakeTempCardInHandAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.purple.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
@@ -9,6 +9,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.localization.UIStrings;
+import com.megacrit.cardcrawl.monsters.beyond.Nemesis;
 import com.megacrit.cardcrawl.powers.DoubleDamagePower;
 import com.megacrit.cardcrawl.powers.EntanglePower;
 import com.megacrit.cardcrawl.relics.*;
@@ -83,6 +84,15 @@ public class Zenith implements ChallengeDefinition {
         List<WinCondition> conditions = new ArrayList<>();
         conditions.add(new CompleteActWinCondition(3));
         return conditions;
+    }
+
+    @Override
+    public void applyPreCombatLogic(AbstractPlayer p) {
+        if (AbstractDungeon.getMonsters().getMonster(Nemesis.ID) != null) {
+            AbstractCard vault = new Vault();
+            vault.setCostForTurn(0);
+            AbstractDungeon.actionManager.addToBottom(new MakeTempCardInHandAction(vault, 1, false));
+        }
     }
 
     @Override

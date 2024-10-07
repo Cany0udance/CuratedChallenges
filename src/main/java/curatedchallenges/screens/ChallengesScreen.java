@@ -47,11 +47,14 @@ public class ChallengesScreen implements ScrollBarListener {
     public CustomToggleButton ascension20Button;
     public ArrayList<MenuFireEffect> fireEffects;
     private float fireEffectTimer;
+    private boolean isControllerMode = false;
     private static final float FIRE_EFFECT_INTERVAL = 0.025F;
     private ArrayList<AbstractRelic> currentRelicList;
     private boolean isRelicPopupOpen = false;
     private AbstractRelic clickStartedRelic = null;
-
+    private CSelectionType currentSelectionType = CSelectionType.CHARACTER;
+    private int currentCharacterIndex = 0;
+    private int currentChallengeIndex = 0;
     public float scrollY;
     private float targetY;
     private boolean grabbedScreen = false;
@@ -59,6 +62,7 @@ public class ChallengesScreen implements ScrollBarListener {
     private float scrollLowerBound = 0.0F;
     private float scrollUpperBound = 0.0F;
     private ScrollBar scrollBar;
+    private List<Challenge> currentCharacterChallenges;
 
     public static final float ASCENSION20_BUTTON_X = Settings.WIDTH * 0.5f;
     private static final float ASCENSION20_BUTTON_Y = Settings.HEIGHT * 0.75f;
@@ -92,6 +96,9 @@ public class ChallengesScreen implements ScrollBarListener {
                 uiStrings.TEXT[1],
                 CuratedChallenges.defaultAscension20
         );
+        if (!characterButtons.isEmpty()) {
+            characterButtons.get(0).hb.hovered = true;
+        }
         this.fireEffects = new ArrayList<>();
         this.fireEffectTimer = 0.0F;
         this.renderer = new ChallengesScreenRenderer();
@@ -213,6 +220,12 @@ public class ChallengesScreen implements ScrollBarListener {
     }
 
     public void update() {
+        this.isControllerMode = Settings.isControllerMode;
+        this.updateControllerInput();
+
+        if (!this.isControllerMode) {
+            this.updateScrolling();
+        }
         this.cancelButton.update();
         if (this.cancelButton.hb.clicked || InputHelper.pressedEscape) {
             InputHelper.pressedEscape = false;
@@ -270,6 +283,116 @@ public class ChallengesScreen implements ScrollBarListener {
         this.updateEmbarkButton();
     }
 
+    private void updateControllerInput() {
+        if (Settings.isControllerMode) {
+            if (currentSelectionType == CSelectionType.CHARACTER) {
+                updateCharacterSelection();
+            } else if (currentSelectionType == CSelectionType.CHALLENGE) {
+                updateChallengeSelection();
+            }
+
+            if (CInputActionSet.topPanel.isJustPressed()) {
+                toggleAscension20();
+            }
+            // Allow switching back to character selection
+            if (currentSelectionType == CSelectionType.CHALLENGE &&
+                    (CInputActionSet.up.isJustPressed() || CInputActionSet.altUp.isJustPressed()) &&
+                    currentChallengeIndex == 0) {
+                currentSelectionType = CSelectionType.CHARACTER;
+                updateHoveredCharacter();
+            }
+        }
+    }
+
+    private void updateCharacterSelection() {
+        boolean characterChanged = false;
+
+        if (CInputActionSet.right.isJustPressed() || CInputActionSet.altRight.isJustPressed()) {
+            currentCharacterIndex = (currentCharacterIndex + 1) % characterButtons.size();
+            characterChanged = true;
+        } else if (CInputActionSet.left.isJustPressed() || CInputActionSet.altLeft.isJustPressed()) {
+            currentCharacterIndex = (currentCharacterIndex - 1 + characterButtons.size()) % characterButtons.size();
+            characterChanged = true;
+        } else if (CInputActionSet.select.isJustPressed()) {
+            selectCurrentCharacter();
+        }
+
+        if (characterChanged) {
+            updateHoveredCharacter();
+            CardCrawlGame.sound.play("UI_CLICK_1");  // Play a sound for feedback
+        }
+    }
+
+    private void updateChallengeSelection() {
+        if (currentCharacterChallenges == null || currentCharacterChallenges.isEmpty()) {
+            return;
+        }
+
+        if (CInputActionSet.up.isJustPressed() || CInputActionSet.altUp.isJustPressed()) {
+            currentChallengeIndex = Math.max(0, currentChallengeIndex - 1);
+            updateHoveredChallenge();
+        } else if (CInputActionSet.down.isJustPressed() || CInputActionSet.altDown.isJustPressed()) {
+            currentChallengeIndex = Math.min(currentCharacterChallenges.size() - 1, currentChallengeIndex + 1);
+            updateHoveredChallenge();
+        } else if (CInputActionSet.select.isJustPressed()) {
+            selectCurrentChallenge();
+        }
+    }
+
+    private void updateHoveredCharacter() {
+        for (int i = 0; i < characterButtons.size(); i++) {
+            CustomModeCharacterButton button = characterButtons.get(i);
+            button.hb.hovered = (i == currentCharacterIndex);
+        }
+    }
+
+    private void updateHoveredChallenge() {
+        if (currentCharacterChallenges == null || currentCharacterChallenges.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < currentCharacterChallenges.size(); i++) {
+            currentCharacterChallenges.get(i).hb.hovered = (i == currentChallengeIndex);
+        }
+    }
+
+    private void selectCurrentCharacter() {
+        CustomModeCharacterButton selectedButton = characterButtons.get(currentCharacterIndex);
+        deselectOtherOptions(selectedButton);
+        selectedButton.selected = true;
+        this.selectedCharacter = selectedButton.c.chosenClass;
+        currentSelectionType = CSelectionType.CHALLENGE;
+        updateCurrentCharacterChallenges();
+        currentChallengeIndex = 0;
+        updateHoveredChallenge();
+        CardCrawlGame.sound.play("UI_CLICK_1");  // Play a sound for selection feedback
+    }
+
+    private void updateCurrentCharacterChallenges() {
+        currentCharacterChallenges = challenges.stream()
+                .filter(challenge -> challenge.characterClass == this.selectedCharacter)
+                .collect(Collectors.toList());
+    }
+
+    private void selectCurrentChallenge() {
+        if (currentChallengeIndex >= 0 && currentChallengeIndex < currentCharacterChallenges.size()) {
+            Challenge selectedChallenge = currentCharacterChallenges.get(currentChallengeIndex);
+            if (!selectedChallenge.selected) {
+                deselectAllChallenges();
+                selectedChallenge.selected = true;
+            }
+        }
+    }
+
+    private void toggleAscension20() {
+        this.ascension20Button.enabled = !this.ascension20Button.enabled;
+    }
+
+    private void deselectAllChallenges() {
+        for (Challenge challenge : challenges) {
+            challenge.selected = false;
+        }
+    }
 
     private void updateCharacterButtons() {
         float dynamicSpacing = calculateDynamicSpacing(characterButtons.size());
@@ -282,26 +405,30 @@ public class ChallengesScreen implements ScrollBarListener {
     }
 
     private void updateScrolling() {
-        int y = InputHelper.mY;
-        if (!this.grabbedScreen) {
-            if (InputHelper.scrolledDown) {
-                this.targetY += Settings.SCROLL_SPEED;
-            } else if (InputHelper.scrolledUp) {
-                this.targetY -= Settings.SCROLL_SPEED;
-            }
-            if (InputHelper.justClickedLeft) {
-                this.grabbedScreen = true;
-                this.grabStartY = y - this.targetY;
-            }
-        } else if (InputHelper.isMouseDown) {
-            this.targetY = y - this.grabStartY;
-        } else {
-            this.grabbedScreen = false;
-        }
+        // Only update scrolling if not in controller mode
+        if (!this.isControllerMode) {
+            int y = InputHelper.mY;
+            if (!this.grabbedScreen) {
+                if (InputHelper.scrolledDown) {
+                    this.targetY += Settings.SCROLL_SPEED;
+                } else if (InputHelper.scrolledUp) {
+                    this.targetY -= Settings.SCROLL_SPEED;
+                }
 
-        this.scrollY = MathHelper.scrollSnapLerpSpeed(this.scrollY, this.targetY);
-        resetTargetYIfNeeded();
-        updateBarPosition();
+                if (InputHelper.justClickedLeft) {
+                    this.grabbedScreen = true;
+                    this.grabStartY = y - this.targetY;
+                }
+            } else if (InputHelper.isMouseDown) {
+                this.targetY = y - this.grabStartY;
+            } else {
+                this.grabbedScreen = false;
+            }
+
+            this.scrollY = MathHelper.scrollSnapLerpSpeed(this.scrollY, this.targetY);
+            resetTargetYIfNeeded();
+            updateBarPosition();
+        }
     }
 
     private void resetTargetYIfNeeded() {
@@ -448,10 +575,6 @@ public class ChallengesScreen implements ScrollBarListener {
         }
     }
 
-    private void deselectAllChallenges() {
-        challenges.forEach(challenge -> challenge.selected = false);
-    }
-
     private void updateChallenges() {
         if (this.selectedCharacter != null) {
             float startY = ChallengesScreenRenderer.DESCRIPTION_START_Y - CHALLENGE_LIST_Y_OFFSET + this.scrollY;
@@ -493,6 +616,11 @@ public class ChallengesScreen implements ScrollBarListener {
 
     public void render(SpriteBatch sb) {
         this.renderer.render(sb, this, this.scrollY);
+    }
+
+    private enum CSelectionType {
+        CHARACTER,
+        CHALLENGE
     }
 
 }

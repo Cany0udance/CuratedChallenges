@@ -41,7 +41,7 @@ public class GlassCannon implements ChallengeDefinition {
     @Override
     public ArrayList<AbstractCard> getStartingDeck() {
         ArrayList<AbstractCard> deck = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             AbstractCard strike = new Strike_Green();
             strike.upgrade();
             deck.add(strike);

@@ -268,9 +268,7 @@ public class CuratedChallenges implements
                 config.remove(CHALLENGE_RUN_KEY);
             }
             config.save();
-      //      BaseMod.logger.info("Saved challenge data. ID: " + currentChallengeId);
         } catch (IOException e) {
-       //     BaseMod.logger.error("Error saving challenge data: " + e.getMessage());
         }
     }
 
@@ -279,13 +277,10 @@ public class CuratedChallenges implements
             SpireConfig config = new SpireConfig(modID, "SaveData");
             if (config.getBool(CHALLENGE_RUN_KEY)) {
                 currentChallengeId = config.getString(SAVE_KEY);
-           //     BaseMod.logger.info("Loaded challenge data. ID: " + currentChallengeId);
             } else {
                 currentChallengeId = null;
-        //        BaseMod.logger.info("No challenge data found.");
             }
         } catch (IOException e) {
-        //    BaseMod.logger.error("Error loading challenge data: " + e.getMessage());
         }
     }
 
@@ -296,9 +291,7 @@ public class CuratedChallenges implements
             config.remove(CHALLENGE_RUN_KEY);
             config.save();
             currentChallengeId = null;
-         //   BaseMod.logger.info("Cleared challenge data.");
         } catch (IOException e) {
-       //     BaseMod.logger.error("Error clearing challenge data: " + e.getMessage());
         }
     }
 

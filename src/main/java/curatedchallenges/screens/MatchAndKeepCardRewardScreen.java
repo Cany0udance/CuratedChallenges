@@ -15,6 +15,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
+import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
@@ -106,11 +107,69 @@ public class MatchAndKeepCardRewardScreen extends CardRewardScreen {
     @Override
     public void update() {
         if (this.isMatchGameActive) {
-            updateMatchGameLogic();
+            this.updateControllerInput();
+            this.updateMatchGameLogic();
         } else if (this.returnToCombatReward) {
             returnToCombatRewardScreen();
         } else {
             super.update();
+        }
+    }
+
+    private void updateControllerInput() {
+        if (Settings.isControllerMode) {
+            boolean anyHovered = false;
+            int index = 0;
+            CardGroup cards = (CardGroup) ReflectionHacks.getPrivate(this.matchGame, GremlinMatchGame.class, "cards");
+
+            for (AbstractCard c : cards.group) {
+                if (c.hb.hovered) {
+                    anyHovered = true;
+                    break;
+                }
+                index++;
+            }
+
+            if (!anyHovered) {
+                Gdx.input.setCursorPosition(
+                        (int)cards.group.get(0).hb.cX,
+                        Settings.HEIGHT - (int)cards.group.get(0).hb.cY
+                );
+            } else {
+                float x, y;
+                AbstractCard hoveredCard = cards.group.get(index);
+
+                if (CInputActionSet.up.isJustPressed() || CInputActionSet.altUp.isJustPressed()) {
+                    y = hoveredCard.hb.cY + 230.0F * Settings.scale;
+                    if (y > 865.0F * Settings.scale) {
+                        y = 290.0F * Settings.scale;
+                    }
+                    Gdx.input.setCursorPosition((int)hoveredCard.hb.cX, Settings.HEIGHT - (int)y);
+                } else if (CInputActionSet.down.isJustPressed() || CInputActionSet.altDown.isJustPressed()) {
+                    y = hoveredCard.hb.cY - 230.0F * Settings.scale;
+                    if (y < 175.0F * Settings.scale) {
+                        y = 750.0F * Settings.scale;
+                    }
+                    Gdx.input.setCursorPosition((int)hoveredCard.hb.cX, Settings.HEIGHT - (int)y);
+                } else if (CInputActionSet.left.isJustPressed() || CInputActionSet.altLeft.isJustPressed()) {
+                    x = hoveredCard.hb.cX - 210.0F * Settings.scale;
+                    if (x < 530.0F * Settings.scale) {
+                        x = 1270.0F * Settings.scale;
+                    }
+                    Gdx.input.setCursorPosition((int)x, Settings.HEIGHT - (int)hoveredCard.hb.cY);
+                } else if (CInputActionSet.right.isJustPressed() || CInputActionSet.altRight.isJustPressed()) {
+                    x = hoveredCard.hb.cX + 210.0F * Settings.scale;
+                    if (x > 1375.0F * Settings.scale) {
+                        x = 640.0F * Settings.scale;
+                    }
+                    Gdx.input.setCursorPosition((int)x, Settings.HEIGHT - (int)hoveredCard.hb.cY);
+                }
+
+                if (CInputActionSet.select.isJustPressed()) {
+                    CInputActionSet.select.unpress();
+                    InputHelper.justClickedLeft = true;
+                }
+            }
         }
     }
 
@@ -172,7 +231,7 @@ public class MatchAndKeepCardRewardScreen extends CardRewardScreen {
                     if (!this.animationStarted) {
                         this.animationStarted = true;
                         this.matchAnimationTimer = MATCH_ANIMATION_DURATION;
-                        AbstractCard cardToObtain = this.chosenCard.makeCopy();
+                        AbstractCard cardToObtain = this.chosenCard.makeStatEquivalentCopy();
                         AbstractDungeon.effectList.add(new ShowCardAndObtainEffect(cardToObtain, (float)Settings.WIDTH / 2.0F, (float)Settings.HEIGHT / 2.0F));
                     } else {
                         this.matchAnimationTimer -= Gdx.graphics.getDeltaTime();

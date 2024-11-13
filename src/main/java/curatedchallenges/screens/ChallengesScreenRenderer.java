@@ -1,35 +1,30 @@
 package curatedchallenges.screens;
 
-import basemod.BaseMod;
 import com.badlogic.gdx.graphics.Color;
-import com.megacrit.cardcrawl.cards.curses.CurseOfTheBell;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.purple.Fasting;
 import com.megacrit.cardcrawl.cards.red.Combust;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.localization.PowerStrings;
 import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.potions.*;
 import com.megacrit.cardcrawl.powers.*;
+import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.Circlet;
 import com.megacrit.cardcrawl.relics.Ectoplasm;
 import com.megacrit.cardcrawl.relics.RunicPyramid;
 import com.megacrit.cardcrawl.screens.custom.CustomModeCharacterButton;
+import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 import curatedchallenges.buttons.CustomToggleButton;
 import curatedchallenges.effects.MenuFireEffect;
 import curatedchallenges.elements.Challenge;
-import curatedchallenges.screens.ChallengesScreen;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.megacrit.cardcrawl.cards.AbstractCard;
-import com.megacrit.cardcrawl.core.Settings;
-import com.megacrit.cardcrawl.relics.AbstractRelic;
-import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static curatedchallenges.CuratedChallenges.makeID;
 
@@ -505,7 +500,7 @@ public class ChallengesScreenRenderer {
         powerDelimiters.put(StrengthPower.POWER_ID, "3");
         powerDelimiters.put(EnvenomPower.POWER_ID, "1");
         powerDelimiters.put(SadisticPower.POWER_ID, "3");
-      //  powerDelimiters.put(CombustPower.POWER_ID, "1|5"); // Use '|' to separate multiple delimiters
+        //  powerDelimiters.put(CombustPower.POWER_ID, "1|5"); // Use '|' to separate multiple delimiters
         // Add more custom delimiters as needed
     }
 

@@ -8,7 +8,7 @@
   "CuratedChallenges:AuxiliaryPower": {
     "TEXT": [
       "Auxiliary Power",
-      "Draw #b2 fewer cards per turn. NL Start with an additional orb slot. NL At the start of combat, channel one of each orb in random order.",
+      "Draw #b2 fewer cards per turn. NL Lose #b1 Energy at the start of your turn. NL Start with an additional orb slot. NL At the start of combat, channel one of each orb in random order.",
       "Complete Act 4."
     ]
   },
@@ -134,7 +134,7 @@
   "CuratedChallenges:Freeloader": {
     "TEXT": [
       "Freeloader",
-      "Unknown rooms appear more often. NL N'loth will frequently be encountered in unknown rooms. NL You cannot avoid giving relics to N'loth, and N'loth will you a #yCirclet in return.",
+      "Unknown rooms appear more often. NL N'loth will frequently be encountered in unknown rooms. NL You cannot avoid giving relics to N'loth, and N'loth will give you a #yCirclet in return.",
       "Complete Act 3 OR NL Have #b8 #yCirclets at once."
     ]
   },

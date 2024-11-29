@@ -38,7 +38,7 @@ public class FreeloaderRoomGenerationPatch {
                 }
             }
 
-            int roomsToConvert = Math.round(totalMonsterRooms * 0.5f);
+            int roomsToConvert = Math.round(totalMonsterRooms * 0.55f);
 
             // Shuffle the list of monster rooms
             Collections.shuffle(monsterRooms, new java.util.Random(AbstractDungeon.mapRng.randomLong()));

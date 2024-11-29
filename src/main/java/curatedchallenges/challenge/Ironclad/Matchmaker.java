@@ -4,6 +4,9 @@ import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.red.*;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.events.beyond.SensoryStone;
+import com.megacrit.cardcrawl.events.shrines.FountainOfCurseRemoval;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.relics.*;
@@ -87,6 +90,13 @@ public class Matchmaker implements ChallengeDefinition {
     @Override
     public List<String> getRelicsToRemove() {
         return Arrays.asList(SingingBowl.ID, DreamCatcher.ID);
+    }
+
+    @Override
+    public List<Class<? extends AbstractEvent>> getEventsToRemove() {
+        return Arrays.asList(
+                SensoryStone.class
+        );
     }
 
 }

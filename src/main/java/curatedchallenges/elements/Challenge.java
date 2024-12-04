@@ -180,7 +180,8 @@ public class Challenge {
     }
 
     private boolean isAchievementUnlocked(String achievementKey) {
-        return UnlockTracker.isAchievementUnlocked(CuratedChallenges.makeID(achievementKey));
+        String fullKey = CuratedChallenges.makeID(achievementKey);
+        return UnlockTracker.isAchievementUnlocked(fullKey);
     }
 
     public AbstractPlayer.PlayerClass getCharacterClass() {

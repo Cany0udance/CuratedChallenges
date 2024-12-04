@@ -65,25 +65,29 @@ public class ChallengesScreenRenderer {
         screen.cancelButton.render(sb);
         renderCharacterButtons(sb, screen, scrollY);
 
-
-        if (screen.selectedCharacter != null) {
+        // Show challenges if a character is selected (not for Surprise Me)
+        if (screen.selectedCharacter != null && !screen.isSurpriseMeSelected()) {
             screen.challenges.stream()
                     .filter(challenge -> challenge.characterClass.equals(screen.selectedCharacter))
                     .forEach(challenge -> challenge.render(sb, scrollY));
         }
 
+        // Show A20 and Embark buttons only if conditions are met
+        if (shouldShowEmbarkAndA20Buttons(screen)) {
+            renderAscension20Button(sb, screen, scrollY);
+            screen.embarkButton.render(sb);
+            // Only show fire effects if A20 is enabled
+            if (screen.fireEffects != null && !screen.fireEffects.isEmpty()) {
+                for (MenuFireEffect effect : screen.fireEffects) {
+                    effect.render(sb);
+                }
+            }
+        }
 
         Challenge selectedChallenge = screen.getSelectedChallenge();
         if (selectedChallenge != null) {
             renderChallengeDescription(sb, selectedChallenge, scrollY);
             renderRelicTooltips(sb, selectedChallenge);
-            renderAscension20Button(sb, screen, scrollY);
-            screen.embarkButton.render(sb);
-
-
-            for (MenuFireEffect effect : screen.fireEffects) {
-                effect.render(sb);
-            }
         }
         if (cardToPreview != null) {
             renderCardPreview(sb);
@@ -91,6 +95,19 @@ public class ChallengesScreenRenderer {
         if (tipToRender != null) {
             renderKeywordTooltip(sb);
         }
+    }
+
+    // New method for checking if A20 and Embark buttons should be shown
+    private boolean shouldShowEmbarkAndA20Buttons(ChallengesScreen screen) {
+        // First condition: Surprise Me button is selected
+        boolean surpriseMeSelected = screen.isSurpriseMeSelected();
+
+        // Second condition: Character is selected AND a challenge is selected
+        boolean characterAndChallengeSelected = screen.selectedCharacter != null &&
+                screen.challenges.stream()
+                        .anyMatch(challenge -> challenge.selected);
+
+        return surpriseMeSelected || characterAndChallengeSelected;
     }
 
 

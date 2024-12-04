@@ -145,6 +145,13 @@
       "Complete Act 3."
     ]
   },
+  "CuratedChallenges:Berserker": {
+    "TEXT": [
+      "Berserker",
+      "Whenever Vulnerable is applied, gain 1 #yStrength.",
+      "Complete Act 3."
+    ]
+  },
   "CuratedChallenges:MatchmakerText": {
     "TEXT": [
       "Play Match and Keep!"
@@ -198,6 +205,12 @@
   "CuratedChallenges:ConfigMenu": {
     "TEXT": [
       "Enable Ascension Level 20 by default in the Curated Challenges screen"
+    ]
+  },
+  "CuratedChallenges:SurpriseMeButton": {
+    "TEXT": [
+      "Surprise Me!",
+      "A random challenge will be selected for you to play. NL NL Prioritizes challenges that have not been completed. Otherwise, selection is truly random. NL NL (Note: hovering over the trophy icon in-game displays current challenge info)"
     ]
   }
 }

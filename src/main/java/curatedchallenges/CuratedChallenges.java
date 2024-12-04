@@ -608,6 +608,7 @@ public class CuratedChallenges implements
         ChallengeRegistry.registerChallenge(new Endoparasitic());
         ChallengeRegistry.registerChallenge(new Matchmaker());
         ChallengeRegistry.registerChallenge(new CursedCombo());
+       // ChallengeRegistry.registerChallenge(new Berserker());
         ChallengeRegistry.registerChallenge(new Necronomics());
         ChallengeRegistry.registerChallenge(new CheatDay());
 

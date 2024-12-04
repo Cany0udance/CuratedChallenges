@@ -1,9 +1,12 @@
 package curatedchallenges.screens;
 
+import basemod.BaseMod;
+import com.badlogic.gdx.math.MathUtils;
 import com.megacrit.cardcrawl.helpers.MathHelper;
 import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBarListener;
+import curatedchallenges.buttons.SurpriseMeButton;
 import curatedchallenges.patches.ChallengeModePatches;
 import curatedchallenges.util.ChallengeRegistry;
 import curatedchallenges.CuratedChallenges;
@@ -32,6 +35,7 @@ import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.megacrit.cardcrawl.unlock.UnlockTracker.isAchievementUnlocked;
 import static curatedchallenges.CuratedChallenges.makeID;
 
 public class ChallengesScreen implements ScrollBarListener {
@@ -106,6 +110,26 @@ public class ChallengesScreen implements ScrollBarListener {
         calculateScrollBounds();
     }
 
+    public boolean shouldShowButtons() {
+        // First condition: Surprise Me button is selected
+        boolean surpriseMeSelected = this.characterButtons.stream()
+                .filter(button -> button instanceof SurpriseMeButton)
+                .anyMatch(button -> button.selected);
+
+        // Second condition: Character is selected AND a challenge is selected
+        boolean characterAndChallengeSelected = this.selectedCharacter != null &&
+                this.challenges.stream()
+                        .anyMatch(challenge -> challenge.selected);
+
+        return surpriseMeSelected || characterAndChallengeSelected;
+    }
+
+    public boolean isSurpriseMeSelected() {
+        return this.characterButtons.stream()
+                .filter(button -> button instanceof SurpriseMeButton)
+                .anyMatch(button -> button.selected);
+    }
+
     private void calculateScrollBounds() {
         this.scrollUpperBound = 300.0F * Settings.scale;
         this.scrollLowerBound = 0.0F;
@@ -119,15 +143,19 @@ public class ChallengesScreen implements ScrollBarListener {
                 .filter(character -> charactersWithChallenges.contains(character.chosenClass))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        float dynamicSpacing = calculateDynamicSpacing(validCharacters.size());
-        float startX = CHARACTER_ICON_X - ((validCharacters.size() - 1) * dynamicSpacing / 2f);
+        float dynamicSpacing = calculateDynamicSpacing(validCharacters.size() + 1); // +1 for surprise button
+        float startX = CHARACTER_ICON_X - ((validCharacters.size()) * dynamicSpacing / 2f);
 
         for (int i = 0; i < validCharacters.size(); i++) {
             AbstractPlayer character = validCharacters.get(i);
-            CustomModeCharacterButton button = new CustomModeCharacterButton(character, UnlockTracker.isCharacterLocked(character.chosenClass.toString()));
+            CustomModeCharacterButton button = new CustomModeCharacterButton(character,
+                    UnlockTracker.isCharacterLocked(character.chosenClass.toString()));
             button.move(startX + (i * dynamicSpacing), CHARACTER_ICON_Y);
             this.characterButtons.add(button);
         }
+
+        // Add surprise me button at the end
+        addSurpriseMeButton(startX, dynamicSpacing, validCharacters.size());
     }
 
     private float calculateDynamicSpacing(int characterCount) {
@@ -222,10 +250,10 @@ public class ChallengesScreen implements ScrollBarListener {
     public void update() {
         this.isControllerMode = Settings.isControllerMode;
         this.updateControllerInput();
-
         if (!this.isControllerMode) {
             this.updateScrolling();
         }
+
         this.cancelButton.update();
         if (this.cancelButton.hb.clicked || InputHelper.pressedEscape) {
             InputHelper.pressedEscape = false;
@@ -251,17 +279,27 @@ public class ChallengesScreen implements ScrollBarListener {
                 if (!button.selected) {
                     deselectOtherOptions(button);
                     button.selected = true;
-                    AbstractPlayer.PlayerClass newSelectedCharacter = button.c.chosenClass;
-                    if (newSelectedCharacter != this.selectedCharacter) {
-                        deselectAllChallenges();
-                        this.selectedCharacter = newSelectedCharacter;
-                    }
                     CardCrawlGame.sound.playA("UI_CLICK_1", -0.4F);
+                    if (button instanceof SurpriseMeButton) {
+                        this.selectedCharacter = null;
+                        deselectAllChallenges();
+                    } else {
+                        AbstractPlayer.PlayerClass newSelectedCharacter = button.c.chosenClass;
+                        if (newSelectedCharacter != this.selectedCharacter) {
+                            deselectAllChallenges();
+                            this.selectedCharacter = newSelectedCharacter;
+                        }
+                    }
                 }
             }
         }
 
-        if (selectedChallenge != null) {
+        boolean isSurpriseMeActive = this.characterButtons.stream()
+                .filter(button -> button instanceof SurpriseMeButton)
+                .anyMatch(button -> button.selected);
+
+        // Update A20 button and fire effects for both regular challenges and Surprise Me
+        if (selectedChallenge != null || isSurpriseMeActive) {
             this.ascension20Button.update();
             if (this.ascension20Button.enabled) {
                 this.updateFireEffects();
@@ -273,14 +311,54 @@ public class ChallengesScreen implements ScrollBarListener {
             this.fireEffects.clear();
         }
 
-
         updateScrolling();
         this.scrollBar.update();
-
         updateCharacterButtons();
         updateChallenges();
         updateRelics();
         this.updateEmbarkButton();
+    }
+
+    private void addSurpriseMeButton(float startX, float dynamicSpacing, int index) {
+        SurpriseMeButton surpriseButton = new SurpriseMeButton();
+        surpriseButton.move(startX + (index * dynamicSpacing), CHARACTER_ICON_Y);
+        this.characterButtons.add(surpriseButton);
+    }
+
+    private Challenge selectRandomChallenge() {
+        List<Challenge> availableChallenges = new ArrayList<>(challenges);
+
+        // First priority: Challenges that haven't been completed
+        List<Challenge> uncompletedChallenges = new ArrayList<>();
+        for (Challenge c : availableChallenges) {
+            String achievementKey = CuratedChallenges.makeID(c.id);
+            if (!UnlockTracker.isAchievementUnlocked(achievementKey)) {
+                uncompletedChallenges.add(c);
+            }
+        }
+
+        if (!uncompletedChallenges.isEmpty()) {
+            int randomIndex = MathUtils.random(uncompletedChallenges.size() - 1);
+            return uncompletedChallenges.get(randomIndex);
+        }
+
+        // Second priority: Challenges not completed on A20
+        List<Challenge> nonA20Challenges = new ArrayList<>();
+        for (Challenge c : availableChallenges) {
+            String a20AchievementKey = CuratedChallenges.makeID(c.id + "_A20");
+            if (!UnlockTracker.isAchievementUnlocked(a20AchievementKey)) {
+                nonA20Challenges.add(c);
+            }
+        }
+
+        if (!nonA20Challenges.isEmpty()) {
+            int randomIndex = MathUtils.random(nonA20Challenges.size() - 1);
+            return nonA20Challenges.get(randomIndex);
+        }
+
+        // Finally: Completely random selection
+        int randomIndex = MathUtils.random(availableChallenges.size() - 1);
+        return availableChallenges.get(randomIndex);
     }
 
     private void updateControllerInput() {
@@ -477,7 +555,6 @@ public class ChallengesScreen implements ScrollBarListener {
 
     private void updateEmbarkButton() {
         this.embarkButton.update();
-
         if (this.embarkButton.hb.clicked || CInputActionSet.proceed.isJustPressed()) {
             this.embarkButton.hb.clicked = false;
             this.startRun();
@@ -486,9 +563,18 @@ public class ChallengesScreen implements ScrollBarListener {
 
     private void startRun() {
         Challenge selectedChallenge = getSelectedChallenge();
+        boolean isSurpriseMeActive = this.characterButtons.stream()
+                .filter(button -> button instanceof SurpriseMeButton)
+                .anyMatch(button -> button.selected);
+
+        if (selectedChallenge == null && isSurpriseMeActive) {
+            selectedChallenge = selectRandomChallenge();
+        }
+
         if (selectedChallenge == null) {
             return;
         }
+
         if (this.ascension20Button.enabled) {
             AbstractDungeon.isAscensionMode = true;
             AbstractDungeon.ascensionLevel = 20;
@@ -497,7 +583,6 @@ public class ChallengesScreen implements ScrollBarListener {
             AbstractDungeon.ascensionLevel = 0;
         }
 
-        // Get the PlayerClass directly from the challenge definition
         AbstractPlayer.PlayerClass playerClass = selectedChallenge.getCharacterClass();
         CardCrawlGame.chosenCharacter = playerClass;
 
@@ -506,6 +591,7 @@ public class ChallengesScreen implements ScrollBarListener {
         Settings.isTrial = true;
         Settings.isDailyRun = false;
         Settings.isEndless = false;
+
         if (this.currentSeed.isEmpty()) {
             long sourceTime = System.nanoTime();
             com.megacrit.cardcrawl.random.Random rng = new com.megacrit.cardcrawl.random.Random(sourceTime);
@@ -513,6 +599,7 @@ public class ChallengesScreen implements ScrollBarListener {
         } else {
             Settings.seed = Long.parseLong(this.currentSeed);
         }
+
         AbstractDungeon.generateSeeds();
         CustomTrial trial = new CustomTrial();
         CardCrawlGame.trial = trial;

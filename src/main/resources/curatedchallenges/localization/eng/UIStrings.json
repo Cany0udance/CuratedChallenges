@@ -152,6 +152,13 @@
       "Complete Act 3."
     ]
   },
+  "CuratedChallenges:Breacher": {
+    "TEXT": [
+      "Breacher",
+      "Before the start of combat, a random enemy gains #yMalleable and a #b25% max HP boost.",
+      "Complete Act 3."
+    ]
+  },
   "CuratedChallenges:MatchmakerText": {
     "TEXT": [
       "Play Match and Keep!"
@@ -210,7 +217,7 @@
   "CuratedChallenges:SurpriseMeButton": {
     "TEXT": [
       "Surprise Me!",
-      "A random challenge will be selected for you to play. NL NL Prioritizes challenges that have not been completed. Otherwise, selection is truly random. NL NL (Note: hovering over the trophy icon in-game displays current challenge info)"
+      "A random challenge will be selected for you to play. NL NL Prioritizes challenges that have not been completed. Otherwise, selection is truly random. NL NL #y(Note: #yhovering #yover #ythe #ytrophy #yicon #yin-game #ydisplays #ycurrent #ychallenge #yinfo)"
     ]
   }
 }

@@ -631,6 +631,7 @@ public class CuratedChallenges implements
         // Watcher Challenges
 
         ChallengeRegistry.registerChallenge(new Zenith());
+      //  ChallengeRegistry.registerChallenge(new Breacher());
         ChallengeRegistry.registerChallenge(new EmotionalSupportFlower());
         ChallengeRegistry.registerChallenge(new FastTrack());
         ChallengeRegistry.registerChallenge(new Duet());

@@ -488,6 +488,7 @@ public class ChallengesScreenRenderer {
         addKeywordTip(StrengthPower.NAME, StrengthPower.POWER_ID);
         addKeywordTip(EnvenomPower.NAME, EnvenomPower.POWER_ID);
         addKeywordTip(SadisticPower.NAME, SadisticPower.POWER_ID);
+        addKeywordTip(MalleablePower.NAME, MalleablePower.POWER_ID);
         addKeywordTip(getPowerName(EntanglePower.class), EntanglePower.POWER_ID);
         // Add more keywords as needed
     }
@@ -517,6 +518,7 @@ public class ChallengesScreenRenderer {
         powerDelimiters.put(StrengthPower.POWER_ID, "3");
         powerDelimiters.put(EnvenomPower.POWER_ID, "1");
         powerDelimiters.put(SadisticPower.POWER_ID, "3");
+        powerDelimiters.put(MalleablePower.POWER_ID, "3");
         //  powerDelimiters.put(CombustPower.POWER_ID, "1|5"); // Use '|' to separate multiple delimiters
         // Add more custom delimiters as needed
     }

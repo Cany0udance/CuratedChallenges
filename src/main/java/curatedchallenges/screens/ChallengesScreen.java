@@ -131,7 +131,27 @@ public class ChallengesScreen implements ScrollBarListener {
     }
 
     private void calculateScrollBounds() {
-        this.scrollUpperBound = 300.0F * Settings.scale;
+        // Find the character with most challenges
+        int maxChallenges = 0;
+        if (this.selectedCharacter != null) {
+            long challengeCount = this.challenges.stream()
+                    .filter(c -> c.characterClass == this.selectedCharacter)
+                    .count();
+            maxChallenges = (int) challengeCount;
+        } else {
+            // Group challenges by character and find max
+            maxChallenges = this.challenges.stream()
+                    .collect(Collectors.groupingBy(c -> c.characterClass))
+                    .values()
+                    .stream()
+                    .mapToInt(List::size)
+                    .max()
+                    .orElse(0);
+        }
+
+        // Calculate bound with minimum of 300.0F
+        float calculatedBound = maxChallenges * 60.0F * Settings.scale;
+        this.scrollUpperBound = Math.max(300.0F * Settings.scale, calculatedBound);
         this.scrollLowerBound = 0.0F;
     }
 

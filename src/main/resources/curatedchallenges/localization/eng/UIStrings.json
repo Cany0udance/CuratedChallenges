@@ -159,6 +159,41 @@
       "Complete Act 3."
     ]
   },
+  "CuratedChallenges:VacantRevenge": {
+    "TEXT": [
+      "Revenge",
+      "Whenever an enemy dies, all other enemies gain #b2 #yStrength.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:VacantGravedigger": {
+    "TEXT": [
+      "Gravedigger",
+      "Start with half max HP. NL When Lizard Tail is used up, obtain a #yTombstone.",
+      "Complete Act 4."
+    ]
+  },
+  "CuratedChallenges:VacantEmptiness": {
+    "TEXT": [
+      "Emptiness",
+      "Before the start of combat, lose #b3 #yStrength, lose #b3 #yDexterity, and gain #b5 #yVoid.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:VacantVigorMortis": {
+    "TEXT": [
+      "Vigor Mortis",
+      "Whenever an enemy dies, remove all your buffs and gain #b3 #yAntifact.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:VacantBlastMining": {
+    "TEXT": [
+      "Blast Mining",
+      "Whenever The Bomb goes off, #yMine #b3 random #yGems with random sizes. NL #yRare cards in card rewards have a #b50% chance of being replaced by The Bomb.",
+      "Complete Act 4."
+    ]
+  },
   "CuratedChallenges:MatchmakerText": {
     "TEXT": [
       "Play Match and Keep!"

@@ -4,6 +4,7 @@ import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 
@@ -63,6 +64,10 @@ public interface ChallengeDefinition {
 
     // New method for start of act effects
     default void applyStartOfActEffect(AbstractPlayer p, int actNumber) {
+        // Default implementation does nothing
+    }
+
+    default void onMonsterDeath(AbstractPlayer p, AbstractMonster m) {
         // Default implementation does nothing
     }
 

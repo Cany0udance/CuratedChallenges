@@ -46,7 +46,7 @@ public class ChallengesScreen implements ScrollBarListener {
     private static final float BASE_CHARACTER_BUTTON_SPACING = 150f * Settings.scale;
     private static final float SPACING_REDUCTION_PER_EXTRA_CHARACTER = 15f * Settings.scale;
     private static final int MAX_CHARACTERS_BEFORE_SQUISH = 8;
-    private static final float CHALLENGE_LIST_Y_OFFSET = 20f * Settings.scale;
+    public static final float CHALLENGE_LIST_Y_OFFSET = 20f * Settings.scale;
     public static Challenge currentChallenge = null;
     public CustomToggleButton ascension20Button;
     public ArrayList<MenuFireEffect> fireEffects;
@@ -110,20 +110,6 @@ public class ChallengesScreen implements ScrollBarListener {
         calculateScrollBounds();
     }
 
-    public boolean shouldShowButtons() {
-        // First condition: Surprise Me button is selected
-        boolean surpriseMeSelected = this.characterButtons.stream()
-                .filter(button -> button instanceof SurpriseMeButton)
-                .anyMatch(button -> button.selected);
-
-        // Second condition: Character is selected AND a challenge is selected
-        boolean characterAndChallengeSelected = this.selectedCharacter != null &&
-                this.challenges.stream()
-                        .anyMatch(challenge -> challenge.selected);
-
-        return surpriseMeSelected || characterAndChallengeSelected;
-    }
-
     public boolean isSurpriseMeSelected() {
         return this.characterButtons.stream()
                 .filter(button -> button instanceof SurpriseMeButton)
@@ -131,27 +117,27 @@ public class ChallengesScreen implements ScrollBarListener {
     }
 
     private void calculateScrollBounds() {
-        // Find the character with most challenges
-        int maxChallenges = 0;
         if (this.selectedCharacter != null) {
+            // Calculate bounds just for the selected character
             long challengeCount = this.challenges.stream()
                     .filter(c -> c.characterClass == this.selectedCharacter)
                     .count();
-            maxChallenges = (int) challengeCount;
+            float calculatedBound = challengeCount * 91.0F * Settings.scale;
+            this.scrollUpperBound = Math.max(300.0F * Settings.scale, calculatedBound);
+
         } else {
-            // Group challenges by character and find max
-            maxChallenges = this.challenges.stream()
+            // For "Surprise Me" or no selection, use the character with most challenges
+            int maxChallenges = this.challenges.stream()
                     .collect(Collectors.groupingBy(c -> c.characterClass))
                     .values()
                     .stream()
                     .mapToInt(List::size)
                     .max()
                     .orElse(0);
+            float calculatedBound = maxChallenges * 91.0F * Settings.scale;
+            this.scrollUpperBound = Math.max(300.0F * Settings.scale, calculatedBound);
         }
 
-        // Calculate bound with minimum of 300.0F
-        float calculatedBound = maxChallenges * 60.0F * Settings.scale;
-        this.scrollUpperBound = Math.max(300.0F * Settings.scale, calculatedBound);
         this.scrollLowerBound = 0.0F;
     }
 
@@ -310,6 +296,7 @@ public class ChallengesScreen implements ScrollBarListener {
                             this.selectedCharacter = newSelectedCharacter;
                         }
                     }
+                    calculateScrollBounds();  // Add this line
                 }
             }
         }
@@ -463,7 +450,8 @@ public class ChallengesScreen implements ScrollBarListener {
         updateCurrentCharacterChallenges();
         currentChallengeIndex = 0;
         updateHoveredChallenge();
-        CardCrawlGame.sound.play("UI_CLICK_1");  // Play a sound for selection feedback
+        calculateScrollBounds();
+        CardCrawlGame.sound.play("UI_CLICK_1");
     }
 
     private void updateCurrentCharacterChallenges() {
@@ -721,6 +709,7 @@ public class ChallengesScreen implements ScrollBarListener {
         return null;
     }
 
+    // In ChallengesScreen's render method
     public void render(SpriteBatch sb) {
         this.renderer.render(sb, this, this.scrollY);
     }

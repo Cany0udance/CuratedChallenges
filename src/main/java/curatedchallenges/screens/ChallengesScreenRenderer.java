@@ -2,6 +2,7 @@ package curatedchallenges.screens;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.purple.Fasting;
 import com.megacrit.cardcrawl.cards.red.Combust;
@@ -27,6 +28,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static curatedchallenges.CuratedChallenges.makeID;
+import static curatedchallenges.screens.ChallengesScreen.CHALLENGE_LIST_Y_OFFSET;
 
 public class ChallengesScreenRenderer {
     private static final float DESCRIPTION_X = Settings.WIDTH * 0.6f;
@@ -58,12 +60,20 @@ public class ChallengesScreenRenderer {
     private static final String DELIMITER_SEPARATOR = "\\|"; // Use this to separate multiple delimiters
     private static final String[] HEADERS = {uiStrings.TEXT[2], uiStrings.TEXT[3], uiStrings.TEXT[4], uiStrings.TEXT[5]};
 
-
+    // In ChallengesScreenRenderer class
     public void render(SpriteBatch sb, ChallengesScreen screen, float scrollY) {
         cardToPreview = null;
         tipToRender = null;
         screen.cancelButton.render(sb);
         renderCharacterButtons(sb, screen, scrollY);
+
+        // Calculate challenge count here
+        int currentChallengeCount = 0;
+        if (screen.selectedCharacter != null) {
+            currentChallengeCount = (int) screen.challenges.stream()
+                    .filter(c -> c.characterClass == screen.selectedCharacter)
+                    .count();
+        }
 
         // Show challenges if a character is selected (not for Surprise Me)
         if (screen.selectedCharacter != null && !screen.isSurpriseMeSelected()) {
@@ -86,9 +96,10 @@ public class ChallengesScreenRenderer {
 
         Challenge selectedChallenge = screen.getSelectedChallenge();
         if (selectedChallenge != null) {
-            renderChallengeDescription(sb, selectedChallenge, scrollY);
+            renderChallengeDescription(sb, selectedChallenge, scrollY, currentChallengeCount);
             renderRelicTooltips(sb, selectedChallenge);
         }
+
         if (cardToPreview != null) {
             renderCardPreview(sb);
         }
@@ -144,27 +155,43 @@ public class ChallengesScreenRenderer {
                 });
     }
 
+    private void renderChallengeDescription(SpriteBatch sb, Challenge challenge, float scrollY, int challengeCount) {
+        // Define max Y position (90% of screen height)
+        float maxY = Settings.HEIGHT * 0.9f;
 
-    private void renderChallengeDescription(SpriteBatch sb, Challenge challenge, float scrollY) {
-        float currentY = DESCRIPTION_START_Y;
+        float currentY;
 
+        if (challengeCount >= 7) {
+            // For characters with many challenges:
+            // Use DESCRIPTION_START_Y + scrollY, but cap it at maxY
+            currentY = Math.min(DESCRIPTION_START_Y + scrollY, maxY);
+        } else {
+            // For characters with few challenges, use original behavior
+            currentY = DESCRIPTION_START_Y + scrollY;
+        }
 
+        // Render with determined Y position
         for (int i = 0; i < HEADERS.length; i++) {
             String header = HEADERS[i];
-            FontHelper.renderFontLeftTopAligned(sb, FontHelper.panelNameFont, header, DESCRIPTION_X, currentY + scrollY, Settings.GOLD_COLOR);
+            FontHelper.renderFontLeftTopAligned(
+                    sb,
+                    FontHelper.panelNameFont,
+                    header,
+                    DESCRIPTION_X,
+                    currentY,
+                    Settings.GOLD_COLOR
+            );
             currentY -= FontHelper.getHeight(FontHelper.panelNameFont) + LINE_SPACING;
 
-
             if (header.equals(uiStrings.TEXT[3])) {
-                currentY = renderRelics(sb, challenge, currentY, scrollY);
+                currentY = renderRelics(sb, challenge, currentY, 0);
             } else if (header.equals(uiStrings.TEXT[2])) {
-                currentY = renderTinyCards(sb, challenge, currentY, scrollY);
+                currentY = renderTinyCards(sb, challenge, currentY, 0);
             } else {
                 String description = getDescriptionForHeader(challenge, header);
                 boolean useReducedSpacing = header.equals(uiStrings.TEXT[4]) || header.equals(uiStrings.TEXT[5]);
-                currentY = renderWrappedText(sb, description, currentY, useReducedSpacing, scrollY);
+                currentY = renderWrappedText(sb, description, currentY, useReducedSpacing, 0);
             }
-
 
             if (i < HEADERS.length - 1) {
                 currentY -= SECTION_SPACING;
@@ -172,6 +199,31 @@ public class ChallengesScreenRenderer {
         }
     }
 
+    private float calculateEasedProgress(float progress) {
+        // Clamp progress to 0-1 range
+        progress = MathUtils.clamp(progress, 0f, 1f);
+
+        // You can adjust these values to change how gradually the transition happens
+        float easeFactor = 2.0f; // Higher values make the transition more gradual
+
+        // Using a simple power function for easing
+        // You can experiment with different easing functions:
+
+        // Linear (no easing):
+         return progress;
+
+        // Quadratic (moderate easing):
+        // return progress * progress;
+
+        // Cubic (more pronounced easing):
+        // return progress * progress * progress;
+
+        // Custom power easing (adjustable with easeFactor):
+        //return (float) Math.pow(progress, easeFactor);
+
+        // Smooth step (smooth acceleration and deceleration):
+        // return progress * progress * (3 - 2 * progress);
+    }
 
     private float renderRelics(SpriteBatch sb, Challenge challenge, float startY, float scrollY) {
         float relicX = DESCRIPTION_X;

@@ -20,6 +20,7 @@ import curatedchallenges.challenge.Defect.Overclocked;
 import curatedchallenges.challenge.Ironclad.*;
 import curatedchallenges.challenge.Silent.*;
 import curatedchallenges.challenge.Defect.CuriousCreatures;
+import curatedchallenges.challenge.Vacant.*;
 import curatedchallenges.challenge.Watcher.*;
 import curatedchallenges.elements.Challenge;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -106,6 +107,7 @@ public class CuratedChallenges implements
         Texture badgeTexture = TextureLoader.getTexture(imagePath("badge.png"));
         BaseMod.registerModBadge(badgeTexture, info.Name, GeneralUtils.arrToString(info.Authors), info.Description, settingsPanel);
         BaseMod.addSaveField(ChallengeInfo.SAVE_KEY, new ChallengeInfo());
+
         initializeChallenges();
     }
 
@@ -636,6 +638,14 @@ public class CuratedChallenges implements
         ChallengeRegistry.registerChallenge(new FastTrack());
         ChallengeRegistry.registerChallenge(new Duet());
         ChallengeRegistry.registerChallenge(new AmpedEnemies());
+
+        if (ModCharacterHandler.isVacantModLoaded()) {
+            ChallengeRegistry.registerChallenge(new BlastMining());
+            ChallengeRegistry.registerChallenge(new Revenge());
+            ChallengeRegistry.registerChallenge(new Emptiness());
+            ChallengeRegistry.registerChallenge(new Gravedigger());
+            ChallengeRegistry.registerChallenge(new VigorMortis());
+        }
     }
 
     public Challenge getChallengeById(String challengeId) {

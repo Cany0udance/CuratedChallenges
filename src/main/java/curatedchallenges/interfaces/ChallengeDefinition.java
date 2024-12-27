@@ -11,6 +11,7 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static curatedchallenges.CuratedChallenges.makeID;
 
@@ -23,6 +24,9 @@ public interface ChallengeDefinition {
     String getSpecialRules();
     String getWinConditions();
     List<WinCondition> getWinConditionLogic();
+    default Map<String, String> getPowerDelimiters() {
+        return Collections.emptyMap();
+    }
 
     default ArrayList<AbstractPotion> getStartingPotions() {
         return new ArrayList<>();

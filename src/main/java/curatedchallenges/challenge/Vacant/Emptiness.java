@@ -24,7 +24,9 @@ import theVacant.characters.TheVacant;
 import theVacant.powers.VoidPower;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static curatedchallenges.CuratedChallenges.makeID;
 
@@ -103,6 +105,15 @@ public class Emptiness implements ChallengeDefinition {
         AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(p, p, new StrengthPower(p, -3), -3));
         AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(p, p, new DexterityPower(p, -3), -3));
         AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(p, p, new VoidPower(p, p, 5), 5));
+    }
+
+    @Override
+    public Map<String, String> getPowerDelimiters() {
+        Map<String, String> delimiters = new HashMap<>();
+        delimiters.put(StrengthPower.POWER_ID, "-3"); // Will show "decreases attack damage by 3"
+        delimiters.put(DexterityPower.POWER_ID, "-3"); // Will show "gain 3 less block"
+        delimiters.put(VoidPower.POWER_ID, "5"); // Custom delimiter for void power
+        return delimiters;
     }
 
 }

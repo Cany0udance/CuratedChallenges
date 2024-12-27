@@ -23,6 +23,12 @@ import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 import curatedchallenges.buttons.CustomToggleButton;
 import curatedchallenges.effects.MenuFireEffect;
 import curatedchallenges.elements.Challenge;
+import curatedchallenges.interfaces.ChallengeDefinition;
+import curatedchallenges.util.ChallengeRegistry;
+import curatedchallenges.util.ModCharacterHandler;
+import theVacant.powers.AntifactPower;
+import theVacant.powers.VoidPower;
+import theVacant.relics.TombstoneRelic;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -48,6 +54,8 @@ public class ChallengesScreenRenderer {
     private PowerTip tipToRender;
     private float tipX;
     private float tipY;
+    private Challenge currentChallenge;
+    private Map<String, PowerTip> currentChallengeTips;
     private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("ChallengeScreen"));
     private static final Map<String, PowerTip> keywordTips = new HashMap<>();
     private static final Map<String, PowerTip> relicTips = new HashMap<>();
@@ -160,6 +168,11 @@ public class ChallengesScreenRenderer {
         float maxY = Settings.HEIGHT * 0.9f;
 
         float currentY;
+
+        if (currentChallenge != challenge) {
+            currentChallenge = challenge;
+            updateCurrentChallengeTips(challenge);
+        }
 
         if (challengeCount >= 7) {
             // For characters with many challenges:
@@ -440,10 +453,11 @@ public class ChallengesScreenRenderer {
     }
 
     private void setupTooltipOrPreview(String name, float x, float y) {
-        PowerTip tip = keywordTips.get(name);
+        PowerTip tip = currentChallengeTips.get(name);
         if (tip != null) {
             setupKeywordTooltip(tip, x, y);
         } else {
+            // Rest of the existing tooltip checks (relics, potions, cards)
             tip = relicTips.get(name);
             if (tip != null) {
                 setupKeywordTooltip(tip, x, y);
@@ -460,6 +474,60 @@ public class ChallengesScreenRenderer {
             }
         }
     }
+
+    private void updateCurrentChallengeTips(Challenge challenge) {
+        if (challenge == null) {
+            currentChallengeTips = keywordTips;
+            return;
+        }
+
+        currentChallengeTips = new HashMap<>(keywordTips);
+
+        ChallengeDefinition definition = ChallengeRegistry.getChallenge(challenge.id);
+        if (definition == null) {
+            return;
+        }
+
+        Map<String, String> challengeDelimiters = definition.getPowerDelimiters();
+
+        for (Map.Entry<String, String> entry : challengeDelimiters.entrySet()) {
+            String powerId = entry.getKey();
+            PowerDelimiterInfo delimiterInfo = PowerDelimiterInfo.fromString(entry.getValue());
+
+            PowerStrings powerStrings = CardCrawlGame.languagePack.getPowerStrings(powerId);
+            String description;
+
+            if (shouldUseDualDescriptions(powerId)) {
+                description = joinDualDescriptions(powerStrings.DESCRIPTIONS, delimiterInfo);
+            } else {
+                description = joinDescriptions(powerStrings.DESCRIPTIONS, delimiterInfo.value);
+            }
+
+            currentChallengeTips.put(powerStrings.NAME.toLowerCase().replaceAll("[^a-z0-9 ]", ""),
+                    new PowerTip(powerStrings.NAME, description));
+        }
+    }
+
+
+    private boolean shouldUseDualDescriptions(String powerId) {
+        // Add any powers that have different descriptions for positive/negative values
+        return powerId.equals(StrengthPower.POWER_ID) ||
+                powerId.equals(DexterityPower.POWER_ID) ||
+                powerId.equals(FocusPower.POWER_ID);
+    }
+
+    private String joinDualDescriptions(String[] descriptions, PowerDelimiterInfo delimiterInfo) {
+        // For powers with different positive/negative descriptions
+        // descriptions[0] is typically the positive effect
+        // descriptions[1] is typically the negative effect
+        // descriptions[2] is typically the period or additional text
+        if (delimiterInfo.isNegative) {
+            return descriptions[1] + delimiterInfo.value + descriptions[2];
+        } else {
+            return descriptions[0] + delimiterInfo.value + descriptions[2];
+        }
+    }
+
 
     private void setupCardPreview(AbstractCard card, float x, float y) {
         cardToPreview = card;
@@ -538,11 +606,17 @@ public class ChallengesScreenRenderer {
         // Add keywords and their corresponding PowerTips here
         addKeywordTip(CuriosityPower.NAME, CuriosityPower.POWER_ID);
         addKeywordTip(StrengthPower.NAME, StrengthPower.POWER_ID);
+        addKeywordTip(DexterityPower.NAME, DexterityPower.POWER_ID);
         addKeywordTip(EnvenomPower.NAME, EnvenomPower.POWER_ID);
         addKeywordTip(SadisticPower.NAME, SadisticPower.POWER_ID);
         addKeywordTip(MalleablePower.NAME, MalleablePower.POWER_ID);
         addKeywordTip(getPowerName(EntanglePower.class), EntanglePower.POWER_ID);
-        // Add more keywords as needed
+
+        if (ModCharacterHandler.isVacantModLoaded()) {
+            addKeywordTip(VoidPower.NAME, VoidPower.POWER_ID);
+            addKeywordTip(AntifactPower.NAME, AntifactPower.POWER_ID);
+        }
+
     }
 
     private static String getPowerName(Class<? extends AbstractPower> powerClass) {
@@ -568,11 +642,17 @@ public class ChallengesScreenRenderer {
         // Set custom delimiters for powers that need them
         powerDelimiters.put(CuriosityPower.POWER_ID, "1");
         powerDelimiters.put(StrengthPower.POWER_ID, "3");
+        powerDelimiters.put(DexterityPower.POWER_ID, "3");
         powerDelimiters.put(EnvenomPower.POWER_ID, "1");
         powerDelimiters.put(SadisticPower.POWER_ID, "3");
         powerDelimiters.put(MalleablePower.POWER_ID, "3");
         //  powerDelimiters.put(CombustPower.POWER_ID, "1|5"); // Use '|' to separate multiple delimiters
-        // Add more custom delimiters as needed
+
+        if (ModCharacterHandler.isVacantModLoaded()) {
+            powerDelimiters.put(VoidPower.POWER_ID, "5");
+            powerDelimiters.put(AntifactPower.POWER_ID, "3");
+        }
+
     }
 
     private static void initializeCardPreviews() {
@@ -585,6 +665,11 @@ public class ChallengesScreenRenderer {
         addRelicTip(Circlet.ID);
         addRelicTip(Ectoplasm.ID);
         addRelicTip(RunicPyramid.ID);
+
+        if (ModCharacterHandler.isVacantModLoaded()) {
+            addRelicTip(TombstoneRelic.ID);
+        }
+
         // Add more relics as needed
     }
 
@@ -614,23 +699,30 @@ public class ChallengesScreenRenderer {
     private static void addKeywordTip(String keyword, String powerId) {
         PowerStrings powerStrings = CardCrawlGame.languagePack.getPowerStrings(powerId);
         String delimiterString = powerDelimiters.getOrDefault(powerId, "1");
-        String description;
-
-        if (powerId.equals(StrengthPower.POWER_ID)) {
-            description = joinDescriptionsForStrength(powerStrings.DESCRIPTIONS, delimiterString);
-        } else {
-            description = joinDescriptions(powerStrings.DESCRIPTIONS, delimiterString);
-        }
-
+        String description = joinDescriptionsForDefaultTips(powerStrings.DESCRIPTIONS, delimiterString);
         addTipToMap(keywordTips, keyword, new PowerTip(powerStrings.NAME, description));
     }
 
-    private static String joinDescriptionsForStrength(String[] descriptions, String delimiterString) {
-        // For Strength, we want to use the second and third descriptions
-        return descriptions[1] + delimiterString + descriptions[2];
+    private static class PowerDelimiterInfo {
+        public final String value;
+        public final boolean isNegative;
+
+        public PowerDelimiterInfo(String value, boolean isNegative) {
+            this.value = value;
+            this.isNegative = isNegative;
+        }
+
+        public static PowerDelimiterInfo fromString(String value) {
+            if (value.startsWith("-")) {
+                return new PowerDelimiterInfo(value.substring(1), true);
+            }
+            return new PowerDelimiterInfo(value, false);
+        }
     }
 
+
     private static String joinDescriptions(String[] descriptions, String delimiterString) {
+        // Original joining logic for powers without positive/negative distinction
         String[] delimiters = delimiterString.split(DELIMITER_SEPARATOR);
         StringBuilder result = new StringBuilder(descriptions[0]);
         for (int i = 1; i < descriptions.length; i++) {
@@ -639,6 +731,17 @@ public class ChallengesScreenRenderer {
         }
         return result.toString();
     }
+
+    // Static version for use in initialization
+    private static String joinDescriptionsForDefaultTips(String[] descriptions, String delimiterString) {
+        PowerDelimiterInfo delimiterInfo = PowerDelimiterInfo.fromString(delimiterString);
+        if (descriptions.length >= 3) {
+            // Always use the negative version for default tooltips to match original behavior
+            return descriptions[1] + delimiterInfo.value + descriptions[2];
+        }
+        return joinDescriptions(descriptions, delimiterInfo.value);
+    }
+
 
 
     private String getDescriptionForHeader(Challenge challenge, String header) {

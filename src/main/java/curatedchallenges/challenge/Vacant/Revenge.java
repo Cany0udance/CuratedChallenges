@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.powers.DexterityPower;
 import com.megacrit.cardcrawl.powers.StrengthPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import curatedchallenges.interfaces.ChallengeDefinition;
@@ -19,10 +20,13 @@ import theVacant.cards.Attacks.VacantStarterStrike;
 import theVacant.cards.Skills.AwMan;
 import theVacant.cards.Skills.VacantStarterDefend;
 import theVacant.characters.TheVacant;
+import theVacant.powers.VoidPower;
 import theVacant.relics.SilkTouch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static curatedchallenges.CuratedChallenges.makeID;
 
@@ -107,6 +111,13 @@ public class Revenge implements ChallengeDefinition {
                 }
             }
         }
+    }
+
+    @Override
+    public Map<String, String> getPowerDelimiters() {
+        Map<String, String> delimiters = new HashMap<>();
+        delimiters.put(StrengthPower.POWER_ID, "2");
+        return delimiters;
     }
 
 }

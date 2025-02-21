@@ -180,6 +180,27 @@
       "Complete Act 4."
     ]
   },
+  "CuratedChallenges:BiomesAllelopathy": {
+    "TEXT": [
+      "Allelopathy",
+      "Grass is present in each combat. NL At the start of your turn, for each unplucked crop, EVERYONE gains #b1 #yPoison.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:DownfallKnifeToAGunfight": {
+    "TEXT": [
+      "Knife To A Gunfight",
+      "Before the start of combat, lose #b3 #yStrength.",
+      "Complete Act 3."
+    ]
+  },
+  "CuratedChallenges:DownfallGoopLab": {
+    "TEXT": [
+      "Goop Lab",
+      "Before the start of combat, lose #b3 #yStrength. NL At the start of your turn, #ySplit into a random #ySlime. NL Instead of gaining #yStrength when absorbing a #ySlime, gain #ySlimy #yTongue.",
+      "Complete Act 3."
+    ]
+  },
   "CuratedChallenges:MatchmakerText": {
     "TEXT": [
       "玩对对碰！"

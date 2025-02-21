@@ -1,7 +1,12 @@
 package curatedchallenges.challenge.Ironclad;
 
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.cards.colorless.Enlightenment;
+import com.megacrit.cardcrawl.cards.colorless.Finesse;
+import com.megacrit.cardcrawl.cards.colorless.GoodInstincts;
+import com.megacrit.cardcrawl.cards.colorless.PanicButton;
 import com.megacrit.cardcrawl.cards.curses.Parasite;
+import com.megacrit.cardcrawl.cards.green.*;
 import com.megacrit.cardcrawl.cards.red.Bash;
 import com.megacrit.cardcrawl.cards.red.Defend_Red;
 import com.megacrit.cardcrawl.cards.red.Rampage;
@@ -85,6 +90,13 @@ public class Necronomics implements ChallengeDefinition {
     @Override
     public List<String> getRelicsToRemove() {
         return Arrays.asList(SneckoEye.ID);
+    }
+
+    @Override
+    public List<Class<? extends AbstractCard>> getCardsToRemove() {
+        return Arrays.asList(
+                Enlightenment.class
+        );
     }
 
     @Override

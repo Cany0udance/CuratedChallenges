@@ -61,6 +61,9 @@ public interface ChallengeDefinition {
         // Note that this method is applied post-draw
     }
 
+    default void applyEndOfTurnEffect(AbstractPlayer p) {
+    }
+
     // New method for post battle logic
     default void applyPostBattleEffect(AbstractPlayer p) {
         // Default implementation does nothing
@@ -73,6 +76,10 @@ public interface ChallengeDefinition {
 
     default void onMonsterDeath(AbstractPlayer p, AbstractMonster m) {
         // Default implementation does nothing
+    }
+
+    default void applyPostGameEffect(AbstractPlayer p) {
+        // Usually just for cleanup after a challenge ends
     }
 
     default String getTopPanelSummary() {

@@ -31,6 +31,7 @@ import com.megacrit.cardcrawl.screens.runHistory.TinyCard;
 import com.megacrit.cardcrawl.trials.CustomTrial;
 import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
+import curatedchallenges.util.ModCharacterHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -574,15 +575,12 @@ public class ChallengesScreen implements ScrollBarListener {
         boolean isSurpriseMeActive = this.characterButtons.stream()
                 .filter(button -> button instanceof SurpriseMeButton)
                 .anyMatch(button -> button.selected);
-
         if (selectedChallenge == null && isSurpriseMeActive) {
             selectedChallenge = selectRandomChallenge();
         }
-
         if (selectedChallenge == null) {
             return;
         }
-
         if (this.ascension20Button.enabled) {
             AbstractDungeon.isAscensionMode = true;
             AbstractDungeon.ascensionLevel = 20;
@@ -590,16 +588,29 @@ public class ChallengesScreen implements ScrollBarListener {
             AbstractDungeon.isAscensionMode = false;
             AbstractDungeon.ascensionLevel = 0;
         }
-
         AbstractPlayer.PlayerClass playerClass = selectedChallenge.getCharacterClass();
-        CardCrawlGame.chosenCharacter = playerClass;
 
+        // Add Downfall integration
+        if (ModCharacterHandler.isDownfallLoaded()) {
+            try {
+                Class<?> slimeboundEnumClass = Class.forName("slimebound.patches.SlimeboundEnum");
+                Object slimeboundValue = slimeboundEnumClass.getField("SLIMEBOUND").get(null);
+
+                if (playerClass == slimeboundValue) {
+                    Class<?> evilModeClass = Class.forName("downfall.patches.EvilModeCharacterSelect");
+                    evilModeClass.getField("evilMode").set(null, true);
+                }
+            } catch (Exception e) {
+                // Silently handle reflection errors
+            }
+        }
+
+        CardCrawlGame.chosenCharacter = playerClass;
         CardCrawlGame.mainMenuScreen.isFadingOut = true;
         CardCrawlGame.mainMenuScreen.fadeOutMusic();
         Settings.isTrial = true;
         Settings.isDailyRun = false;
         Settings.isEndless = false;
-
         if (this.currentSeed.isEmpty()) {
             long sourceTime = System.nanoTime();
             com.megacrit.cardcrawl.random.Random rng = new com.megacrit.cardcrawl.random.Random(sourceTime);
@@ -607,7 +618,6 @@ public class ChallengesScreen implements ScrollBarListener {
         } else {
             Settings.seed = Long.parseLong(this.currentSeed);
         }
-
         AbstractDungeon.generateSeeds();
         CustomTrial trial = new CustomTrial();
         CardCrawlGame.trial = trial;

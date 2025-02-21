@@ -17,9 +17,11 @@ import curatedchallenges.challenge.Defect.AuxiliaryPower;
 import curatedchallenges.challenge.Defect.FlyingRobot;
 import curatedchallenges.challenge.Defect.Gamblecore;
 import curatedchallenges.challenge.Defect.Overclocked;
+import curatedchallenges.challenge.Hermit.KnifeToAGunfight;
 import curatedchallenges.challenge.Ironclad.*;
 import curatedchallenges.challenge.Silent.*;
 import curatedchallenges.challenge.Defect.CuriousCreatures;
+import curatedchallenges.challenge.SlimeBoss.GoopLab;
 import curatedchallenges.challenge.Vacant.*;
 import curatedchallenges.challenge.Watcher.*;
 import curatedchallenges.elements.Challenge;
@@ -645,6 +647,15 @@ public class CuratedChallenges implements
             ChallengeRegistry.registerChallenge(new Emptiness());
             ChallengeRegistry.registerChallenge(new Gravedigger());
             ChallengeRegistry.registerChallenge(new VigorMortis());
+        }
+
+        if (ModCharacterHandler.isBiomesLoaded()) {
+            ChallengeRegistry.registerChallenge(new Allelopathy());
+        }
+
+        if (ModCharacterHandler.isDownfallLoaded()) {
+            ChallengeRegistry.registerChallenge(new KnifeToAGunfight());
+            ChallengeRegistry.registerChallenge(new GoopLab());
         }
     }
 

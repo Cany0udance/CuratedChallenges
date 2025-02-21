@@ -1,32 +1,31 @@
-package curatedchallenges.challenge.Vacant;
+package curatedchallenges.challenge.Hermit;
 
+import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
-import com.megacrit.cardcrawl.cards.colorless.TheBomb;
+import com.megacrit.cardcrawl.cards.green.BladeDance;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.localization.UIStrings;
+import com.megacrit.cardcrawl.powers.StrengthPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import curatedchallenges.interfaces.ChallengeDefinition;
 import curatedchallenges.interfaces.WinCondition;
 import curatedchallenges.winconditions.CompleteActWinCondition;
-import theVacant.cards.Attacks.SoulBash;
-import theVacant.cards.Attacks.VacantStarterStrike;
-import theVacant.cards.Skills.Corporeate;
-import theVacant.cards.Skills.Polish;
-import theVacant.cards.Skills.VacantStarterDefend;
-import theVacant.characters.TheVacant;
-import theVacant.relics.BrassGoblet;
+import hermit.cards.*;
+import theHexaghost.relics.Sixitude;
+import hermit.characters.hermit;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static curatedchallenges.CuratedChallenges.makeID;
 
-public class BlastMining implements ChallengeDefinition {
-    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("VacantBlastMining"));
+public class KnifeToAGunfight implements ChallengeDefinition {
+    private static final UIStrings uiStrings = CardCrawlGame.languagePack.getUIString(makeID("DownfallKnifeToAGunfight"));
 
-    public static final String ID = "VACANT_BLAST_MINING";
+    public static final String ID = "DOWNFALL_KNIFE_TO_A_GUNFIGHT";
 
     @Override
     public String getId() {
@@ -40,28 +39,30 @@ public class BlastMining implements ChallengeDefinition {
 
     @Override
     public AbstractPlayer.PlayerClass getCharacterClass() {
-        return TheVacant.Enums.THE_VACANT;
+        return hermit.Enums.HERMIT;
     }
 
     @Override
     public ArrayList<AbstractCard> getStartingDeck() {
         ArrayList<AbstractCard> deck = new ArrayList<>();
 
-        for (int i = 0; i < 3; i++) {
-            deck.add(new VacantStarterStrike());
+        for (int i = 0; i < 2; i++) {
+            deck.add(new Strike_Hermit());
         }
 
         for (int i = 0; i < 3; i++) {
-            deck.add(new VacantStarterDefend());
+            deck.add(new Defend_Hermit());
         }
 
-        deck.add(new SoulBash());
+        for (int i = 0; i < 2; i++) {
+            deck.add(new BladeDance());
+        }
 
-        deck.add(new Corporeate());
+        deck.add(new Feint());
 
-        deck.add(new Polish());
+        deck.add(new FromBeyond());
 
-        deck.add(new TheBomb());
+        deck.add(new Covet());
 
         return deck;
     }
@@ -69,7 +70,7 @@ public class BlastMining implements ChallengeDefinition {
     @Override
     public ArrayList<AbstractRelic> getStartingRelics() {
         ArrayList<AbstractRelic> relics = new ArrayList<>();
-        relics.add(RelicLibrary.getRelic(BrassGoblet.ID).makeCopy());
+        relics.add(RelicLibrary.getRelic(Sixitude.ID).makeCopy());
         return relics;
     }
 
@@ -88,6 +89,13 @@ public class BlastMining implements ChallengeDefinition {
         List<WinCondition> conditions = new ArrayList<>();
         conditions.add(new CompleteActWinCondition(4));
         return conditions;
+    }
+
+    @Override
+    public void applyPreCombatLogic(AbstractPlayer p) {
+        // Player loses 3 Strength
+        AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(p, p,
+                new StrengthPower(p, -3), -3));
     }
 
 }

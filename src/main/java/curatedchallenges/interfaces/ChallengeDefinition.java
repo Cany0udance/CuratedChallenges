@@ -83,7 +83,7 @@ public interface ChallengeDefinition {
     }
 
     default boolean requiresBossRelicSelection() {
-        return false; // Default is not required
+        return false;
     }
 
     default String getTopPanelSummary() {
@@ -140,7 +140,7 @@ public interface ChallengeDefinition {
         return Collections.emptyList();
     }
 
-    // New methods for forced boss relics
+    // New methods for forced boss relics, note that it's min 1 max 5
     default List<String> getForcedBossRelicsAct1() {
         return Collections.emptyList();
     }

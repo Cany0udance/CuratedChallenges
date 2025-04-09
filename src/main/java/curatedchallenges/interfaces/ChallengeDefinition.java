@@ -82,6 +82,10 @@ public interface ChallengeDefinition {
         // Usually just for cleanup after a challenge ends
     }
 
+    default boolean requiresBossRelicSelection() {
+        return false; // Default is not required
+    }
+
     default String getTopPanelSummary() {
         StringBuilder summary = new StringBuilder();
         summary.append(CardCrawlGame.languagePack.getUIString(makeID("TopPanel")).TEXT[0]).append(" NL NL ");
@@ -133,6 +137,15 @@ public interface ChallengeDefinition {
     }
 
     default List<Class<? extends AbstractEvent>> getEventsToRemove() {
+        return Collections.emptyList();
+    }
+
+    // New methods for forced boss relics
+    default List<String> getForcedBossRelicsAct1() {
+        return Collections.emptyList();
+    }
+
+    default List<String> getForcedBossRelicsAct2() {
         return Collections.emptyList();
     }
 

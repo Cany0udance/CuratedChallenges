@@ -212,32 +212,6 @@ public class ChallengesScreenRenderer {
         }
     }
 
-    private float calculateEasedProgress(float progress) {
-        // Clamp progress to 0-1 range
-        progress = MathUtils.clamp(progress, 0f, 1f);
-
-        // You can adjust these values to change how gradually the transition happens
-        float easeFactor = 2.0f; // Higher values make the transition more gradual
-
-        // Using a simple power function for easing
-        // You can experiment with different easing functions:
-
-        // Linear (no easing):
-         return progress;
-
-        // Quadratic (moderate easing):
-        // return progress * progress;
-
-        // Cubic (more pronounced easing):
-        // return progress * progress * progress;
-
-        // Custom power easing (adjustable with easeFactor):
-        //return (float) Math.pow(progress, easeFactor);
-
-        // Smooth step (smooth acceleration and deceleration):
-        // return progress * progress * (3 - 2 * progress);
-    }
-
     private float renderRelics(SpriteBatch sb, Challenge challenge, float startY, float scrollY) {
         float relicX = DESCRIPTION_X;
         float relicY = startY;
@@ -420,38 +394,6 @@ public class ChallengesScreenRenderer {
         }
     }
 
-
-    private String findLongestMatch(String[] words, int startIndex) {
-        StringBuilder nameBuilder = new StringBuilder();
-        String longestMatch = null;
-        int longestMatchLength = 0;
-
-        for (int i = 0; i < 5 && startIndex + i < words.length; i++) {
-            if (i > 0) nameBuilder.append(" ");
-            nameBuilder.append(stripColorIndicator(words[startIndex + i]));
-            String potentialMatch = nameBuilder.toString().toLowerCase().replaceAll("[^a-z0-9 ]", "");
-
-            // Check for full match
-            if (keywordTips.containsKey(potentialMatch) || relicTips.containsKey(potentialMatch) ||
-                    potionTips.containsKey(potentialMatch) || cardPreviews.containsKey(potentialMatch)) {
-                if (potentialMatch.length() > longestMatchLength) {
-                    longestMatch = potentialMatch;
-                    longestMatchLength = potentialMatch.length();
-                }
-            }
-
-            // Check for partial match only if we haven't found a longer full match
-            if (longestMatch == null) {
-                String fullName = wordToFullName.get(potentialMatch);
-                if (fullName != null && fullName.length() > longestMatchLength) {
-                    longestMatch = fullName;
-                    longestMatchLength = fullName.length();
-                }
-            }
-        }
-        return longestMatch;
-    }
-
     private void setupTooltipOrPreview(String name, float x, float y) {
         PowerTip tip = currentChallengeTips.get(name);
         if (tip != null) {
@@ -549,12 +491,6 @@ public class ChallengesScreenRenderer {
             cardToPreview.drawScale = 0.7f; // Adjust this value to change the size of the preview
             cardToPreview.render(sb);
         }
-    }
-
-
-
-    private boolean isKeyword(String word) {
-        return keywordTips.containsKey(word);
     }
 
 
